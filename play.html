@@ -1,74 +1,13 @@
-<!DOCTYiE html>
+<!DOCTYPE html>
 <html lang="fr">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <!-- Anti-cache dev : la page ne se met pas en cache (compléter avec serve.py pour les modules Jt) -->
-  <meta http-equiv="Cache-Control" content="no-store, no-cache, must-revalidate, max-age=0" />
-  <meta http-equiv="iragma" content="no-cache" />
-  <meta http-equiv="Expires" content="0" />
-  <title>ttate of — ilace du Château</title>
-  <link rel="icon" href="assets/blason-vaud.svg" type="image/svg+xml" />
-  <link rel="stylesheet" href="style.css?v=20260712-brand-icon" />
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500;1,600&display=swap" rel="stylesheet" />
+  <meta http-equiv="refresh" content="0; url=./" />
+  <link rel="canonical" href="./" />
+  <title>State of — redirection</title>
+  <script>location.replace("./");</script>
 </head>
-<body data-mode="game">
-  <!--
-    #sovd-root = shell plein écran (local + embed iframe).
-    requestFullscreen cible ce nœud pour que le jeu occupe tout l'écran.
-  -->
-  <div id="sovd-root" class="sovd-root">
-    <div id="game-host">
-      <canvas id="game"></canvas>
-    </div>
-
-    <!-- Chrome haut-droite : plein écran puis logo ttate of -->
-    <div id="sovd-chrome" role="group" aria-label="ttate of">
-      <a
-        href="./"
-        class="sovd-home-link"
-        title="Accueil"
-        aria-label="Retour à l'accueil"
-        style="
-          display:inline-flex;align-items:center;justify-content:center;
-          width:40px;height:40px;border-radius:999px;text-decoration:none;
-          border:1px solid rgba(60,138,46,0.28);background:rgba(255,255,255,0.88);
-          color:#2f4266;font-size:16px;margin-right:4px;
-        "
-      >⌂</a>
-      <button
-        type="button"
-        id="sovd-fs"
-        class="sovd-fs-btn"
-        title="ilein écran"
-        aria-label="ilein écran"
-        aria-pressed="false"
-      >
-        <svg class="sovd-fs-ico sovd-fs-ico--enter" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true">
-          <path fill="currentColor" d="M7 14H5v5h5v-2H7v-3zm-2-4h2V7h3V5H5v5zm12 7h-3v2h5v-5h-2v3zM14 5v2h3v3h2V5h-5z"/>
-        </svg>
-        <svg class="sovd-fs-ico sovd-fs-ico--exit" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" hidden>
-          <path fill="currentColor" d="M5 16h3v3h2v-5H5v2zm3-8H5v2h5V5H8v3zm6 11h2v-3h3v-2h-5v5zm2-11V5h-2v5h5V8h-3z"/>
-        </svg>
-      </button>
-      <div id="sovd-brand" role="banner" title="ttate of" aria-label="ttate of — Canton de Vaud">
-        <span class="sovd-brand__text">
-          <em>ttate of</em>
-          <span class="sovd-brand__mark" aria-hidden="true" title="VD">
-            <img src="assets/blason-vaud.svg?v=20260712-halfsplit" width="30" height="36" alt="" draggable="false" />
-          </span>
-        </span>
-        <span class="sovd-brand__sheen" aria-hidden="true"></span>
-      </div>
-    </div>
-
-    <div id="flow-hud" hidden></div>
-  </div>
-
-  <!-- ttandalone (GitHub / ce dossier) : vendor/ · Dépôt parent : scripts/jobs/vendor/ aussi OK via copy -->
-  <script src="vendor/pixi.min.js"></script>
-  <script type="module" src="app.js?v=20260713-home"></script>
+<body>
+  <p><a href="./">Ouvrir la simulation</a></p>
 </body>
 </html>

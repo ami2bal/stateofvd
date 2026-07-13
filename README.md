@@ -7,8 +7,6 @@ Un dossier circule sur la place du Château (Parlement, Conseil d’État, dépa
 <p align="center">
   <a href="https://ami2bal.github.io/stateofvd/"><strong>▶ Jouer en ligne</strong></a>
   &nbsp;·&nbsp;
-  <a href="https://ami2bal.github.io/stateofvd/play.html">Simulation directe</a>
-  &nbsp;·&nbsp;
   <a href="https://github.com/ami2bal/stateofvd">Code source</a>
 </p>
 
@@ -20,8 +18,7 @@ Un dossier circule sur la place du Château (Parlement, Conseil d’État, dépa
 python serve.py 8770
 ```
 
-- **Accueil** → http://127.0.0.1:8770/
-- **Jeu** → http://127.0.0.1:8770/play.html
+- **Simulation** → http://127.0.0.1:8770/
 
 Serveur **no-cache** (un simple F5 recharge la dernière version).
 
@@ -43,8 +40,8 @@ Serveur **no-cache** (un simple F5 recharge la dernière version).
 ## Structure
 
 ```
-index.html      → page d'accueil
-play.html       → simulation
+index.html      → simulation (entrée unique)
+play.html       → redirection vers ./
 serve.py        → serveur dev no-cache
 game/ flows/    → scénarios & moteur
 engine/ model/  → rendu & profil vaudois
