@@ -1,0 +1,21 @@
+{
+  "tile": 16,
+  "width": 608,
+  "height": 384,
+  "grid": {
+    "w": 38,
+    "h": 24
+  },
+  "source": "kenney-mix",
+  "packs": [
+    "Tiny Town (Kenney, CC0) \u2014 terrain & buildings",
+    "RPG Urban Pack (Kenney, CC0) \u2014 sidewalks/roads only",
+    "Tiny Dungeon (Kenney, CC0) \u2014 interiors"
+  ],
+  "credit": "Assets by Kenney (www.kenney.nl) \u2014 CC0. Composition for State of VD.",
+  "layers": {
+    "ground": "ground.png",
+    "roofs": "roofs.png",
+    "interiors": "interiors.png"
+  }
+}

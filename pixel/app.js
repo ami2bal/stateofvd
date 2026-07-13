@@ -283,12 +283,14 @@ async function main() {
   camera.introFly(reduced ? 400 : 1600);
   await new Promise((r) => setTimeout(r, reduced ? 250 : 850));
   if (boot) boot.classList.add("is-done");
-  toast(
-    map.source === "tiled"
-      ? `${tour.list.length} parcours · zoom pour ouvrir les toits`
-      : "Mode procédural (fallback)",
-    3400
-  );
+  const srcMsg =
+    map.source === "kenney-composed"
+      ? `${tour.list.length} parcours · Kenney mix · zoom = intérieurs`
+      : map.source?.includes("tiled")
+        ? `${tour.list.length} parcours · zoom pour ouvrir les toits`
+        : "Mode procédural (fallback)";
+  toast(srcMsg, 3600);
+  if (map.credit) console.info(map.credit);
 
   let last = performance.now();
   let lodT = 0;

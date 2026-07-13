@@ -1,0 +1,7 @@
+State of VD — Kenney asset composition
+
+All pixel tiles: Kenney (www.kenney.nl)
+License: Creative Commons CC0 1.0
+Packs: RPG Urban Pack, Tiny Town, Tiny Dungeon
+
+Map layout & room logic: State of VD (world.json)

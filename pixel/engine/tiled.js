@@ -1,40 +1,52 @@
 /**
- * Chargeur carte Tiled + sprites buildings dual LOD (art pass).
+ * Map loader — Kenney composed layers preferred, Tiled fallback.
  */
 /* global PIXI */
 import { applyNearest } from "./pixel.js";
 
 /**
- * @typedef {{ id:string, label:string, kind:string, sub:string, x:number, y:number, w:number, h:number, cx:number, cy:number }} Hotspot
- */
-
-/**
- * @param {string} mapUrl
+ * @param {string} mapUrl  (kept for API; composed path derived)
  */
 export async function loadTiledMap(mapUrl) {
   applyNearest();
-  const map = await (await fetch(mapUrl)).json();
-  const tile = map.tilewidth || 16;
-  const mapW = (map.width || 38) * tile;
-  const mapH = (map.height || 24) * tile;
-
-  const ts = map.tilesets?.[0];
-  if (!ts) throw new Error("No tileset in map");
   const base = new URL(mapUrl, location.href);
-  const imageUrl = new URL(ts.image, base).href;
-  const firstgid = ts.firstgid || 1;
-  const columns = ts.columns || 16;
 
-  const texture = await PIXI.Assets.load(imageUrl);
-  texture.baseTexture.scaleMode = PIXI.SCALE_MODES.NEAREST;
+  // 1) Prefer Kenney-composed full-map layers
+  try {
+    const composed = await loadComposed(base);
+    if (composed) return composed;
+  } catch (e) {
+    console.warn("[pixel] composed load failed", e);
+  }
+
+  // 2) Classic Tiled fallback
+  return loadClassicTiled(mapUrl);
+}
+
+async function loadComposed(mapBase) {
+  const metaUrl = new URL("../composed/meta.json", mapBase).href;
+  const res = await fetch(metaUrl);
+  if (!res.ok) return null;
+  const meta = await res.json();
+  const layersBase = new URL("../composed/", mapBase);
+
+  const [groundTex, roofTex, intTex] = await Promise.all([
+    PIXI.Assets.load(new URL(meta.layers.ground, layersBase).href),
+    PIXI.Assets.load(new URL(meta.layers.roofs, layersBase).href),
+    PIXI.Assets.load(new URL(meta.layers.interiors, layersBase).href),
+  ]);
+  for (const t of [groundTex, roofTex, intTex]) {
+    t.baseTexture.scaleMode = PIXI.SCALE_MODES.NEAREST;
+  }
+
+  const mapW = meta.width || groundTex.width;
+  const mapH = meta.height || groundTex.height;
 
   const root = new PIXI.Container();
   root.sortableChildren = true;
 
   const groundLayer = new PIXI.Container();
   groundLayer.zIndex = 0;
-  const baseLayer = new PIXI.Container();
-  baseLayer.zIndex = 3;
   const interiorsLayer = new PIXI.Container();
   interiorsLayer.zIndex = 6;
   const roofsLayer = new PIXI.Container();
@@ -47,7 +59,6 @@ export async function loadTiledMap(mapUrl) {
   fxLayer.zIndex = 30;
   root.addChild(
     groundLayer,
-    baseLayer,
     interiorsLayer,
     roofsLayer,
     ambientLayer,
@@ -55,80 +66,64 @@ export async function loadTiledMap(mapUrl) {
     fxLayer
   );
 
-  // Building sprites?
-  let buildingSprites = [];
-  let useBuildingSprites = false;
-  try {
-    const manUrl = new URL("../buildings/manifest.json", base).href;
-    const man = await (await fetch(manUrl)).json();
-    if (man.buildings?.length) {
-      useBuildingSprites = true;
-      const assetsBase = new URL("../", base);
-      for (const b of man.buildings) {
-        const roofUrl = new URL(b.roof, assetsBase).href;
-        const intUrl = new URL(b.interior, assetsBase).href;
-        const [roofTex, intTex] = await Promise.all([
-          PIXI.Assets.load(roofUrl),
-          PIXI.Assets.load(intUrl),
-        ]);
-        roofTex.baseTexture.scaleMode = PIXI.SCALE_MODES.NEAREST;
-        intTex.baseTexture.scaleMode = PIXI.SCALE_MODES.NEAREST;
-        const roofSpr = new PIXI.Sprite(roofTex);
-        roofSpr.position.set(b.x, b.y);
-        roofSpr.roundPixels = true;
-        roofsLayer.addChild(roofSpr);
-        const intSpr = new PIXI.Sprite(intTex);
-        intSpr.position.set(b.x, b.y);
-        intSpr.roundPixels = true;
-        interiorsLayer.addChild(intSpr);
-        buildingSprites.push({ id: b.id, roof: roofSpr, interior: intSpr });
-      }
-    }
-  } catch (e) {
-    console.warn("[pixel] no building sprites", e);
-  }
-
-  const hostFor = {
-    ground: groundLayer,
-    buildings: baseLayer,
-    buildings_base: baseLayer,
-    interiors: interiorsLayer,
-    roofs: roofsLayer,
-  };
-
-  for (const layer of map.layers || []) {
-    if (layer.type !== "tilelayer" || !layer.data) continue;
-    // When we have painted building sprites, skip tile roofs/interiors/base
-    // (sprites replace them) — keep ground only for underlay.
-    if (
-      useBuildingSprites &&
-      (layer.name === "roofs" ||
-        layer.name === "interiors" ||
-        layer.name === "buildings_base" ||
-        layer.name === "buildings")
-    ) {
-      continue;
-    }
-    const host = hostFor[layer.name] || groundLayer;
-    paintTileLayer(host, layer, texture, firstgid, columns, tile);
-  }
+  const g = new PIXI.Sprite(groundTex);
+  g.roundPixels = true;
+  groundLayer.addChild(g);
+  const i = new PIXI.Sprite(intTex);
+  i.roundPixels = true;
+  interiorsLayer.addChild(i);
+  const r = new PIXI.Sprite(roofTex);
+  r.roundPixels = true;
+  roofsLayer.addChild(r);
 
   interiorsLayer.alpha = 0;
   roofsLayer.alpha = 1;
-  baseLayer.alpha = useBuildingSprites ? 0 : 0.35;
 
-  /** @type {Hotspot[]} */
+  const { hotspots, markers } = await loadHotspots(mapBase, hotspotLayer);
+
+  function applyLod(scale, reduced = false) {
+    const t = scale < 1.65 ? 0 : scale > 2.45 ? 1 : (scale - 1.65) / 0.8;
+    if (reduced) {
+      interiorsLayer.alpha = scale >= 2 ? 1 : 0;
+      roofsLayer.alpha = scale >= 2 ? 0.15 : 1;
+      return;
+    }
+    // crossfade: roofs stay slightly visible for silhouette
+    interiorsLayer.alpha = t;
+    roofsLayer.alpha = 1 - t * 0.92;
+  }
+
+  return {
+    root,
+    hotspots,
+    markers,
+    fxLayer,
+    ambientLayer,
+    interiorsLayer,
+    roofsLayer,
+    mapW,
+    mapH,
+    tile: meta.tile || 16,
+    source: "kenney-composed",
+    credit: meta.credit,
+    applyLod,
+  };
+}
+
+async function loadHotspots(mapBase, hotspotLayer) {
   let hotspots = [];
   try {
-    const hsDoc = await (await fetch(new URL("../hotspots.json", base).href)).json();
+    const hsDoc = await (
+      await fetch(new URL("../hotspots.json", mapBase).href)
+    ).json();
     hotspots = hsDoc.hotspots || [];
   } catch {
-    /* ignore */
+    /* empty */
   }
 
   const markers = {};
+  const temp = [];
   for (const hs of hotspots) {
-    // Prefer room-level hits; site-level still ok for overview
     const c = new PIXI.Container();
     c.position.set(hs.cx, hs.cy);
     c.eventMode = "static";
@@ -155,29 +150,77 @@ export async function loadTiledMap(mapUrl) {
     c.addChild(ring);
     c.__ring = ring;
     c.__hs = hs;
-    // rooms above sites for pick priority: later children win in pixi hit
-    // add rooms after sites by sorting
-    hotspotLayer.addChild(c);
+    temp.push(c);
     markers[hs.id] = c;
   }
-  // re-order: rooms on top of sites for hit testing
-  const roomMarkers = hotspotLayer.children.filter((c) => c.__hs?.kind === "room");
-  const otherMarkers = hotspotLayer.children.filter((c) => c.__hs?.kind !== "room");
-  hotspotLayer.removeChildren();
-  for (const c of otherMarkers) hotspotLayer.addChild(c);
-  for (const c of roomMarkers) hotspotLayer.addChild(c);
+  // sites under rooms for hit priority
+  temp
+    .filter((c) => c.__hs?.kind !== "room")
+    .forEach((c) => hotspotLayer.addChild(c));
+  temp
+    .filter((c) => c.__hs?.kind === "room")
+    .forEach((c) => hotspotLayer.addChild(c));
 
-  function applyLod(scale, reduced = false) {
-    const t = scale < 1.7 ? 0 : scale > 2.5 ? 1 : (scale - 1.7) / 0.8;
-    if (reduced) {
-      interiorsLayer.alpha = scale >= 2 ? 1 : 0;
-      roofsLayer.alpha = scale >= 2 ? 0 : 1;
-      return;
+  return { hotspots, markers };
+}
+
+async function loadClassicTiled(mapUrl) {
+  const map = await (await fetch(mapUrl)).json();
+  const tile = map.tilewidth || 16;
+  const mapW = (map.width || 38) * tile;
+  const mapH = (map.height || 24) * tile;
+  const ts = map.tilesets?.[0];
+  if (!ts) throw new Error("No tileset");
+  const base = new URL(mapUrl, location.href);
+  const imageUrl = new URL(ts.image, base).href;
+  const firstgid = ts.firstgid || 1;
+  const columns = ts.columns || 16;
+  const texture = await PIXI.Assets.load(imageUrl);
+  texture.baseTexture.scaleMode = PIXI.SCALE_MODES.NEAREST;
+
+  const root = new PIXI.Container();
+  root.sortableChildren = true;
+  const groundLayer = new PIXI.Container();
+  groundLayer.zIndex = 0;
+  const interiorsLayer = new PIXI.Container();
+  interiorsLayer.zIndex = 6;
+  const roofsLayer = new PIXI.Container();
+  roofsLayer.zIndex = 8;
+  const ambientLayer = new PIXI.Container();
+  ambientLayer.zIndex = 12;
+  const hotspotLayer = new PIXI.Container();
+  hotspotLayer.zIndex = 20;
+  const fxLayer = new PIXI.Container();
+  fxLayer.zIndex = 30;
+  root.addChild(
+    groundLayer,
+    interiorsLayer,
+    roofsLayer,
+    ambientLayer,
+    hotspotLayer,
+    fxLayer
+  );
+
+  const hostFor = {
+    ground: groundLayer,
+    interiors: interiorsLayer,
+    roofs: roofsLayer,
+  };
+  for (const layer of map.layers || []) {
+    if (layer.type === "tilelayer" && layer.data && hostFor[layer.name]) {
+      paintTileLayer(
+        hostFor[layer.name],
+        layer,
+        texture,
+        firstgid,
+        columns,
+        tile
+      );
     }
-    interiorsLayer.alpha = t;
-    roofsLayer.alpha = 1 - t;
   }
-
+  interiorsLayer.alpha = 0;
+  roofsLayer.alpha = 1;
+  const { hotspots, markers } = await loadHotspots(base, hotspotLayer);
   return {
     root,
     hotspots,
@@ -186,13 +229,15 @@ export async function loadTiledMap(mapUrl) {
     ambientLayer,
     interiorsLayer,
     roofsLayer,
-    baseLayer,
-    buildingSprites,
     mapW,
     mapH,
     tile,
-    source: useBuildingSprites ? "tiled+sprites" : "tiled",
-    applyLod,
+    source: "tiled",
+    applyLod(scale, reduced = false) {
+      const t = scale < 1.7 ? 0 : scale > 2.4 ? 1 : (scale - 1.7) / 0.7;
+      interiorsLayer.alpha = reduced ? (scale >= 2 ? 1 : 0) : t;
+      roofsLayer.alpha = reduced ? (scale >= 2 ? 0 : 1) : 1 - t;
+    },
   };
 }
 
@@ -204,13 +249,14 @@ function paintTileLayer(host, layer, texture, firstgid, columns, tile) {
     for (let tx = 0; tx < w; tx++) {
       const raw = data[ty * w + tx] || 0;
       if (!raw) continue;
-      const clean = raw & 0x1fffffff;
-      const local = clean - firstgid;
+      const local = (raw & 0x1fffffff) - firstgid;
       if (local < 0) continue;
       const sx = (local % columns) * tile;
       const sy = Math.floor(local / columns) * tile;
-      const frame = new PIXI.Rectangle(sx, sy, tile, tile);
-      const tr = new PIXI.Texture(texture.baseTexture, frame);
+      const tr = new PIXI.Texture(
+        texture.baseTexture,
+        new PIXI.Rectangle(sx, sy, tile, tile)
+      );
       const spr = new PIXI.Sprite(tr);
       spr.x = tx * tile;
       spr.y = ty * tile;

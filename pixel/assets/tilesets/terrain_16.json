@@ -133,8 +133,5 @@
     "pad_127"
   ],
   "source": "build_from_world.py",
-  "alignedTo": "state-of-vd/data/world.json",
-  "artPass": "agent-v1",
-  "imagewidth": 256,
-  "imageheight": 128
+  "alignedTo": "state-of-vd/data/world.json"
 }
