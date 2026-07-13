@@ -1,0 +1,381 @@
+{
+  "meta": {
+    "image": "dossier_16.png",
+    "size": {
+      "w": 272,
+      "h": 16
+    },
+    "scale": "1"
+  },
+  "frames": {
+    "dossier_s_0": {
+      "frame": {
+        "x": 0,
+        "y": 0,
+        "w": 16,
+        "h": 16
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 16,
+        "h": 16
+      },
+      "sourceSize": {
+        "w": 16,
+        "h": 16
+      }
+    },
+    "dossier_s_1": {
+      "frame": {
+        "x": 16,
+        "y": 0,
+        "w": 16,
+        "h": 16
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 16,
+        "h": 16
+      },
+      "sourceSize": {
+        "w": 16,
+        "h": 16
+      }
+    },
+    "dossier_s_2": {
+      "frame": {
+        "x": 32,
+        "y": 0,
+        "w": 16,
+        "h": 16
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 16,
+        "h": 16
+      },
+      "sourceSize": {
+        "w": 16,
+        "h": 16
+      }
+    },
+    "dossier_s_3": {
+      "frame": {
+        "x": 48,
+        "y": 0,
+        "w": 16,
+        "h": 16
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 16,
+        "h": 16
+      },
+      "sourceSize": {
+        "w": 16,
+        "h": 16
+      }
+    },
+    "dossier_e_0": {
+      "frame": {
+        "x": 64,
+        "y": 0,
+        "w": 16,
+        "h": 16
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 16,
+        "h": 16
+      },
+      "sourceSize": {
+        "w": 16,
+        "h": 16
+      }
+    },
+    "dossier_e_1": {
+      "frame": {
+        "x": 80,
+        "y": 0,
+        "w": 16,
+        "h": 16
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 16,
+        "h": 16
+      },
+      "sourceSize": {
+        "w": 16,
+        "h": 16
+      }
+    },
+    "dossier_e_2": {
+      "frame": {
+        "x": 96,
+        "y": 0,
+        "w": 16,
+        "h": 16
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 16,
+        "h": 16
+      },
+      "sourceSize": {
+        "w": 16,
+        "h": 16
+      }
+    },
+    "dossier_e_3": {
+      "frame": {
+        "x": 112,
+        "y": 0,
+        "w": 16,
+        "h": 16
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 16,
+        "h": 16
+      },
+      "sourceSize": {
+        "w": 16,
+        "h": 16
+      }
+    },
+    "dossier_n_0": {
+      "frame": {
+        "x": 128,
+        "y": 0,
+        "w": 16,
+        "h": 16
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 16,
+        "h": 16
+      },
+      "sourceSize": {
+        "w": 16,
+        "h": 16
+      }
+    },
+    "dossier_n_1": {
+      "frame": {
+        "x": 144,
+        "y": 0,
+        "w": 16,
+        "h": 16
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 16,
+        "h": 16
+      },
+      "sourceSize": {
+        "w": 16,
+        "h": 16
+      }
+    },
+    "dossier_n_2": {
+      "frame": {
+        "x": 160,
+        "y": 0,
+        "w": 16,
+        "h": 16
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 16,
+        "h": 16
+      },
+      "sourceSize": {
+        "w": 16,
+        "h": 16
+      }
+    },
+    "dossier_n_3": {
+      "frame": {
+        "x": 176,
+        "y": 0,
+        "w": 16,
+        "h": 16
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 16,
+        "h": 16
+      },
+      "sourceSize": {
+        "w": 16,
+        "h": 16
+      }
+    },
+    "dossier_o_0": {
+      "frame": {
+        "x": 192,
+        "y": 0,
+        "w": 16,
+        "h": 16
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 16,
+        "h": 16
+      },
+      "sourceSize": {
+        "w": 16,
+        "h": 16
+      }
+    },
+    "dossier_o_1": {
+      "frame": {
+        "x": 208,
+        "y": 0,
+        "w": 16,
+        "h": 16
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 16,
+        "h": 16
+      },
+      "sourceSize": {
+        "w": 16,
+        "h": 16
+      }
+    },
+    "dossier_o_2": {
+      "frame": {
+        "x": 224,
+        "y": 0,
+        "w": 16,
+        "h": 16
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 16,
+        "h": 16
+      },
+      "sourceSize": {
+        "w": 16,
+        "h": 16
+      }
+    },
+    "dossier_o_3": {
+      "frame": {
+        "x": 240,
+        "y": 0,
+        "w": 16,
+        "h": 16
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 16,
+        "h": 16
+      },
+      "sourceSize": {
+        "w": 16,
+        "h": 16
+      }
+    },
+    "dossier_idle": {
+      "frame": {
+        "x": 256,
+        "y": 0,
+        "w": 16,
+        "h": 16
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 16,
+        "h": 16
+      },
+      "sourceSize": {
+        "w": 16,
+        "h": 16
+      }
+    }
+  },
+  "animations": {
+    "walk_s": [
+      "dossier_s_0",
+      "dossier_s_1",
+      "dossier_s_2",
+      "dossier_s_3"
+    ],
+    "walk_e": [
+      "dossier_e_0",
+      "dossier_e_1",
+      "dossier_e_2",
+      "dossier_e_3"
+    ],
+    "walk_n": [
+      "dossier_n_0",
+      "dossier_n_1",
+      "dossier_n_2",
+      "dossier_n_3"
+    ],
+    "walk_o": [
+      "dossier_o_0",
+      "dossier_o_1",
+      "dossier_o_2",
+      "dossier_o_3"
+    ],
+    "idle": [
+      "dossier_idle"
+    ]
+  }
+}

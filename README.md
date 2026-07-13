@@ -52,3 +52,10 @@ vendor/pixi     → runtime
 ## Licence / usage
 
 Prototype pédagogique autour du système parlementaire vaudois.
+
+---
+
+## Pixel edition
+
+→ **https://ami2bal.github.io/stateofvd/pixel/**
+

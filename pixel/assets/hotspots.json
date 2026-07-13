@@ -1,0 +1,149 @@
+{
+  "tile": 16,
+  "hotspots": [
+    {
+      "id": "palais",
+      "label": "Palais de Rumine",
+      "kind": "institution",
+      "sub": "Fronti\u00e8re nord \u00b7 mus\u00e9e / place",
+      "x": 144,
+      "y": 48,
+      "w": 192,
+      "h": 48,
+      "cx": 240.0,
+      "cy": 72.0
+    },
+    {
+      "id": "gc",
+      "label": "Grand Conseil",
+      "kind": "parlement",
+      "sub": "H\u00e9micycle \u00b7 Bureau \u00b7 Commissions",
+      "x": 96,
+      "y": 112,
+      "w": 112,
+      "h": 80,
+      "cx": 152.0,
+      "cy": 152.0
+    },
+    {
+      "id": "ce",
+      "label": "Conseil d'\u00c9tat",
+      "kind": "chateau",
+      "sub": "Ch\u00e2teau Saint-Maire \u00b7 Coll\u00e8ge \u00b7 Chancellerie",
+      "x": 256,
+      "y": 112,
+      "w": 112,
+      "h": 80,
+      "cx": 312.0,
+      "cy": 152.0
+    },
+    {
+      "id": "chancellerie",
+      "label": "Chancellerie",
+      "kind": "service",
+      "sub": "Publication \u00b7 FAO \u00b7 coordination",
+      "x": 192,
+      "y": 192,
+      "w": 80,
+      "h": 32,
+      "cx": 232.0,
+      "cy": 208.0
+    },
+    {
+      "id": "dep-dsas",
+      "label": "DSAS",
+      "kind": "department",
+      "sub": "D\u00e9partement \u00b7 instruction",
+      "x": 48,
+      "y": 288,
+      "w": 48,
+      "h": 16,
+      "cx": 72.0,
+      "cy": 296.0
+    },
+    {
+      "id": "dep-dfa",
+      "label": "DFA",
+      "kind": "department",
+      "sub": "D\u00e9partement \u00b7 instruction",
+      "x": 112,
+      "y": 288,
+      "w": 48,
+      "h": 16,
+      "cx": 136.0,
+      "cy": 296.0
+    },
+    {
+      "id": "dep-dits",
+      "label": "DITS",
+      "kind": "department",
+      "sub": "D\u00e9partement \u00b7 instruction",
+      "x": 176,
+      "y": 288,
+      "w": 48,
+      "h": 16,
+      "cx": 200.0,
+      "cy": 296.0
+    },
+    {
+      "id": "dep-djes",
+      "label": "DJES",
+      "kind": "department",
+      "sub": "D\u00e9partement \u00b7 instruction",
+      "x": 240,
+      "y": 288,
+      "w": 48,
+      "h": 16,
+      "cx": 264.0,
+      "cy": 296.0
+    },
+    {
+      "id": "dep-def",
+      "label": "DEF",
+      "kind": "department",
+      "sub": "D\u00e9partement \u00b7 instruction",
+      "x": 304,
+      "y": 288,
+      "w": 48,
+      "h": 16,
+      "cx": 328.0,
+      "cy": 296.0
+    },
+    {
+      "id": "dep-deiep",
+      "label": "DEIEP",
+      "kind": "department",
+      "sub": "D\u00e9partement \u00b7 instruction",
+      "x": 368,
+      "y": 288,
+      "w": 48,
+      "h": 16,
+      "cx": 392.0,
+      "cy": 296.0
+    },
+    {
+      "id": "cathedrale",
+      "label": "Cath\u00e9drale",
+      "kind": "culture",
+      "sub": "Rep\u00e8re urbain",
+      "x": 32,
+      "y": 128,
+      "w": 48,
+      "h": 80,
+      "cx": 56.0,
+      "cy": 168.0
+    },
+    {
+      "id": "leman",
+      "label": "Lac L\u00e9man",
+      "kind": "nature",
+      "sub": "Fronti\u00e8re sud \u00b7 CGN",
+      "x": 0,
+      "y": 320,
+      "w": 480,
+      "h": 48,
+      "cx": 240.0,
+      "cy": 344.0
+    }
+  ]
+}

@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta http-equiv="Cache-Control" content="no-store, no-cache, must-revalidate, max-age=0" />
+  <title>State of — Place du Château (pixel)</title>
+  <meta name="description" content="Simulation institutionnelle vaudoise — fork pixel art DA cible." />
+  <meta name="theme-color" content="#1a2438" />
+  <link rel="icon" href="assets/blason-vaud.svg" type="image/svg+xml" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500;1,600&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div id="sovd-root" class="sovd-root">
+    <div id="boot" class="boot" aria-live="polite">
+      <div class="boot__inner">
+        <img src="assets/blason-vaud.svg" width="44" height="52" alt="" />
+        <p class="boot__title"><em>State of</em> <span>pixel</span></p>
+        <p class="boot__sub">Place du Château · direction artistique cible</p>
+        <div class="boot__bar"><i></i></div>
+      </div>
+    </div>
+
+    <div id="game-host" class="game-host" aria-label="Carte interactive"></div>
+
+    <!-- Chrome haut-droite -->
+    <div id="sovd-chrome" class="chrome" role="group" aria-label="State of">
+      <button type="button" id="sovd-fs" class="chrome-btn" title="Plein écran" aria-label="Plein écran" aria-pressed="false">
+        <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path fill="currentColor" d="M7 14H5v5h5v-2H7v-3zm-2-4h2V7h3V5H5v5zm12 7h-3v2h5v-5h-2v3zM14 5v2h3v3h2V5h-5z"/></svg>
+      </button>
+      <div class="brand" title="State of — Canton de Vaud">
+        <em>State of</em>
+        <img src="assets/blason-vaud.svg" width="28" height="34" alt="" draggable="false" />
+        <span class="brand__tag">pixel</span>
+      </div>
+    </div>
+
+    <!-- Panneau scénarios -->
+    <aside id="panel" class="panel" aria-label="Scénarios">
+      <header class="panel__head">
+        <h1>Parcours</h1>
+        <p class="panel__hint">Un dossier circule sur la place — lisez, pausez, explorez.</p>
+      </header>
+      <div id="scenario-list" class="scenario-list"></div>
+      <footer class="panel__foot">
+        <div id="transport" class="transport" hidden>
+          <button type="button" id="btn-play" class="t-btn t-btn--primary" title="Lecture">▶</button>
+          <button type="button" id="btn-pause" class="t-btn" title="Pause">❚❚</button>
+          <button type="button" id="btn-stop" class="t-btn" title="Stop">■</button>
+          <div class="transport__meta">
+            <span id="t-step" class="t-step">—</span>
+            <div class="t-rail"><i id="t-fill"></i></div>
+          </div>
+        </div>
+        <p class="panel__legend">N · Jura → S · Léman · molette zoom · glisser pour pan</p>
+      </footer>
+    </aside>
+
+    <!-- Card étape (cinématique) -->
+    <div id="step-card" class="step-card" hidden>
+      <div class="step-card__kicker" id="step-kicker">Étape</div>
+      <h2 id="step-title" class="step-card__title">—</h2>
+      <p id="step-body" class="step-card__body"></p>
+      <div class="step-card__timer" aria-hidden="true"><svg viewBox="0 0 36 36"><circle cx="18" cy="18" r="15" class="ring-bg"/><circle cx="18" cy="18" r="15" class="ring-fg" id="step-ring"/></svg></div>
+    </div>
+
+    <!-- Tooltip hover -->
+    <div id="tip" class="tip" hidden role="tooltip"></div>
+
+    <!-- Fiche pin -->
+    <div id="pin" class="pin" hidden>
+      <button type="button" class="pin__close" id="pin-close" aria-label="Fermer">×</button>
+      <div class="pin__badge" id="pin-badge"></div>
+      <h2 id="pin-title"></h2>
+      <p id="pin-sub"></p>
+    </div>
+
+    <div id="toast" class="toast" hidden></div>
+  </div>
+
+  <script src="vendor/pixi.min.js"></script>
+  <script type="module" src="app.js"></script>
+</body>
+</html>
