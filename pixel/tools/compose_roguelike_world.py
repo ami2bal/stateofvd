@@ -1,11 +1,13 @@
 #!/usr/bin/env python3
-"""Compose world using ONLY Kenney Roguelike RPG Pack — Sample1/2 language.
+"""Compose world — Roguelike RPG Pack only, Sample1 texture discipline (playbook v4).
 
-DA rules (playbook v3):
-  - Structure tiles only for walls/roofs (beige 872/873, brown roof kit).
-  - Furniture is props only (sparse, never flood-fill).
-  - Terrain from sample_map frequencies (grass 62, dirt 408/465, water 60, trees 586/643).
-  - Buildings stamped as modular kits (peak + roof body + walls + door/window).
+Hard rules:
+  1. Trees = 2-high pairs (canopy 586 over trunk 643). Never orphan either.
+  2. Paths = mono tile 408, orthogonal corridors end-to-end (no tetris mix).
+  3. Buildings = roof-dominant; only bottom wall_rows are facade (walls+door+windows).
+  4. Windows only on south facade — never mid-footprint, never on interiors.
+  5. Indoor floors = wood/beige; never cobble/path/outdoor paving for rooms.
+  6. Furniture = sparse interior props only.
 """
 from __future__ import annotations
 
@@ -72,6 +74,218 @@ def as_rgb(v):
     return tuple(int(x) for x in v)
 
 
+# ── path network (orthogonal tunnels) ──────────────────────────────────────
+
+
+def ortho_corridor(x0, y0, x1, y1):
+    """L-shaped path cells from (x0,y0) to (x1,y1): horizontal then vertical."""
+    cells = []
+    x, y = x0, y0
+    # horizontal first
+    step = 1 if x1 >= x else -1
+    while x != x1:
+        cells.append((x, y))
+        x += step
+    cells.append((x, y))
+    step = 1 if y1 >= y else -1
+    while y != y1:
+        y += step
+        cells.append((x, y))
+    return cells
+
+
+def build_path_set(sites, esplanade, W, H):
+    """Directional tunnels between buildings — not a flooded tetris grid."""
+    path = set()
+    # Main E–W avenue in front of departments (row 15)
+    avenue_y = 15
+    for x in range(2, min(36, W - 2)):
+        path.add((x, avenue_y))
+
+    # Esplanade spine (cobble drawn separately; dirt link into avenue)
+    if esplanade:
+        ex0 = esplanade["gx0"]
+        ex1 = esplanade["gx1"]
+        ey0 = esplanade["gy0"]
+        ey1 = esplanade["gy1"]
+        mid_x = (ex0 + ex1) // 2
+        # vertical link esplanade bottom → avenue
+        for y in range(ey1, avenue_y + 1):
+            path.add((mid_x, y))
+            if mid_x + 1 <= ex1:
+                path.add((mid_x + 1, y))
+
+    for s in sites:
+        entry = s.get("entry") or {}
+        ex, ey = entry.get("gx"), entry.get("gy")
+        if ex is None:
+            continue
+        # short approach from entry to avenue (vertical then join)
+        for cell in ortho_corridor(ex, ey, ex, avenue_y):
+            if 0 <= cell[0] < W and 0 <= cell[1] < H:
+                path.add(cell)
+        # one step in front of door (south) if free
+        if ey + 1 < H:
+            path.add((ex, ey + 1))
+
+    # N–S connector under parlement/chateau gap → avenue already via esplanade
+    return path
+
+
+# ── trees (always complete pairs) ───────────────────────────────────────────
+
+
+def place_trees(ground, sheet, roles, free, W, H, rng):
+    """Place full trees only: canopy over trunk. Never orphan."""
+    canopy = first(roles, "tree_canopy")
+    trunk = first(roles, "tree_trunk")
+    canopy_alt = first(roles, "tree_canopy_alt")
+    trunk_alt = first(roles, "tree_trunk_alt")
+
+    def try_tree(tx, ty, autumn=False):
+        if ty + 1 >= H:
+            return False
+        if (tx, ty) not in free or (tx, ty + 1) not in free:
+            return False
+        c, t = (canopy_alt, trunk_alt) if autumn else (canopy, trunk)
+        paste(ground, sheet, c, tx, ty)
+        paste(ground, sheet, t, tx, ty + 1)
+        free.discard((tx, ty))
+        free.discard((tx, ty + 1))
+        return True
+
+    # North forest band (rows 0–1 need height 2 → place canopy at 0, trunk at 1)
+    for tx in range(0, W):
+        if rng.random() < 0.75:
+            try_tree(tx, 0, autumn=rng.random() < 0.12)
+
+    # East woods
+    for ty in range(2, H - 5, 2):
+        for tx in range(W - 3, W):
+            if rng.random() < 0.7:
+                try_tree(tx, ty, autumn=rng.random() < 0.1)
+
+    # West edge
+    for ty in range(2, 12, 2):
+        for tx in range(0, 2):
+            if rng.random() < 0.55:
+                try_tree(tx, ty)
+
+    # No sparse park trees in the campus core — keeps path corridors clean.
+    # Only edge forests (N / E / W) above.
+
+
+# ── buildings ───────────────────────────────────────────────────────────────
+
+
+def stamp_building(roofs, sheet, s, recipe, roles, rng, dept_tint=None):
+    """Sample1 house: roof-dominant mass + short south facade (walls/door/windows)."""
+    gx, gy, fw, fh = s["gx"], s["gy"], s["fw"], s["fh"]
+    wall_rows = int(recipe.get("wall_rows", 2))
+    wall_rows = max(1, min(wall_rows, fh - 1))
+    roof_rows = fh - wall_rows
+    win_every = int(recipe.get("window_every", 3))
+    strength = float(recipe.get("tint_strength", 0.25))
+
+    peak_l = first(roles, "roof_peak_l")
+    peak_r = first(roles, "roof_peak_r")
+    ridge = roles["roof_ridge"]["ids"]
+    roof_fill = roles["roof_fill"]["ids"]
+    eave_l = roles["roof_eave_l"]["ids"]
+    eave_r = roles["roof_eave_r"]["ids"]
+    wall_fill = roles["wall_fill"]["ids"]
+    wall_top = roles["wall_top"]["ids"]
+    door = first(roles, "door")
+    windows = roles["window"]["ids"]
+
+    tw = as_rgb(recipe.get("tint_wall") or dept_tint)
+    tr = as_rgb(recipe.get("tint_roof") or dept_tint)
+
+    entry = s.get("entry") or {}
+    ex, ey = entry.get("gx"), entry.get("gy")
+
+    for ty in range(gy, gy + fh):
+        for tx in range(gx, gx + fw):
+            ly = ty - gy
+            lx = tx - gx
+            is_left = lx == 0
+            is_right = lx == fw - 1
+            is_bottom = ly == fh - 1
+
+            # ── roof (dominates footprint) ──
+            if ly < roof_rows:
+                if roof_rows == 1:
+                    if is_left:
+                        idx = peak_l
+                    elif is_right:
+                        idx = peak_r
+                    else:
+                        idx = pick(rng, roof_fill)
+                else:
+                    # top row = peaks / ridge; lower roof rows = body / eaves
+                    if ly == 0:
+                        if is_left:
+                            idx = peak_l
+                        elif is_right:
+                            idx = peak_r
+                        else:
+                            idx = pick(rng, ridge)
+                    elif ly == roof_rows - 1:
+                        if is_left:
+                            idx = pick(rng, eave_l)
+                        elif is_right:
+                            idx = pick(rng, eave_r)
+                        else:
+                            idx = pick(rng, roof_fill)
+                    else:
+                        idx = pick(rng, roof_fill)
+                paste(roofs, sheet, idx, tx, ty, tr, strength)
+                continue
+
+            # ── facade wall rows only ──
+            # Door: prefer world entry tile if on facade; else south-center
+            if ex is not None and tx == ex and ty == ey:
+                paste(roofs, sheet, door, tx, ty)
+                continue
+            if is_bottom and ex is None and lx == fw // 2:
+                paste(roofs, sheet, door, tx, ty)
+                continue
+            # If entry is on this building but not on bottom row, still door on bottom under entry x
+            if is_bottom and ex is not None and tx == ex:
+                paste(roofs, sheet, door, tx, ty)
+                continue
+
+            # Windows: SOUTH facade only (bottom wall row), not corners, spaced
+            on_south_facade = is_bottom or ly == fh - 2
+            if (
+                on_south_facade
+                and not is_left
+                and not is_right
+                and not (is_bottom and ex is not None and tx == ex)
+                and win_every > 0
+                and (lx % win_every) == (win_every // 2)
+            ):
+                # only one window row: the upper facade row (under roof) looks best
+                if ly == roof_rows:
+                    paste(roofs, sheet, pick(rng, windows), tx, ty, tw, strength * 0.45)
+                    continue
+
+            # Wall tiles
+            if ly == roof_rows:
+                idx = pick(rng, wall_top)
+            else:
+                idx = pick(rng, wall_fill)
+            paste(roofs, sheet, idx, tx, ty, tw if ly == roof_rows else None, strength if ly == roof_rows else 0.0)
+
+    # Soft outline
+    d = ImageDraw.Draw(roofs)
+    base = tw or (100, 88, 70)
+    d.rectangle(
+        [gx * TW, gy * TW, (gx + fw) * TW - 1, (gy + fh) * TW - 1],
+        outline=(base[0], base[1], base[2], 160),
+    )
+
+
 def room_layouts(site):
     gx, gy, fw, fh = site["gx"], site["gy"], site["fw"], site["fh"]
     rooms = site.get("rooms") or []
@@ -122,132 +336,41 @@ def room_layouts(site):
     return out
 
 
-def stamp_building(roofs, sheet, s, recipe, roles, rng, dept_tint=None):
-    """Modular Kenney house: roof peaks + brown body + beige walls + door/window."""
-    gx, gy, fw, fh = s["gx"], s["gy"], s["fw"], s["fh"]
-    rr = int(recipe.get("roof_rows", 2))
-    if s.get("kind") == "department":
-        rr = 1
-    rr = max(1, min(rr, fh - 1))
-
-    wall_ids = roles[recipe["wall"]]["ids"]
-    roof_fill_ids = roles[recipe["roof_fill"]]["ids"]
-    peak_l = first(roles, "roof_peak_l")
-    peak_r = first(roles, "roof_peak_r")
-    eave_l = pick(rng, roles["roof_eave_l"]["ids"])
-    eave_r = pick(rng, roles["roof_eave_r"]["ids"])
-    mid_ids = roles["roof_mid"]["ids"]
-    door = first(roles, recipe.get("door", "door"))
-    win_ids = roles[recipe.get("window", "window")]["ids"]
-    win_every = int(recipe.get("window_every", 3))
-    strength = float(recipe.get("tint_strength", 0.28))
-
-    tw = as_rgb(recipe.get("tint_wall") or dept_tint)
-    tr = as_rgb(recipe.get("tint_roof") or dept_tint)
-
-    entry = s.get("entry") or {}
-    ex, ey = entry.get("gx"), entry.get("gy")
-
-    for ty in range(gy, gy + fh):
-        for tx in range(gx, gx + fw):
-            ly = ty - gy
-            lx = tx - gx
-            is_left = lx == 0
-            is_right = lx == fw - 1
-
-            # --- roof ---
-            if ly < rr:
-                if rr == 1:
-                    if is_left:
-                        idx = peak_l
-                    elif is_right:
-                        idx = peak_r
-                    else:
-                        idx = pick(rng, roof_fill_ids)
-                else:
-                    # row 0 = peaks / ridge, row 1 = eaves / body
-                    if ly == 0:
-                        if is_left:
-                            idx = peak_l
-                        elif is_right:
-                            idx = peak_r
-                        else:
-                            idx = pick(rng, mid_ids or roof_fill_ids)
-                    else:
-                        if is_left:
-                            idx = eave_l
-                        elif is_right:
-                            idx = eave_r
-                        else:
-                            idx = pick(rng, roof_fill_ids)
-                paste(roofs, sheet, idx, tx, ty, tr, strength)
-                continue
-
-            # --- door on entry tile ---
-            if ex is not None and ey is not None and tx == ex and ty == ey:
-                paste(roofs, sheet, door, tx, ty)
-                continue
-
-            # --- windows on first wall row under roof (not corners of small depts) ---
-            if ly == rr and win_every > 0 and not is_left and not is_right:
-                if (lx % win_every) == (win_every // 2):
-                    paste(roofs, sheet, pick(rng, win_ids), tx, ty, tw, strength * 0.5)
-                    continue
-
-            # --- solid wall ---
-            wall = pick(rng, wall_ids)
-            paste(roofs, sheet, wall, tx, ty, tw if ly == rr else None, strength if ly == rr else 0.0)
-
-    # subtle outline so buildings read as blocks at zoom-out
-    d = ImageDraw.Draw(roofs)
-    base = tw or (90, 78, 60)
-    d.rectangle(
-        [gx * TW, gy * TW, (gx + fw) * TW - 1, (gy + fh) * TW - 1],
-        outline=(base[0], base[1], base[2], 180),
-    )
-
-
 def stamp_interior(interiors, sheet, s, roles, rng):
+    """Indoor floors + sparse props. No windows. No outdoor paving."""
     kind = s.get("kind")
-    rooms = room_layouts(s)
-    if not rooms:
-        # fallback: whole footprint as one room
-        rooms = [
-            {
-                "id": s["id"],
-                "gx": s["gx"],
-                "gy": s["gy"],
-                "fw": s["fw"],
-                "fh": s["fh"],
-            }
-        ]
-
-    chairs = roles["furniture_chair"]["ids"]
-    tables = roles["furniture_table"]["ids"]
-    cabinets = roles.get("furniture_cabinet", {}).get("ids") or []
+    rooms = room_layouts(s) or [
+        {"id": s["id"], "gx": s["gx"], "gy": s["gy"], "fw": s["fw"], "fh": s["fh"]}
+    ]
+    chairs = roles["chair"]["ids"]
+    tables = roles["table"]["ids"]
+    cabinets = roles["cabinet"]["ids"]
 
     for rh in rooms:
         rid = rh["id"]
+        # Floor choice by room type — NEVER cobble/path
         if rid == "plenum-gc":
             floor_ids = roles["floor_wood"]["ids"]
-            carpet = True
+            use_carpet = True
+        elif kind == "department":
+            floor_ids = roles["floor_wood"]["ids"]  # wood only for depts
+            use_carpet = False
         elif kind == "chateau":
             floor_ids = roles["floor_beige"]["ids"]
-            carpet = False
-        elif kind == "parlement":
-            floor_ids = roles["floor_stone"]["ids"]
-            carpet = False
+            use_carpet = False
+        elif rid in ("pas-perdus",):
+            floor_ids = roles["floor_stone_indoor"]["ids"]
+            use_carpet = False
         else:
-            floor_ids = roles["floor_stone"]["ids"]
-            carpet = False
+            floor_ids = roles["floor_wood"]["ids"]
+            use_carpet = False
 
         floor_id = pick(rng, floor_ids)
         for ty in range(rh["gy"], rh["gy"] + rh["fh"]):
             for tx in range(rh["gx"], rh["gx"] + rh["fw"]):
                 paste(interiors, sheet, floor_id, tx, ty)
 
-        # green carpet inset for plenum (Sample2 board-room language)
-        if carpet and rh["fw"] >= 4 and rh["fh"] >= 4:
+        if use_carpet and rh["fw"] >= 4 and rh["fh"] >= 4:
             cg = first(roles, "carpet_green")
             for ty in range(rh["gy"] + 1, rh["gy"] + rh["fh"] - 1):
                 for tx in range(rh["gx"] + 1, rh["gx"] + rh["fw"] - 1):
@@ -255,15 +378,12 @@ def stamp_interior(interiors, sheet, s, roles, rng):
             cx = rh["gx"] + rh["fw"] // 2
             cy = rh["gy"] + rh["fh"] // 2
             paste(interiors, sheet, pick(rng, tables), cx, cy)
-            if rh["fw"] >= 5 and chairs:
+            if chairs and rh["fw"] >= 5:
                 paste(interiors, sheet, pick(rng, chairs), cx - 1, cy)
                 paste(interiors, sheet, pick(rng, chairs), cx + 1, cy)
-                if rh["fh"] >= 5:
-                    paste(interiors, sheet, pick(rng, chairs), cx, cy - 1)
-                    paste(interiors, sheet, pick(rng, chairs), cx, cy + 1)
             continue
 
-        # sparse props only — max 3 per room, never flood
+        # Sparse props — max 2–3, never flood, never windows
         if rh["fw"] >= 2 and rh["fh"] >= 2 and chairs:
             paste(interiors, sheet, pick(rng, chairs), rh["gx"] + 1, rh["gy"] + 1)
         if rh["fw"] >= 3 and rh["fh"] >= 3 and tables:
@@ -274,7 +394,14 @@ def stamp_interior(interiors, sheet, s, roles, rng):
                 rh["gx"] + rh["fw"] // 2,
                 rh["gy"] + rh["fh"] // 2,
             )
-        if cabinets and rh["fw"] >= 3 and rh["fh"] >= 2 and rng.random() < 0.55:
+        # cabinets only if room large enough and not a 1-tile-wide corridor room
+        if (
+            cabinets
+            and rh["fw"] >= 3
+            and rh["fh"] >= 3
+            and kind != "department"
+            and rng.random() < 0.45
+        ):
             paste(
                 interiors,
                 sheet,
@@ -282,6 +409,9 @@ def stamp_interior(interiors, sheet, s, roles, rng):
                 rh["gx"] + rh["fw"] - 2,
                 rh["gy"] + 1,
             )
+
+
+# ── main ────────────────────────────────────────────────────────────────────
 
 
 def build():
@@ -292,28 +422,19 @@ def build():
     W, H = world["grid"]["w"], world["grid"]["h"]
     sites = world["sites"]
     esplanade = world.get("esplanade") or {}
-    rng = random.Random(7)
+    rng = random.Random(11)
     sheet = load_sheet()
 
-    grass = roles["grass"]["ids"]
-    dirt = roles["dirt_path"]["ids"]
-    dirt_soft = roles["dirt_soft"]["ids"]
-    water = roles["water_fill"]["ids"]
-    tree = roles["tree"]["ids"]
-    cobble = roles["cobble"]["ids"]
+    grass = first(roles, "grass")
+    path_body = first(roles, "path_body")
+    water = first(roles, "water_fill")
+    cobble = first(roles, "cobble")
 
-    print("Roguelike v3 — Sample1/2 language")
-    for k in (
-        "grass",
-        "dirt_path",
-        "water_fill",
-        "tree",
-        "wall_beige",
-        "roof_fill",
-        "door",
-        "window",
-    ):
-        print(f"  {k}: {roles[k]['ids']}")
+    print("Roguelike v4 — texture discipline")
+    print("  tree pair:", first(roles, "tree_canopy"), "+", first(roles, "tree_trunk"))
+    print("  path mono:", path_body)
+    print("  wall facade:", roles["wall_fill"]["ids"], roles["wall_top"]["ids"])
+    print("  indoor dept floor:", roles["floor_wood"]["ids"])
 
     occupied = set()
     for s in sites:
@@ -321,59 +442,63 @@ def build():
             for y in range(s["gy"], s["gy"] + s["fh"]):
                 occupied.add((x, y))
 
+    path_cells = build_path_set(sites, esplanade, W, H)
+    # paths do not run under building interiors (stop at facade)
+    path_cells -= occupied
+
     ground = Image.new("RGBA", (W * TW, H * TW), (50, 120, 60, 255))
     roofs = Image.new("RGBA", (W * TW, H * TW), (0, 0, 0, 0))
     interiors = Image.new("RGBA", (W * TW, H * TW), (0, 0, 0, 0))
 
-    # ---- terrain (Sample1 outdoor) ----
+    # 1) base terrain
     for ty in range(H):
         for tx in range(W):
-            # north forest band
-            if ty <= 1:
-                if ty == 1 and rng.random() < 0.55:
-                    paste(ground, sheet, pick(rng, tree), tx, ty)
-                else:
-                    paste(ground, sheet, pick(rng, grass), tx, ty)
-                continue
-            # south lake
             if ty >= H - 2:
-                paste(ground, sheet, pick(rng, water), tx, ty)
-                continue
-            # shore
-            if ty == H - 3:
-                paste(ground, sheet, pick(rng, dirt_soft if rng.random() < 0.4 else dirt), tx, ty)
-                continue
-            # east woods
-            if tx >= W - 3 and 3 <= ty <= H - 5:
-                if rng.random() < 0.65:
-                    paste(ground, sheet, pick(rng, tree), tx, ty)
-                else:
-                    paste(ground, sheet, pick(rng, grass), tx, ty)
-                continue
-            # esplanade cobble
-            if (
-                esplanade
-                and esplanade.get("gx0", 0) <= tx <= esplanade.get("gx1", 0)
-                and esplanade.get("gy0", 0) <= ty <= esplanade.get("gy1", 0)
-            ):
-                paste(ground, sheet, pick(rng, cobble), tx, ty)
-                continue
-            # east-west path in front of depts
-            if ty in (14, 15) and 2 <= tx <= 36:
-                paste(ground, sheet, pick(rng, dirt), tx, ty)
-                continue
-            # under / around buildings + entries → dirt
-            near = any(
-                abs(tx - s["entry"]["gx"]) + abs(ty - s["entry"]["gy"]) <= 1 for s in sites
-            )
-            if near or (tx, ty) in occupied:
-                paste(ground, sheet, pick(rng, dirt), tx, ty)
-            elif (tx <= 1 or tx >= W - 4) and 2 <= ty <= 13 and rng.random() < 0.45:
-                paste(ground, sheet, pick(rng, tree), tx, ty)
+                paste(ground, sheet, water, tx, ty)
+            elif ty == H - 3:
+                paste(ground, sheet, path_body, tx, ty)  # shore as dirt band
             else:
-                paste(ground, sheet, pick(rng, grass), tx, ty)
+                paste(ground, sheet, grass, tx, ty)
 
-    # ---- buildings ----
+    # 2) esplanade cobble (outdoor plaza only)
+    if esplanade:
+        for ty in range(esplanade["gy0"], esplanade["gy1"] + 1):
+            for tx in range(esplanade["gx0"], esplanade["gx1"] + 1):
+                if (tx, ty) not in occupied:
+                    paste(ground, sheet, cobble, tx, ty)
+
+    # 3) mono-tile path tunnels
+    for tx, ty in path_cells:
+        if 0 <= tx < W and 0 <= ty < H and ty < H - 2:
+            paste(ground, sheet, path_body, tx, ty)
+
+    # 4) dirt apron only 1 cell under building footprint edge (not full fill)
+    for s in sites:
+        for tx in range(s["gx"], s["gx"] + s["fw"]):
+            ty = s["gy"] + s["fh"]  # just south of building
+            if ty < H - 2 and (tx, ty) not in occupied:
+                paste(ground, sheet, path_body, tx, ty)
+                path_cells.add((tx, ty))
+
+    # free cells for trees = grass, not path, not occupied, not water/shore
+    free = set()
+    for ty in range(0, H - 3):
+        for tx in range(W):
+            if (tx, ty) in occupied:
+                continue
+            if (tx, ty) in path_cells:
+                continue
+            if esplanade and (
+                esplanade["gx0"] <= tx <= esplanade["gx1"]
+                and esplanade["gy0"] <= ty <= esplanade["gy1"]
+            ):
+                continue
+            free.add((tx, ty))
+
+    # 5) trees as complete pairs only
+    place_trees(ground, sheet, roles, free, W, H, rng)
+
+    # 6) buildings
     dept_tints = {}
     for d in world.get("namedDepartments") or []:
         if str(d.get("deptTint", "")).startswith("#"):
@@ -386,11 +511,12 @@ def build():
         stamp_building(roofs, sheet, s, recipe, roles, rng, dept_tints.get(s["id"]))
         stamp_interior(interiors, sheet, s, roles, rng)
 
-    # esplanade fountain / marker (door-like accent, not furniture flood)
+    # esplanade marker (door tile as archway accent — outdoor)
     if esplanade:
         sx = (esplanade["gx0"] + esplanade["gx1"]) // 2
         sy = (esplanade["gy0"] + esplanade["gy1"]) // 2
-        paste(roofs, sheet, first(roles, "door"), sx, sy, (201, 164, 92), 0.35)
+        if (sx, sy) not in occupied:
+            paste(roofs, sheet, first(roles, "door"), sx, sy, (201, 164, 92), 0.3)
 
     OUT.mkdir(parents=True, exist_ok=True)
     ground.save(OUT / "ground.png")
@@ -404,28 +530,33 @@ def build():
     prev2.alpha_composite(interiors)
     prev2.save(OUT / "preview_interiors.png")
 
-    # role proof sheet
+    # proof sheet
     pairs = [
-        ("grass", roles["grass"]["ids"]),
-        ("dirt", roles["dirt_path"]["ids"]),
-        ("water", roles["water_fill"]["ids"]),
-        ("tree", roles["tree"]["ids"]),
-        ("wall", roles["wall_beige"]["ids"]),
-        ("roofF", roles["roof_fill"]["ids"]),
-        ("roofP", roles["roof_peak_l"]["ids"] + roles["roof_peak_r"]["ids"]),
-        ("door", roles["door"]["ids"]),
+        ("grass", [grass]),
+        ("path", [path_body]),
+        ("water", [water]),
+        ("cobble", [cobble]),
+        ("treeC", [first(roles, "tree_canopy")]),
+        ("treeT", [first(roles, "tree_trunk")]),
+        ("wall", roles["wall_fill"]["ids"]),
+        ("wallT", roles["wall_top"]["ids"]),
+        ("roof", roles["roof_fill"]["ids"][:3]),
+        ("door", [first(roles, "door")]),
         ("win", roles["window"]["ids"]),
-        ("floor", roles["floor_stone"]["ids"]),
-        ("chair", roles["furniture_chair"]["ids"]),
-        ("table", roles["furniture_table"]["ids"]),
+        ("wood", roles["floor_wood"]["ids"]),
+        ("chair", roles["chair"]["ids"][:4]),
+        ("table", roles["table"]["ids"][:4]),
     ]
-    img = Image.new("RGBA", (240, len(pairs) * 22), (18, 20, 26, 255))
+    img = Image.new("RGBA", (260, len(pairs) * 22), (18, 20, 26, 255))
     dr = ImageDraw.Draw(img)
     for ri, (name, ids) in enumerate(pairs):
         dr.text((2, ri * 22 + 4), name, fill=(230, 230, 240))
-        for ci, idx in enumerate(ids[:10]):
+        for ci, idx in enumerate(ids[:8]):
             t = get_tile(sheet, idx)
             img.paste(t, (70 + ci * 18, ri * 22 + 3), t)
+    # tree pair visual
+    img.paste(get_tile(sheet, first(roles, "tree_canopy")), (200, 4 * 22 + 3), get_tile(sheet, first(roles, "tree_canopy")))
+    img.paste(get_tile(sheet, first(roles, "tree_trunk")), (200, 5 * 22 + 3), get_tile(sheet, first(roles, "tree_trunk")))
     img.save(OUT / "role_usage_sheet.png")
 
     meta = {
@@ -434,10 +565,16 @@ def build():
         "height": H * TW,
         "grid": {"w": W, "h": H},
         "source": "roguelike-rpg-pack",
-        "playbook": "roguelike_playbook.json v3",
+        "playbook": "roguelike_playbook.json v4",
         "packs": ["Roguelike RPG Pack — Kenney CC0 (sole art source)"],
         "credit": "Assets by Kenney (www.kenney.nl) CC0 — Roguelike RPG Pack only.",
-        "da": "Sample1 outdoor + Sample2 indoor modular kit; furniture = props only",
+        "da": {
+            "trees": "pair canopy+trunk only",
+            "paths": "mono 408 orthogonal tunnels",
+            "buildings": "roof-dominant + 2-row facade walls",
+            "windows": "south facade only",
+            "interiors": "wood/beige floors; no paving",
+        },
         "layers": {
             "ground": "ground.png",
             "roofs": "roofs.png",
@@ -449,10 +586,10 @@ def build():
         "Roguelike RPG Pack by Kenney (www.kenney.nl)\n"
         "License: CC0 1.0 Universal\n"
         "https://kenney.nl/assets/roguelike-rpg-pack\n"
-        "Sole art pack for state-of-vd-pixel composed world (playbook v3).\n",
+        "Playbook v4 — Sample1 texture discipline.\n",
         encoding="utf-8",
     )
-    print("OK roguelike v3", W, "x", H, "→", OUT)
+    print("OK roguelike v4", W, "x", H, "paths", len(path_cells))
 
 
 if __name__ == "__main__":

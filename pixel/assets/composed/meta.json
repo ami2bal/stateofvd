@@ -7,12 +7,18 @@
     "h": 24
   },
   "source": "roguelike-rpg-pack",
-  "playbook": "roguelike_playbook.json v3",
+  "playbook": "roguelike_playbook.json v4",
   "packs": [
     "Roguelike RPG Pack \u2014 Kenney CC0 (sole art source)"
   ],
   "credit": "Assets by Kenney (www.kenney.nl) CC0 \u2014 Roguelike RPG Pack only.",
-  "da": "Sample1 outdoor + Sample2 indoor modular kit; furniture = props only",
+  "da": {
+    "trees": "pair canopy+trunk only",
+    "paths": "mono 408 orthogonal tunnels",
+    "buildings": "roof-dominant + 2-row facade walls",
+    "windows": "south facade only",
+    "interiors": "wood/beige floors; no paving"
+  },
   "layers": {
     "ground": "ground.png",
     "roofs": "roofs.png",

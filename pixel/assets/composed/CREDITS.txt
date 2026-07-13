@@ -1,4 +1,4 @@
 Roguelike RPG Pack by Kenney (www.kenney.nl)
 License: CC0 1.0 Universal
 https://kenney.nl/assets/roguelike-rpg-pack
-Sole art pack for state-of-vd-pixel composed world (playbook v3).
+Playbook v4 — Sample1 texture discipline.
