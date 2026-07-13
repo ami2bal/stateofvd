@@ -1,0 +1,197 @@
+{
+  "generatedAt": "2026-07-12T21:53:49.652Z",
+  "playable": 19,
+  "totalDefs": 19,
+  "scenarios": [
+    {
+      "id": "petit-credit",
+      "short": "S1",
+      "label": "EMPD — petit crédit",
+      "entry": "dpt",
+      "playable": true,
+      "steps": 9,
+      "lifecycleId": "cycle-projet-acte",
+      "branches": 1
+    },
+    {
+      "id": "credit-qui-fache",
+      "short": "S2",
+      "label": "EMPD — crédit d'ouvrage",
+      "entry": "dpt",
+      "playable": true,
+      "steps": 9,
+      "lifecycleId": "cycle-projet-acte",
+      "branches": 2
+    },
+    {
+      "id": "empl-loi",
+      "short": "S6",
+      "label": "EMPL — loi ordinaire",
+      "entry": "dpt",
+      "playable": true,
+      "steps": 8,
+      "lifecycleId": "cycle-projet-acte",
+      "branches": 0
+    },
+    {
+      "id": "budget-annuel",
+      "short": "S7",
+      "label": "Budget annuel",
+      "entry": "ce",
+      "playable": true,
+      "steps": 10,
+      "lifecycleId": "cycle-projet-acte",
+      "branches": 1
+    },
+    {
+      "id": "revision-constitutionnelle",
+      "short": "S19",
+      "label": "Révision constitutionnelle",
+      "entry": "dpt",
+      "playable": true,
+      "steps": 8,
+      "lifecycleId": "cycle-projet-acte",
+      "branches": 1
+    },
+    {
+      "id": "seance-ce",
+      "short": "S16",
+      "label": "Séance du CE",
+      "entry": "ce",
+      "playable": true,
+      "steps": 4,
+      "lifecycleId": "cycle-projet-acte",
+      "branches": 1
+    },
+    {
+      "id": "referendum",
+      "short": "S17",
+      "label": "Référendum facultatif",
+      "entry": "ce",
+      "playable": true,
+      "steps": 5,
+      "lifecycleId": "cycle-projet-acte",
+      "branches": 0
+    },
+    {
+      "id": "motion",
+      "short": "S3",
+      "label": "La motion",
+      "entry": "gc",
+      "playable": true,
+      "steps": 6,
+      "lifecycleId": "cycle-motion",
+      "branches": 1
+    },
+    {
+      "id": "postulat",
+      "short": "S8",
+      "label": "Le postulat",
+      "entry": "gc",
+      "playable": true,
+      "steps": 5,
+      "lifecycleId": "cycle-postulat",
+      "branches": 1
+    },
+    {
+      "id": "interpellation",
+      "short": "S4",
+      "label": "L'interpellation",
+      "entry": "gc",
+      "playable": true,
+      "steps": 6,
+      "lifecycleId": "cycle-interpellation",
+      "branches": 0
+    },
+    {
+      "id": "simple-question",
+      "short": "S9",
+      "label": "Simple question",
+      "entry": "gc",
+      "playable": true,
+      "steps": 3,
+      "lifecycleId": "cycle-question",
+      "branches": 0
+    },
+    {
+      "id": "question-orale",
+      "short": "S10",
+      "label": "Question orale",
+      "entry": "gc",
+      "playable": true,
+      "steps": 2,
+      "lifecycleId": "cycle-question",
+      "branches": 0
+    },
+    {
+      "id": "resolution",
+      "short": "S11",
+      "label": "Résolution",
+      "entry": "gc",
+      "playable": true,
+      "steps": 4,
+      "lifecycleId": "cycle-resolution",
+      "branches": 1
+    },
+    {
+      "id": "determination",
+      "short": "S12",
+      "label": "Détermination",
+      "entry": "gc",
+      "playable": true,
+      "steps": 3,
+      "lifecycleId": "cycle-determination",
+      "branches": 1
+    },
+    {
+      "id": "initiative",
+      "short": "S13",
+      "label": "Initiative",
+      "entry": "gc",
+      "playable": true,
+      "steps": 5,
+      "lifecycleId": "cycle-initiative-parlementaire",
+      "branches": 1
+    },
+    {
+      "id": "seance-gc",
+      "short": "S15",
+      "label": "Séance du GC",
+      "entry": "gc",
+      "playable": true,
+      "steps": 6,
+      "lifecycleId": "cycle-projet-acte",
+      "branches": 1
+    },
+    {
+      "id": "petition",
+      "short": "S5",
+      "label": "La pétition",
+      "entry": "citoyen",
+      "playable": true,
+      "steps": 6,
+      "lifecycleId": "cycle-petition",
+      "branches": 1
+    },
+    {
+      "id": "demande-de-grace",
+      "short": "S14",
+      "label": "Demande de grâce",
+      "entry": "citoyen",
+      "playable": true,
+      "steps": 4,
+      "lifecycleId": "cycle-grace",
+      "branches": 1
+    },
+    {
+      "id": "initiative-populaire",
+      "short": "S18",
+      "label": "Initiative populaire",
+      "entry": "citoyen",
+      "playable": true,
+      "steps": 5,
+      "lifecycleId": "cycle-initiative-populaire",
+      "branches": 1
+    }
+  ]
+}

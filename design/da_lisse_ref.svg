@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- State of VD — RÉFÉRENCE DA v6 (ADR D-012) : rendu vectoriel lisse façon plan de masse + animations d'ambiance.
+     Cible pour TASK-089 (réécriture renderer). Nuages qui dérivent sur le Jura · vapeur Belle Époque qui avance
+     sur le Léman avec tangage/sillage/fumée · courant du lac. Palette = celle du plan de masse. -->
+<svg viewBox="0 0 900 620" width="900" height="620" xmlns="http://www.w3.org/2000/svg" font-family="'Segoe UI',system-ui,sans-serif">
+  <title>State of VD — référence DA lisse/vectorielle animée (D-012)</title>
+  <defs>
+    <clipPath id="sky"><rect x="0" y="0" width="900" height="210"/></clipPath>
+    <clipPath id="lakeClip"><rect x="0" y="452" width="900" height="168"/></clipPath>
+  </defs>
+  <rect x="0" y="0" width="900" height="210" fill="#DCEAF3"/>
+  <path d="M0 210 L0 120 L120 70 L230 120 L340 60 L470 120 L590 72 L710 120 L820 66 L900 118 L900 210 Z" fill="#9DB3BC"/>
+  <path d="M0 210 L0 150 L140 104 L260 150 L380 98 L520 150 L650 108 L780 150 L900 106 L900 210 Z" fill="#6E8A6E"/>
+  <g fill="#F3F6F4" opacity="0.9"><path d="M340 60 L360 82 L320 82 Z"/><path d="M590 72 L607 90 L573 90 Z"/><path d="M820 66 L838 86 L802 86 Z"/></g>
+  <g clip-path="url(#sky)"><g fill="#FFFFFF" opacity="0.9">
+    <g><ellipse cx="0" cy="70" rx="46" ry="18"/><ellipse cx="34" cy="62" rx="34" ry="20"/><ellipse cx="-28" cy="64" rx="30" ry="16"/><animateTransform attributeName="transform" type="translate" from="-140 0" to="1040 0" dur="34s" repeatCount="indefinite"/></g>
+    <g opacity="0.8"><ellipse cx="0" cy="48" rx="38" ry="15"/><ellipse cx="28" cy="42" rx="28" ry="16"/><ellipse cx="-24" cy="44" rx="24" ry="13"/><animateTransform attributeName="transform" type="translate" from="-260 0" to="1120 0" dur="46s" repeatCount="indefinite"/></g>
+    <g opacity="0.85"><ellipse cx="0" cy="92" rx="40" ry="16"/><ellipse cx="30" cy="86" rx="30" ry="17"/><animateTransform attributeName="transform" type="translate" from="-380 0" to="980 0" dur="40s" repeatCount="indefinite"/></g>
+  </g></g>
+  <rect x="0" y="210" width="900" height="245" fill="#C8D9A8"/>
+  <text x="450" y="196" text-anchor="middle" fill="#4F5E3C" font-size="12" letter-spacing="3" opacity="0.7">N · JURA</text>
+  <g>
+    <rect x="150" y="250" width="230" height="120" rx="4" fill="#DCD2BE" stroke="#A89F8D" stroke-width="2"/>
+    <rect x="150" y="250" width="230" height="24" rx="4" fill="#3E7A52"/>
+    <text x="265" y="267" text-anchor="middle" fill="#fff" font-size="12" font-weight="700">Grand Conseil</text>
+    <rect x="162" y="286" width="120" height="76" rx="3" fill="#EDE8DC" stroke="#B8AE98"/>
+    <g fill="none" stroke="#3E7A52" stroke-width="2" opacity="0.6"><path d="M192 352 A30 30 0 0 1 252 352"/><path d="M204 352 A18 18 0 0 1 240 352"/></g>
+    <text x="222" y="302" text-anchor="middle" fill="#5E6C48" font-size="9">Hémicycle</text>
+    <rect x="290" y="286" width="78" height="36" rx="3" fill="#EDE8DC" stroke="#B8AE98"/><text x="329" y="308" text-anchor="middle" fill="#6B5E48" font-size="8.5">Bureau</text>
+    <rect x="290" y="326" width="78" height="36" rx="3" fill="#EDE8DC" stroke="#B8AE98"/><text x="329" y="348" text-anchor="middle" fill="#6B5E48" font-size="8.5">Commissions</text>
+    <circle cx="222" cy="243" r="9" fill="#9FC2DC" stroke="#5E7E96" stroke-width="1.5"/>
+    <line x1="368" y1="250" x2="368" y2="232" stroke="#8A7E64" stroke-width="1.5"/><path d="M368 233 L384 238 L368 243 Z" fill="#3E7A52"/>
+  </g>
+  <g>
+    <rect x="470" y="250" width="170" height="120" rx="4" fill="#DCD2BE" stroke="#A4553E" stroke-width="2.5"/>
+    <rect x="470" y="250" width="170" height="60" fill="#A4553E"/><rect x="470" y="250" width="170" height="22" fill="#C9A45C"/>
+    <text x="555" y="266" text-anchor="middle" fill="#4A3A17" font-size="11" font-weight="700">Conseil d'État</text>
+    <rect x="462" y="242" width="16" height="16" fill="#A4553E"/><rect x="632" y="242" width="16" height="16" fill="#A4553E"/><rect x="462" y="362" width="16" height="16" fill="#A4553E"/><rect x="632" y="362" width="16" height="16" fill="#A4553E"/>
+    <rect x="482" y="316" width="72" height="46" rx="3" fill="#EDE8DC" stroke="#B8AE98"/><ellipse cx="518" cy="342" rx="22" ry="14" fill="#E2DAC8" stroke="#B0A488"/><text x="518" y="332" text-anchor="middle" fill="#6B5E48" font-size="8">Collège 7</text>
+    <rect x="560" y="316" width="68" height="22" rx="3" fill="#EDE8DC" stroke="#B8AE98"/><text x="594" y="331" text-anchor="middle" fill="#2F4266" font-size="8">Chancellerie</text>
+    <rect x="560" y="340" width="68" height="22" rx="3" fill="#EDE8DC" stroke="#B8AE98"/><text x="594" y="355" text-anchor="middle" fill="#6B5E48" font-size="8">CSG</text>
+    <line x1="628" y1="250" x2="628" y2="232" stroke="#8A7E64" stroke-width="1.5"/><path d="M628 233 L644 238 L628 243 Z" fill="#C9A45C"/>
+  </g>
+  <rect x="384" y="286" width="82" height="76" rx="3" fill="#B8B2A6"/>
+  <line x1="380" y1="324" x2="470" y2="324" stroke="#E8C15A" stroke-width="3" stroke-dasharray="6 5"/>
+  <circle cx="425" cy="324" r="6" fill="#E8C15A" stroke="#B8860B"/>
+  <g>
+    <rect x="180" y="392" width="150" height="46" rx="4" fill="#DCD2BE" stroke="#A89F8D" stroke-width="1.5"/><rect x="180" y="392" width="8" height="46" fill="#7A6A8C"/><text x="258" y="420" text-anchor="middle" fill="#3A3226" font-size="10" font-weight="600">DSAS</text>
+    <rect x="360" y="392" width="150" height="46" rx="4" fill="#DCD2BE" stroke="#A89F8D" stroke-width="1.5"/><rect x="360" y="392" width="8" height="46" fill="#8A7A5C"/><text x="438" y="420" text-anchor="middle" fill="#3A3226" font-size="10" font-weight="600">DFA</text>
+    <rect x="540" y="392" width="150" height="46" rx="4" fill="#DCD2BE" stroke="#A89F8D" stroke-width="1.5"/><rect x="540" y="392" width="8" height="46" fill="#5C6E8A"/><text x="618" y="420" text-anchor="middle" fill="#3A3226" font-size="10" font-weight="600">DITS</text>
+  </g>
+  <g><path d="M78 300 L92 280 L106 300 Z" fill="#B4674F"/><rect x="78" y="300" width="28" height="58" rx="2" fill="#DCD2BE" stroke="#A89F8D"/></g>
+  <rect x="762" y="386" width="120" height="60" fill="#A8B36B" opacity="0.25"/>
+  <g stroke="#87954F" stroke-width="2.5" fill="none" opacity="0.8"><path d="M770 396 Q820 388 872 396"/><path d="M770 414 Q820 406 872 414"/><path d="M770 432 Q820 424 872 432"/></g>
+  <rect x="0" y="452" width="900" height="168" fill="#4C83AB"/>
+  <text x="450" y="472" text-anchor="middle" fill="#EAF2F8" font-size="12" letter-spacing="3" opacity="0.75">S · LAC LÉMAN</text>
+  <g clip-path="url(#lakeClip)" stroke="#6BA4C8" stroke-width="2.5" fill="none" opacity="0.55">
+    <path d="M-40 500 Q60 492 160 500 T360 500 T560 500 T760 500 T960 500"><animateTransform attributeName="transform" type="translate" values="0 0; 40 0; 0 0" dur="9s" repeatCount="indefinite"/></path>
+    <path d="M-40 536 Q60 528 160 536 T360 536 T560 536 T760 536 T960 536"><animateTransform attributeName="transform" type="translate" values="0 0; -46 0; 0 0" dur="11s" repeatCount="indefinite"/></path>
+    <path d="M-40 572 Q60 564 160 572 T360 572 T560 572 T760 572 T960 572"><animateTransform attributeName="transform" type="translate" values="0 0; 34 0; 0 0" dur="13s" repeatCount="indefinite"/></path>
+  </g>
+  <g>
+    <animateTransform attributeName="transform" type="translate" from="-120 0" to="1000 0" dur="30s" repeatCount="indefinite"/>
+    <g>
+      <animateTransform attributeName="transform" type="translate" values="0 0; 0 -2.5; 0 0; 0 2.5; 0 0" dur="4s" repeatCount="indefinite" additive="sum"/>
+      <path d="M18 548 q-40 4 -70 -2" stroke="#BFE0F0" stroke-width="3" fill="none" opacity="0.5"/>
+      <path d="M20 540 h96 l-14 20 h-74 Z" fill="#F4F1EA" stroke="#8A7E64" stroke-width="1.2"/>
+      <rect x="40" y="524" width="54" height="16" rx="2" fill="#EDE8DC" stroke="#8A7E64" stroke-width="1"/>
+      <circle cx="24" cy="546" r="10" fill="#E0D8C6" stroke="#8A7E64" stroke-width="1.2"/>
+      <rect x="64" y="510" width="8" height="16" fill="#B4674F"/><rect x="64" y="508" width="8" height="4" fill="#3A3226"/>
+      <g fill="#D8D8D8" opacity="0.6"><circle cx="68" cy="502" r="4"><animate attributeName="cy" values="502;486" dur="3s" repeatCount="indefinite"/><animate attributeName="opacity" values="0.6;0" dur="3s" repeatCount="indefinite"/></circle></g>
+      <rect x="100" y="516" width="12" height="9" fill="#C4453C"/><rect x="103" y="519.5" width="6" height="2" fill="#fff"/><rect x="105" y="518" width="2" height="5" fill="#fff"/>
+    </g>
+  </g>
+</svg>

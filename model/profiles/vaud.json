@@ -1,0 +1,802 @@
+{
+  "profileVersion": "0.2.0",
+  "label": "Profil institutionnel vaudois v0.2",
+  "catalogues": {
+    "lifecycles": [
+      {
+        "id": "cycle-projet-acte",
+        "label": "Cycle projet d'acte (loi, décret, révision constitutionnelle)",
+        "sources": [
+          {"type": "legal", "legal_ref": {"source": "lgc", "art": "94"}},
+          {"type": "legal", "legal_ref": {"source": "lgc", "art": "102"}},
+          {"type": "legal", "legal_ref": {"source": "lgc", "art": "137"}},
+          {"type": "legal", "legal_ref": {"source": "cst_vd", "art": "84"}}
+        ],
+        "states": [
+          {"id": "en-elaboration", "label": "En élaboration", "initial": true},
+          {"id": "adopte-ce", "label": "Adopté par le CE"},
+          {"id": "saisine-commission", "label": "Saisine de la commission"},
+          {"id": "rapports-deposes", "label": "Rapports déposés"},
+          {"id": "entree-en-matiere", "label": "Entrée en matière"},
+          {"id": "en-debats", "label": "En débats"},
+          {"id": "vote-final", "label": "Vote final"},
+          {"id": "mise-au-point", "label": "Mise au point"},
+          {"id": "publie-delai-referendaire", "label": "Publié — délai référendaire"},
+          {"id": "promulgue", "label": "Promulgué", "terminal": true},
+          {"id": "rejete", "label": "Rejeté", "terminal": true},
+          {"id": "retire", "label": "Retiré", "terminal": true}
+        ],
+        "transitions": [
+          {"from": "en-elaboration", "to": "adopte-ce", "by": "decision", "decisionType": "adopte"},
+          {"from": "en-elaboration", "to": "retire", "by": "author-act"},
+          {"from": "adopte-ce", "to": "saisine-commission", "by": "handover"},
+          {"from": "adopte-ce", "to": "retire", "by": "author-act"},
+          {"from": "saisine-commission", "to": "rapports-deposes", "by": "handover"},
+          {"from": "saisine-commission", "to": "retire", "by": "author-act"},
+          {"from": "rapports-deposes", "to": "entree-en-matiere", "by": "decision", "decisionType": "adopte"},
+          {"from": "rapports-deposes", "to": "rejete", "by": "decision", "decisionType": "non-entree-en-matiere"},
+          {"from": "rapports-deposes", "to": "retire", "by": "author-act"},
+          {"from": "entree-en-matiere", "to": "en-debats", "by": "decision", "decisionType": "adopte"},
+          {"from": "entree-en-matiere", "to": "rejete", "by": "decision", "decisionType": "refuse"},
+          {"from": "entree-en-matiere", "to": "retire", "by": "author-act"},
+          {"from": "en-debats", "to": "vote-final", "by": "decision", "decisionType": "adopte"},
+          {"from": "en-debats", "to": "rejete", "by": "decision", "decisionType": "refuse"},
+          {"from": "en-debats", "to": "saisine-commission", "by": "decision", "decisionType": "renvoye-commission"},
+          {"from": "en-debats", "to": "retire", "by": "author-act"},
+          {"from": "vote-final", "to": "mise-au-point", "by": "decision", "decisionType": "adopte"},
+          {"from": "vote-final", "to": "rejete", "by": "decision", "decisionType": "refuse"},
+          {"from": "mise-au-point", "to": "publie-delai-referendaire", "by": "handover"},
+          {"from": "publie-delai-referendaire", "to": "promulgue", "by": "handover"}
+        ]
+      },
+      {
+        "id": "cycle-motion",
+        "label": "Cycle motion parlementaire",
+        "sources": [
+          {"type": "legal", "legal_ref": {"source": "lgc", "art": "111"}},
+          {"type": "legal", "legal_ref": {"source": "lgc", "art": "121"}},
+          {"type": "legal", "legal_ref": {"source": "lgc", "art": "123"}},
+          {"type": "legal", "legal_ref": {"source": "lgc", "art": "124"}}
+        ],
+        "states": [
+          {"id": "ebauche", "label": "Ébauche", "initial": true},
+          {"id": "deposee", "label": "Déposée"},
+          {"id": "recevable", "label": "Recevable"},
+          {"id": "developpee", "label": "Développée"},
+          {"id": "renvoyee-commission", "label": "Renvoyée en commission"},
+          {"id": "preavisee", "label": "Préavisée"},
+          {"id": "prise-en-consideration", "label": "Prise en considération"},
+          {"id": "renvoyee-au-ce", "label": "Renvoyée au CE"},
+          {"id": "reponse-deposee", "label": "Réponse déposée"},
+          {"id": "traitee", "label": "Traitée", "terminal": true},
+          {"id": "non-prise-en-consideration", "label": "Non prise en considération", "terminal": true},
+          {"id": "transformee-en-postulat", "label": "Transformée en postulat", "terminal": true},
+          {"id": "retiree", "label": "Retirée", "terminal": true}
+        ],
+        "transitions": [
+          {"from": "ebauche", "to": "deposee", "by": "handover"},
+          {"from": "ebauche", "to": "deposee", "by": "author-act"},
+          {"from": "ebauche", "to": "retiree", "by": "author-act"},
+          {"from": "deposee", "to": "recevable", "by": "decision", "decisionType": "pris-acte"},
+          {"from": "deposee", "to": "renvoyee-commission", "by": "handover"},
+          {"from": "deposee", "to": "retiree", "by": "author-act"},
+          {"from": "recevable", "to": "developpee", "by": "author-act"},
+          {"from": "recevable", "to": "renvoyee-commission", "by": "handover"},
+          {"from": "recevable", "to": "retiree", "by": "author-act"},
+          {"from": "developpee", "to": "renvoyee-commission", "by": "decision", "decisionType": "renvoye-commission"},
+          {"from": "developpee", "to": "prise-en-consideration", "by": "decision", "decisionType": "pris-en-consideration"},
+          {"from": "developpee", "to": "transformee-en-postulat", "by": "decision", "decisionType": "transforme-en-postulat"},
+          {"from": "developpee", "to": "retiree", "by": "author-act"},
+          {"from": "renvoyee-commission", "to": "preavisee", "by": "handover"},
+          {"from": "renvoyee-commission", "to": "prise-en-consideration", "by": "decision", "decisionType": "adopte"},
+          {"from": "renvoyee-commission", "to": "non-prise-en-consideration", "by": "decision", "decisionType": "refuse"},
+          {"from": "preavisee", "to": "prise-en-consideration", "by": "decision", "decisionType": "pris-en-consideration"},
+          {"from": "preavisee", "to": "prise-en-consideration", "by": "decision", "decisionType": "adopte"},
+          {"from": "preavisee", "to": "non-prise-en-consideration", "by": "decision", "decisionType": "refuse"},
+          {"from": "prise-en-consideration", "to": "renvoyee-au-ce", "by": "handover"},
+          {"from": "prise-en-consideration", "to": "renvoyee-au-ce", "by": "decision", "decisionType": "renvoye-ce"},
+          {"from": "renvoyee-au-ce", "to": "reponse-deposee", "by": "handover"},
+          {"from": "reponse-deposee", "to": "traitee", "by": "handover"},
+          {"from": "reponse-deposee", "to": "traitee", "by": "decision", "decisionType": "classe"}
+        ]
+      },
+      {
+        "id": "cycle-interpellation",
+        "label": "Cycle interpellation (contrôle — 0 acte)",
+        "sources": [
+          {"type": "legal", "legal_ref": {"source": "lgc", "art": "115"}},
+          {"type": "legal", "legal_ref": {"source": "lgc", "art": "137"}},
+          {"type": "legal", "legal_ref": {"source": "lgc", "art": "111"}}
+        ],
+        "states": [
+          {"id": "ebauche", "label": "Ébauche", "initial": true},
+          {"id": "deposee", "label": "Déposée"},
+          {"id": "developpee", "label": "Développée en plénum"},
+          {"id": "en-preparation-ce", "label": "En préparation CE"},
+          {"id": "repondue", "label": "Répondue en plénum"},
+          {"id": "closee", "label": "Clôturée (satisfaction)", "terminal": true},
+          {"id": "retiree", "label": "Retirée", "terminal": true}
+        ],
+        "transitions": [
+          {"from": "ebauche", "to": "deposee", "by": "handover"},
+          {"from": "deposee", "to": "developpee", "by": "handover"},
+          {"from": "developpee", "to": "en-preparation-ce", "by": "handover"},
+          {"from": "en-preparation-ce", "to": "repondue", "by": "handover"},
+          {"from": "repondue", "to": "closee", "by": "handover"}
+        ]
+      },
+      {
+        "id": "cycle-resolution",
+        "label": "Cycle résolution (vœu GC — art. 136)",
+        "sources": [
+          {"type": "legal", "legal_ref": {"source": "lgc", "art": "136"}}
+        ],
+        "states": [
+          {"id": "ebauche", "label": "Ébauche", "initial": true},
+          {"id": "deposee", "label": "Déposée (20 soutiens)"},
+          {"id": "inscrite", "label": "Inscrite à l'ODJ"},
+          {"id": "adoptee", "label": "Adoptée"},
+          {"id": "en-suivi-ce", "label": "En suivi du vœu (CE)", "terminal": true},
+          {"id": "rejetee", "label": "Rejetée", "terminal": true}
+        ],
+        "transitions": [
+          {"from": "ebauche", "to": "deposee", "by": "handover"},
+          {"from": "deposee", "to": "inscrite", "by": "handover"},
+          {"from": "inscrite", "to": "adoptee", "by": "decision", "decisionType": "adopte"},
+          {"from": "inscrite", "to": "rejetee", "by": "decision", "decisionType": "refuse"},
+          {"from": "adoptee", "to": "en-suivi-ce", "by": "handover"}
+        ]
+      },
+      {
+        "id": "cycle-determination",
+        "label": "Cycle détermination (suite d'interpellation — art. 117)",
+        "sources": [
+          {"type": "legal", "legal_ref": {"source": "lgc", "art": "117"}}
+        ],
+        "states": [
+          {"id": "apres-interpellation", "label": "Après réponse d'interpellation", "initial": true},
+          {"id": "deposee", "label": "Déposée"},
+          {"id": "adoptee", "label": "Adoptée", "terminal": true},
+          {"id": "rejetee", "label": "Rejetée", "terminal": true}
+        ],
+        "transitions": [
+          {"from": "apres-interpellation", "to": "deposee", "by": "handover"},
+          {"from": "deposee", "to": "adoptee", "by": "decision", "decisionType": "adopte"},
+          {"from": "deposee", "to": "rejetee", "by": "decision", "decisionType": "refuse"}
+        ]
+      },
+      {
+        "id": "cycle-initiative-parlementaire",
+        "label": "Cycle initiative parlementaire (projet rédigé)",
+        "sources": [
+          {"type": "legal", "legal_ref": {"source": "lgc", "art": "127"}},
+          {"type": "legal", "legal_ref": {"source": "lgc", "art": "128"}}
+        ],
+        "states": [
+          {"id": "ebauche", "label": "Ébauche", "initial": true},
+          {"id": "deposee", "label": "Déposée (texte rédigé)"},
+          {"id": "preavisee-ce", "label": "Préavisée par le CE"},
+          {"id": "en-commission", "label": "En commission"},
+          {"id": "statuee-gc", "label": "Statuée par le GC"},
+          {"id": "renvoyee-circuit-acte", "label": "Renvoyée au circuit projet d'acte", "terminal": true},
+          {"id": "rejetee", "label": "Rejetée", "terminal": true}
+        ],
+        "transitions": [
+          {"from": "ebauche", "to": "deposee", "by": "handover"},
+          {"from": "deposee", "to": "preavisee-ce", "by": "handover"},
+          {"from": "preavisee-ce", "to": "en-commission", "by": "handover"},
+          {"from": "en-commission", "to": "statuee-gc", "by": "decision", "decisionType": "adopte"},
+          {"from": "en-commission", "to": "rejetee", "by": "decision", "decisionType": "refuse"},
+          {"from": "statuee-gc", "to": "renvoyee-circuit-acte", "by": "handover"}
+        ]
+      },
+      {
+        "id": "cycle-initiative-populaire",
+        "label": "Cycle initiative populaire (préambule hors carte → SGC)",
+        "sources": [
+          {"type": "legal", "legal_ref": {"source": "cst_vd", "art": "78"}},
+          {"type": "legal", "legal_ref": {"source": "lgc", "art": "127"}}
+        ],
+        "states": [
+          {"id": "preambule-hors-carte", "label": "Préambule (signatures hors carte)", "initial": true},
+          {"id": "recue-sgc", "label": "Reçue au SGC"},
+          {"id": "preavisee-ce", "label": "Préavisée par le CE"},
+          {"id": "en-examen", "label": "En examen (commission / Bureau)"},
+          {"id": "statuee-gc", "label": "Statuée par le GC", "terminal": true},
+          {"id": "rejetee", "label": "Rejetée / classée", "terminal": true}
+        ],
+        "transitions": [
+          {"from": "preambule-hors-carte", "to": "preambule-hors-carte", "by": "handover"},
+          {"from": "preambule-hors-carte", "to": "recue-sgc", "by": "handover"},
+          {"from": "recue-sgc", "to": "preavisee-ce", "by": "handover"},
+          {"from": "preavisee-ce", "to": "en-examen", "by": "handover"},
+          {"from": "en-examen", "to": "statuee-gc", "by": "decision", "decisionType": "adopte"},
+          {"from": "en-examen", "to": "rejetee", "by": "decision", "decisionType": "refuse"}
+        ]
+      },
+      {
+        "id": "cycle-postulat",
+        "label": "Cycle postulat (mandat d'étude au CE)",
+        "sources": [
+          {"type": "legal", "legal_ref": {"source": "lgc", "art": "118"}},
+          {"type": "legal", "legal_ref": {"source": "lgc", "art": "119"}},
+          {"type": "legal", "legal_ref": {"source": "lgc", "art": "111"}}
+        ],
+        "states": [
+          {"id": "ebauche", "label": "Ébauche", "initial": true},
+          {"id": "depose", "label": "Déposé"},
+          {"id": "pris-en-consideration", "label": "Pris en considération"},
+          {"id": "en-etude-ce", "label": "En étude au CE"},
+          {"id": "rapport-depose", "label": "Rapport d'étude déposé"},
+          {"id": "clos", "label": "Clos (prise d'acte)", "terminal": true},
+          {"id": "rejete", "label": "Non pris en considération", "terminal": true},
+          {"id": "retire", "label": "Retiré", "terminal": true}
+        ],
+        "transitions": [
+          {"from": "ebauche", "to": "depose", "by": "handover"},
+          {"from": "depose", "to": "pris-en-consideration", "by": "decision", "decisionType": "adopte"},
+          {"from": "depose", "to": "rejete", "by": "decision", "decisionType": "refuse"},
+          {"from": "pris-en-consideration", "to": "en-etude-ce", "by": "handover"},
+          {"from": "en-etude-ce", "to": "rapport-depose", "by": "handover"},
+          {"from": "rapport-depose", "to": "clos", "by": "handover"}
+        ]
+      },
+      {
+        "id": "cycle-question",
+        "label": "Cycle question (simple / orale) — contrôle",
+        "sources": [
+          {"type": "legal", "legal_ref": {"source": "lgc", "art": "112"}},
+          {"type": "legal", "legal_ref": {"source": "lgc", "art": "113"}},
+          {"type": "legal", "legal_ref": {"source": "lgc", "art": "114"}}
+        ],
+        "states": [
+          {"id": "ebauche", "label": "Ébauche", "initial": true},
+          {"id": "deposee", "label": "Déposée"},
+          {"id": "en-preparation-ce", "label": "En préparation CE"},
+          {"id": "repondue", "label": "Répondue", "terminal": true},
+          {"id": "retiree", "label": "Retirée", "terminal": true}
+        ],
+        "transitions": [
+          {"from": "ebauche", "to": "deposee", "by": "handover"},
+          {"from": "deposee", "to": "en-preparation-ce", "by": "handover"},
+          {"from": "deposee", "to": "repondue", "by": "handover"},
+          {"from": "en-preparation-ce", "to": "repondue", "by": "handover"}
+        ]
+      },
+      {
+        "id": "cycle-petition",
+        "label": "Cycle pétition (obligation de réponse art. 105)",
+        "sources": [
+          {"type": "legal", "legal_ref": {"source": "lgc", "art": "105"}},
+          {"type": "legal", "legal_ref": {"source": "lgc", "art": "106"}},
+          {"type": "legal", "legal_ref": {"source": "cst_vd", "art": "31"}}
+        ],
+        "states": [
+          {"id": "ebauche", "label": "Ébauche", "initial": true},
+          {"id": "recue-sgc", "label": "Reçue au SGC"},
+          {"id": "en-commission", "label": "En commission des pétitions"},
+          {"id": "rapport-pret", "label": "Rapport prêt"},
+          {"id": "statuee-gc", "label": "Statuée par le GC"},
+          {"id": "en-etude-ce", "label": "En étude au CE (si renvoi)"},
+          {"id": "reponse-notifiee", "label": "Réponse notifiée", "terminal": true},
+          {"id": "classee", "label": "Classée (réponse motivée)", "terminal": true}
+        ],
+        "transitions": [
+          {"from": "ebauche", "to": "recue-sgc", "by": "handover"},
+          {"from": "recue-sgc", "to": "en-commission", "by": "handover"},
+          {"from": "en-commission", "to": "rapport-pret", "by": "handover"},
+          {"from": "rapport-pret", "to": "statuee-gc", "by": "decision", "decisionType": "adopte"},
+          {"from": "rapport-pret", "to": "classee", "by": "decision", "decisionType": "refuse"},
+          {"from": "statuee-gc", "to": "en-etude-ce", "by": "handover"},
+          {"from": "en-etude-ce", "to": "reponse-notifiee", "by": "handover"}
+        ]
+      },
+      {
+        "id": "cycle-grace",
+        "label": "Cycle demande de grâce (scrutin secret)",
+        "sources": [
+          {"type": "legal", "legal_ref": {"source": "lgc", "art": "103"}},
+          {"type": "legal", "legal_ref": {"source": "lgc", "art": "104"}}
+        ],
+        "states": [
+          {"id": "ebauche", "label": "Ébauche / hors carte", "initial": true},
+          {"id": "recue-sgc", "label": "Reçue au SGC"},
+          {"id": "rapport-distribue", "label": "Rapport distribué (≥ 5 j)"},
+          {"id": "votee-secret", "label": "Votée (scrutin secret)", "terminal": true},
+          {"id": "refusee-secret", "label": "Refusée (scrutin secret)", "terminal": true}
+        ],
+        "transitions": [
+          {"from": "ebauche", "to": "recue-sgc", "by": "handover"},
+          {"from": "recue-sgc", "to": "rapport-distribue", "by": "handover"},
+          {"from": "rapport-distribue", "to": "votee-secret", "by": "decision", "decisionType": "adopte"},
+          {"from": "rapport-distribue", "to": "refusee-secret", "by": "decision", "decisionType": "refuse"}
+        ]
+      }
+    ],
+    "objectTypes": [
+      {
+        "id": "loi",
+        "family": "act",
+        "label": "Loi",
+        "lifecycle": "cycle-projet-acte",
+        "sources": [{"type": "legal", "legal_ref": {"source": "lgc", "art": "92"}}]
+      },
+      {
+        "id": "decret",
+        "family": "act",
+        "label": "Décret",
+        "lifecycle": "cycle-projet-acte",
+        "sources": [{"type": "legal", "legal_ref": {"source": "lgc", "art": "92"}}]
+      },
+      {
+        "id": "revision-constitutionnelle",
+        "family": "act",
+        "label": "Révision constitutionnelle",
+        "lifecycle": "cycle-projet-acte",
+        "sources": [{"type": "legal", "legal_ref": {"source": "lgc", "art": "92"}}]
+      },
+      {
+        "id": "motion",
+        "family": "instrument",
+        "label": "Motion",
+        "lifecycle": "cycle-motion",
+        "legal_ref": {"source": "lgc", "art": "120"},
+        "sources": [{"type": "legal", "legal_ref": {"source": "lgc", "art": "120"}}]
+      },
+      {
+        "id": "postulat",
+        "family": "instrument",
+        "label": "Postulat",
+        "lifecycle": "cycle-postulat",
+        "sources": [{"type": "legal", "legal_ref": {"source": "lgc", "art": "118"}}]
+      },
+      {
+        "id": "interpellation",
+        "family": "instrument",
+        "label": "Interpellation",
+        "lifecycle": "cycle-interpellation",
+        "sources": [{"type": "legal", "legal_ref": {"source": "lgc", "art": "115"}}]
+      },
+      {
+        "id": "initiative",
+        "family": "instrument",
+        "label": "Initiative",
+        "lifecycle": "cycle-initiative-parlementaire",
+        "sources": [{"type": "legal", "legal_ref": {"source": "lgc", "art": "127"}}]
+      },
+      {
+        "id": "simple-question",
+        "family": "instrument",
+        "label": "Simple question",
+        "lifecycle": "cycle-question",
+        "sources": [{"type": "legal", "legal_ref": {"source": "lgc", "art": "113"}}]
+      },
+      {
+        "id": "question-orale",
+        "family": "instrument",
+        "label": "Question orale",
+        "lifecycle": "cycle-question",
+        "sources": [{"type": "legal", "legal_ref": {"source": "lgc", "art": "112"}}]
+      },
+      {
+        "id": "determination",
+        "family": "instrument",
+        "label": "Détermination",
+        "lifecycle": "cycle-determination",
+        "sources": [{"type": "legal", "legal_ref": {"source": "lgc", "art": "117"}}]
+      },
+      {
+        "id": "resolution",
+        "family": "instrument",
+        "label": "Résolution",
+        "lifecycle": "cycle-resolution",
+        "sources": [{"type": "legal", "legal_ref": {"source": "lgc", "art": "136"}}]
+      },
+      {
+        "id": "petition",
+        "family": "instrument",
+        "label": "Pétition",
+        "lifecycle": "cycle-petition",
+        "sources": [{"type": "legal", "legal_ref": {"source": "lgc", "art": "105"}}]
+      },
+      {
+        "id": "demande-de-grace",
+        "family": "instrument",
+        "label": "Demande de grâce",
+        "lifecycle": "cycle-grace",
+        "sources": [{"type": "legal", "legal_ref": {"source": "lgc", "art": "103"}}]
+      },
+      {
+        "id": "rapport-commission",
+        "family": "working-document",
+        "label": "Rapport de commission",
+        "lifecycle": null,
+        "sources": [{"type": "legal", "legal_ref": {"source": "lgc", "art": "45"}}]
+      }
+    ],
+    "decisionTypes": [
+      {
+        "id": "adopte",
+        "label": "Adopté",
+        "sources": [{"type": "legal", "legal_ref": {"source": "lgc", "art": "102"}}]
+      },
+      {
+        "id": "refuse",
+        "label": "Refusé",
+        "sources": [{"type": "legal", "legal_ref": {"source": "lgc", "art": "102"}}]
+      },
+      {
+        "id": "non-entree-en-matiere",
+        "label": "Non-entrée en matière",
+        "sources": [{"type": "legal", "legal_ref": {"source": "lgc", "art": "94"}}]
+      },
+      {
+        "id": "pris-en-consideration",
+        "label": "Pris en considération",
+        "sources": [{"type": "legal", "legal_ref": {"source": "lgc", "art": "121"}}]
+      },
+      {
+        "id": "renvoye-commission",
+        "label": "Renvoyé en commission",
+        "sources": [{"type": "legal", "legal_ref": {"source": "lgc", "art": "121"}}]
+      },
+      {
+        "id": "renvoye-ce",
+        "label": "Renvoyé au Conseil d'État",
+        "sources": [{"type": "legal", "legal_ref": {"source": "lgc", "art": "111"}}]
+      },
+      {
+        "id": "renvoye-manque-de-temps",
+        "label": "Renvoyé faute de temps",
+        "sources": [{"type": "convention", "ref": "Manuel V2.00 §9.2"}]
+      },
+      {
+        "id": "transforme-en-postulat",
+        "label": "Transformé en postulat",
+        "sources": [{"type": "legal", "legal_ref": {"source": "lgc", "art": "123"}}]
+      },
+      {
+        "id": "classe",
+        "label": "Classé",
+        "sources": [{"type": "legal", "legal_ref": {"source": "lgc", "art": "111"}}]
+      },
+      {
+        "id": "retire",
+        "label": "Retiré",
+        "sources": [{"type": "legal", "legal_ref": {"source": "lgc", "art": "124"}}]
+      },
+      {
+        "id": "pris-acte",
+        "label": "Pris acte",
+        "sources": [{"type": "legal", "legal_ref": {"source": "lgc", "art": "102"}}]
+      },
+      {
+        "id": "reporte",
+        "label": "Reporté",
+        "sources": [{"type": "convention", "ref": "Manuel V2.00 §9.2"}]
+      }
+    ],
+    "deadlineTypes": [
+      {
+        "id": "reponse-motion-postulat-initiative",
+        "label": "Réponse motion / postulat / initiative",
+        "duration": "P1Y",
+        "trigger": "renvoi-au-ce",
+        "legal_ref": {"source": "lgc", "art": "111"},
+        "sources": [{"type": "legal", "legal_ref": {"source": "lgc", "art": "111"}}]
+      },
+      {
+        "id": "reponse-simple-question",
+        "label": "Réponse à une simple question",
+        "duration": "P4W",
+        "trigger": "depot-simple-question",
+        "legal_ref": {"source": "lgc", "art": "114"},
+        "sources": [{"type": "legal", "legal_ref": {"source": "lgc", "art": "114"}}]
+      },
+      {
+        "id": "reponse-interpellation",
+        "label": "Réponse à une interpellation",
+        "duration": "P3M",
+        "trigger": "depot-interpellation",
+        "legal_ref": {"source": "lgc", "art": "116"},
+        "sources": [{"type": "legal", "legal_ref": {"source": "lgc", "art": "116"}}]
+      },
+      {
+        "id": "suivi-voeu",
+        "label": "Suivi de vœu",
+        "duration": "P3M",
+        "trigger": "adoption-voeu",
+        "legal_ref": {"source": "lgc", "art": "117"},
+        "sources": [{"type": "legal", "legal_ref": {"source": "lgc", "art": "117"}}]
+      },
+      {
+        "id": "docs-ce-avant-commission",
+        "label": "Documents du CE avant commission",
+        "duration": "P4W",
+        "trigger": "saisine-commission",
+        "legal_ref": {"source": "lgc", "art": "139"},
+        "sources": [{"type": "legal", "legal_ref": {"source": "lgc", "art": "139"}}]
+      },
+      {
+        "id": "reponse-interpellation-avant-seance",
+        "label": "Réponse d'interpellation avant séance",
+        "duration": "P15D",
+        "trigger": "convocation-seance",
+        "legal_ref": {"source": "lgc", "art": "139"},
+        "sources": [{"type": "legal", "legal_ref": {"source": "lgc", "art": "139"}}]
+      },
+      {
+        "id": "rapport-gestion",
+        "label": "Rapport de gestion",
+        "duration": "fixed-date",
+        "fixedDate": "05-31",
+        "trigger": "annee-civile",
+        "legal_ref": {"source": "lgc", "art": "139"},
+        "sources": [{"type": "legal", "legal_ref": {"source": "lgc", "art": "139"}}]
+      },
+      {
+        "id": "distribution-rapports",
+        "label": "Distribution des rapports de commission",
+        "duration": "P5D",
+        "trigger": "depot-rapport",
+        "legal_ref": {"source": "lgc", "art": "45"},
+        "sources": [{"type": "legal", "legal_ref": {"source": "lgc", "art": "45"}}]
+      },
+      {
+        "id": "rapport-grace",
+        "label": "Rapport sur demande de grâce",
+        "duration": "P5D",
+        "trigger": "depot-demande-grace",
+        "legal_ref": {"source": "lgc", "art": "103"},
+        "sources": [{"type": "legal", "legal_ref": {"source": "lgc", "art": "103"}}]
+      },
+      {
+        "id": "petition-debat",
+        "label": "Débat de pétition",
+        "duration": "P4W",
+        "trigger": "depot-petition",
+        "legal_ref": {"source": "lgc", "art": "108"},
+        "sources": [{"type": "legal", "legal_ref": {"source": "lgc", "art": "108"}}]
+      },
+      {
+        "id": "petition-info",
+        "label": "Information suite à pétition",
+        "duration": "P2W",
+        "trigger": "decision-petition",
+        "legal_ref": {"source": "lgc", "art": "108"},
+        "sources": [{"type": "legal", "legal_ref": {"source": "lgc", "art": "108"}}]
+      },
+      {
+        "id": "petition-suite",
+        "label": "Suite donnée à une pétition",
+        "duration": "P3M",
+        "trigger": "decision-petition",
+        "legal_ref": {"source": "lgc", "art": "108"},
+        "sources": [{"type": "legal", "legal_ref": {"source": "lgc", "art": "108"}}]
+      },
+      {
+        "id": "avis-ce-projet-commission",
+        "label": "Avis du CE sur projet de commission",
+        "duration": "P2M",
+        "trigger": "saisine-ce-projet-commission",
+        "legal_ref": {"source": "lgc", "art": "126a"},
+        "sources": [{"type": "legal", "legal_ref": {"source": "lgc", "art": "126a"}}]
+      },
+      {
+        "id": "delai-referendaire",
+        "label": "Délai référendaire facultatif",
+        "duration": "P60D",
+        "trigger": "publication-acte",
+        "legal_ref": {"source": "cst_vd", "art": "84"},
+        "sources": [{"type": "legal", "legal_ref": {"source": "cst_vd", "art": "84"}}]
+      }
+    ]
+  },
+  "structure": {
+    "institutions": [
+      {
+        "id": "gc",
+        "label": "Grand Conseil",
+        "sources": [{"type": "legal", "legal_ref": {"source": "cst_vd", "art": "84"}}]
+      },
+      {
+        "id": "ce",
+        "label": "Conseil d'État",
+        "sources": [{"type": "legal", "legal_ref": {"source": "loce", "art": "1"}}]
+      }
+    ],
+    "bodies": [
+      {
+        "id": "plenum-gc",
+        "kind": "plenary",
+        "institution": "gc",
+        "label": "Plénum du Grand Conseil",
+        "sources": [{"type": "legal", "legal_ref": {"source": "lgc", "art": "1"}}]
+      },
+      {
+        "id": "bureau-gc",
+        "kind": "bureau",
+        "institution": "gc",
+        "parent": "plenum-gc",
+        "label": "Bureau du Grand Conseil",
+        "sources": [{"type": "legal", "legal_ref": {"source": "lgc", "art": "1"}}]
+      },
+      {
+        "id": "sgc",
+        "kind": "registry",
+        "institution": "gc",
+        "parent": "bureau-gc",
+        "label": "Secrétariat général du Grand Conseil",
+        "sources": [{"type": "legal", "legal_ref": {"source": "lgc", "art": "1"}}]
+      },
+      {
+        "id": "commission",
+        "kind": "committee",
+        "institution": "gc",
+        "parent": "plenum-gc",
+        "label": "Commissions parlementaires",
+        "generic": true,
+        "sources": [{"type": "legal", "legal_ref": {"source": "lgc", "art": "45"}}]
+      },
+      {
+        "id": "college-ce",
+        "kind": "executive-college",
+        "institution": "ce",
+        "label": "Collège du Conseil d'État",
+        "sources": [{"type": "legal", "legal_ref": {"source": "loce", "art": "20"}}]
+      },
+      {
+        "id": "chancellerie",
+        "kind": "registry",
+        "institution": "ce",
+        "parent": "college-ce",
+        "label": "Chancellerie d'État",
+        "sources": [{"type": "legal", "legal_ref": {"source": "loce", "art": "20"}}]
+      },
+      {
+        "id": "csg",
+        "kind": "group",
+        "institution": "ce",
+        "parent": "college-ce",
+        "label": "Conférence des secrétaires généraux",
+        "sources": [{"type": "convention", "ref": "Pratique administrative — voie de circulation (hors LOCE)"}]
+      },
+      {
+        "id": "departement",
+        "kind": "department",
+        "institution": "ce",
+        "parent": "college-ce",
+        "label": "Département",
+        "generic": true,
+        "sources": [{"type": "legal", "legal_ref": {"source": "loce", "art": "20"}}]
+      },
+      {
+        "id": "dep-dits",
+        "kind": "department",
+        "institution": "ce",
+        "parent": "college-ce",
+        "acronym": "DITS",
+        "label": "Institutions, territoire et sport",
+        "legislature": "2022-2027",
+        "sources": [{"type": "convention", "ref": "État de Vaud — dénominations des départements 2022-2027"}]
+      },
+      {
+        "id": "dep-deiep",
+        "kind": "department",
+        "institution": "ce",
+        "parent": "college-ce",
+        "acronym": "DEIEP",
+        "label": "Économie, innovation, emploi et patrimoine",
+        "legislature": "2022-2027",
+        "sources": [{"type": "convention", "ref": "État de Vaud — dénominations des départements 2022-2027"}]
+      },
+      {
+        "id": "dep-def",
+        "kind": "department",
+        "institution": "ce",
+        "parent": "college-ce",
+        "acronym": "DEF",
+        "label": "Enseignement et formation professionnelle",
+        "legislature": "2022-2027",
+        "sources": [{"type": "convention", "ref": "État de Vaud — dénominations des départements 2022-2027"}]
+      },
+      {
+        "id": "dep-dsas",
+        "kind": "department",
+        "institution": "ce",
+        "parent": "college-ce",
+        "acronym": "DSAS",
+        "label": "Santé et action sociale",
+        "legislature": "2022-2027",
+        "sources": [{"type": "convention", "ref": "État de Vaud — dénominations des départements 2022-2027"}]
+      },
+      {
+        "id": "dep-dcirh",
+        "kind": "department",
+        "institution": "ce",
+        "parent": "college-ce",
+        "acronym": "DCIRH",
+        "label": "Culture, infrastructures et ressources humaines",
+        "legislature": "2022-2027",
+        "sources": [{"type": "convention", "ref": "État de Vaud — dénominations des départements 2022-2027"}]
+      },
+      {
+        "id": "dep-djes",
+        "kind": "department",
+        "institution": "ce",
+        "parent": "college-ce",
+        "acronym": "DJES",
+        "label": "Jeunesse, environnement et sécurité",
+        "legislature": "2022-2027",
+        "sources": [{"type": "convention", "ref": "État de Vaud — dénominations des départements 2022-2027"}]
+      },
+      {
+        "id": "dep-dfa",
+        "kind": "department",
+        "institution": "ce",
+        "parent": "college-ce",
+        "acronym": "DFA",
+        "label": "Finances et agriculture",
+        "legislature": "2022-2027",
+        "sources": [{"type": "convention", "ref": "État de Vaud — dénominations des départements 2022-2027"}]
+      },
+      {
+        "id": "service",
+        "kind": "service",
+        "institution": "ce",
+        "parent": "departement",
+        "label": "Service",
+        "generic": true,
+        "sources": [{"type": "convention", "ref": "Organisation administrative cantonale"}]
+      }
+    ]
+  },
+  "examples": {
+    "persons": [
+      {"id": "pers-alice", "displayName": "Alice Députée (fictive)"}
+    ],
+    "civicObjects": [
+      {
+        "id": "obj-motion-demo",
+        "objectType": "motion",
+        "label": "Motion fictive sur la mobilité douce",
+        "author": "pers-alice",
+        "state": "renvoyee-au-ce"
+      },
+      {
+        "id": "obj-reponse-demo",
+        "objectType": "rapport-commission",
+        "label": "Réponse fictive du CE à la motion",
+        "state": "disponible"
+      }
+    ],
+    "dossiers": [
+      {
+        "id": "dos-motion-demo",
+        "label": "Dossier motion démo",
+        "relations": [
+          {"kind": "replies-to", "from": "obj-reponse-demo", "to": "obj-motion-demo"}
+        ]
+      }
+    ],
+    "handovers": [
+      {
+        "id": "ho-motion-vers-ce",
+        "object": "obj-motion-demo",
+        "fromBody": "plenum-gc",
+        "toBody": "college-ce",
+        "deadlinesStarted": ["reponse-motion-postulat-initiative"]
+      }
+    ],
+    "deadlines": [
+      {
+        "id": "dl-reponse-motion",
+        "deadlineType": "reponse-motion-postulat-initiative",
+        "startDate": "2026-01-15",
+        "computedDue": "2027-01-15",
+        "state": "running",
+        "object": "obj-motion-demo"
+      }
+    ]
+  }
+}

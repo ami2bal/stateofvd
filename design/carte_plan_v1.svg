@@ -1,0 +1,300 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg viewBox="0 0 1560 1560" width="1560" height="1560" xmlns="http://www.w3.org/2000/svg" font-family="'Segoe UI',system-ui,sans-serif">
+  <title>State of VD — plan d'architecte de la carte du jeu</title>
+  <desc>Vue du dessus schématique : Jura au nord, Lac Léman au sud, le Grand Conseil et le Château Saint-Maire (Conseil d'État) de part et d'autre de la Place du Château, avec leurs salles intérieures, la rue des Départements, la cathédrale et Lavaux.</desc>
+
+  <defs>
+    <pattern id="grid" width="80" height="80" patternUnits="userSpaceOnUse">
+      <path d="M80 0H0V80" fill="none" stroke="#E2DAC8" stroke-width="1"/>
+    </pattern>
+  </defs>
+
+  <!-- paper -->
+  <rect x="0" y="0" width="1560" height="1560" fill="#EFE9DB"/>
+  <rect x="40" y="30" width="1140" height="1500" fill="#F5F1E7"/>
+  <rect x="40" y="30" width="1140" height="1500" fill="url(#grid)"/>
+  <rect x="40" y="30" width="1140" height="1500" fill="none" stroke="#C9BCA3" stroke-width="2"/>
+
+  <!-- ===== JURA (nord) ===== -->
+  <rect x="40" y="30" width="1140" height="150" fill="#6E8A6E"/>
+  <path d="M40 180 L150 96 L250 150 L360 84 L470 150 L590 100 L700 150 L820 92 L930 150 L1050 104 L1180 150 L1180 180 Z" fill="#587058"/>
+  <path d="M40 180 L150 96 L250 150 L360 84 L470 150 L590 100 L700 150 L820 92 L930 150 L1050 104 L1180 150" fill="none" stroke="#425442" stroke-width="2"/>
+  <text x="610" y="66" text-anchor="middle" fill="#EAF0E6" font-size="22" font-weight="700" letter-spacing="3">N  ·  J U R A</text>
+  <text x="610" y="90" text-anchor="middle" fill="#D2E0CE" font-size="12" letter-spacing="1">frontière cantonale</text>
+
+  <!-- ground -->
+  <rect x="40" y="180" width="1140" height="1250" fill="#C8D9A8"/>
+
+  <!-- ===== PALAIS DE RUMINE (nord) ===== -->
+  <g>
+    <rect x="380" y="212" width="460" height="118" fill="#DCD2BE" stroke="#8A7E64" stroke-width="2.5"/>
+    <rect x="380" y="212" width="460" height="26" fill="#8A93A2"/>
+    <text x="610" y="230" text-anchor="middle" fill="#fff" font-size="13" font-weight="700">PALAIS DE RUMINE</text>
+    <rect x="394" y="250" width="212" height="68" fill="#E8E2D4" stroke="#B8AE98"/>
+    <text x="500" y="280" text-anchor="middle" fill="#6B5E48" font-size="11">Salle historique</text>
+    <text x="500" y="296" text-anchor="middle" fill="#6B5E48" font-size="11">du Grand Conseil</text>
+    <rect x="614" y="250" width="212" height="68" fill="#E8E2D4" stroke="#B8AE98"/>
+    <text x="720" y="280" text-anchor="middle" fill="#6B5E48" font-size="11">Archives · BCU</text>
+    <text x="720" y="296" text-anchor="middle" fill="#9A8C70" font-size="10" font-style="italic">(rôle jeu à définir)</text>
+  </g>
+
+  <!-- ===== GRAND CONSEIL ===== -->
+  <g>
+    <!-- lanterneau -->
+    <polygon points="610,352 640,368 640,392 580,392 580,368" fill="#9FC2DC" stroke="#5E7E96" stroke-width="2"/>
+    <text x="610" y="382" text-anchor="middle" fill="#2F4658" font-size="9">lanterneau</text>
+    <rect x="260" y="392" width="700" height="300" fill="#DCD2BE" stroke="#3E7A52" stroke-width="3"/>
+    <rect x="260" y="392" width="700" height="30" fill="#3E7A52"/>
+    <text x="610" y="413" text-anchor="middle" fill="#fff" font-size="15" font-weight="700">GRAND CONSEIL — 150 députés · législatif</text>
+    <!-- hémicycle -->
+    <rect x="276" y="432" width="286" height="244" fill="#E8E2D4" stroke="#B8AE98"/>
+    <g fill="none" stroke="#3E7A52" stroke-width="2" opacity="0.7">
+      <path d="M336 656 A80 80 0 0 1 496 656"/>
+      <path d="M348 656 A68 68 0 0 1 484 656"/>
+      <path d="M360 656 A56 56 0 0 1 472 656"/>
+      <path d="M372 656 A44 44 0 0 1 460 656"/>
+    </g>
+    <circle cx="416" cy="656" r="7" fill="#C9A45C"/>
+    <text x="419" y="460" text-anchor="middle" fill="#3E5A44" font-size="12" font-weight="600">Hémicycle</text>
+    <text x="419" y="476" text-anchor="middle" fill="#6B5E48" font-size="10">Plénum (le mardi)</text>
+    <!-- pas perdus -->
+    <rect x="562" y="432" width="40" height="244" fill="#D8CFBE" stroke="#B8AE98"/>
+    <text x="582" y="554" fill="#6B5E48" font-size="10" transform="rotate(-90 582 554)" text-anchor="middle">Salle des pas perdus</text>
+    <!-- right rooms -->
+    <rect x="602" y="432" width="176" height="116" fill="#E8E2D4" stroke="#B8AE98"/>
+    <text x="690" y="486" text-anchor="middle" fill="#6B5E48" font-size="11">Bureau du GC</text>
+    <text x="690" y="502" text-anchor="middle" fill="#9A8C70" font-size="9">recevabilité · ODJ</text>
+    <rect x="784" y="432" width="160" height="116" fill="#E8E2D4" stroke="#B8AE98"/>
+    <text x="864" y="486" text-anchor="middle" fill="#6B5E48" font-size="11">Commissions</text>
+    <text x="864" y="502" text-anchor="middle" fill="#9A8C70" font-size="9">huis clos</text>
+    <rect x="602" y="556" width="176" height="120" fill="#E8E2D4" stroke="#B8AE98"/>
+    <text x="690" y="600" text-anchor="middle" fill="#6B5E48" font-size="11">Secrétariat général</text>
+    <text x="690" y="615" text-anchor="middle" fill="#9A8C70" font-size="9">(SGC)</text>
+    <g stroke="#C4453C" stroke-width="1.5" fill="none" opacity="0.75">
+      <rect x="648" y="628" width="84" height="34"/>
+      <line x1="648" y1="639" x2="732" y2="639"/><line x1="648" y1="650" x2="732" y2="650"/>
+      <line x1="676" y1="628" x2="676" y2="662"/><line x1="704" y1="628" x2="704" y2="662"/>
+    </g>
+    <text x="690" y="672" text-anchor="middle" fill="#B0483F" font-size="8.5">tableau des délais</text>
+    <rect x="784" y="556" width="160" height="120" fill="#E8E2D4" stroke="#B8AE98"/>
+    <text x="864" y="612" text-anchor="middle" fill="#6B5E48" font-size="11">Commissions</text>
+    <text x="864" y="628" text-anchor="middle" fill="#9A8C70" font-size="9">rapporteurs</text>
+  </g>
+
+  <!-- ===== PLACE DU CHÂTEAU (esplanade) ===== -->
+  <rect x="340" y="704" width="540" height="96" fill="#B8B2A6" stroke="#9A9284" stroke-width="1.5"/>
+  <text x="610" y="736" text-anchor="middle" fill="#5C564A" font-size="12" font-weight="600" letter-spacing="1">PLACE DU CHÂTEAU · l'esplanade</text>
+  <!-- gold navette -->
+  <line x1="610" y1="692" x2="610" y2="820" stroke="#E8C15A" stroke-width="4" stroke-dasharray="7 6"/>
+  <circle cx="610" cy="756" r="10" fill="#E8C15A" stroke="#B8860B" stroke-width="1.5"/>
+  <text x="632" y="760" fill="#8A6A16" font-size="10" font-weight="600">navette</text>
+  <text x="632" y="774" fill="#9A8C70" font-size="9">responsabilité</text>
+
+  <!-- ===== CHÂTEAU SAINT-MAIRE (Conseil d'État) ===== -->
+  <g>
+    <rect x="330" y="820" width="560" height="300" fill="#DCD2BE" stroke="#A4553E" stroke-width="4"/>
+    <!-- turrets (brique) -->
+    <rect x="318" y="808" width="24" height="24" fill="#A4553E"/>
+    <rect x="878" y="808" width="24" height="24" fill="#A4553E"/>
+    <rect x="318" y="1108" width="24" height="24" fill="#A4553E"/>
+    <rect x="878" y="1108" width="24" height="24" fill="#A4553E"/>
+    <rect x="330" y="820" width="560" height="30" fill="#C9A45C"/>
+    <text x="610" y="841" text-anchor="middle" fill="#4A3A17" font-size="15" font-weight="700">CONSEIL D'ÉTAT — 7 conseillers · exécutif  ·  Château Saint-Maire</text>
+    <!-- Salle du Conseil -->
+    <rect x="346" y="862" width="268" height="244" fill="#E8E2D4" stroke="#B8AE98"/>
+    <text x="480" y="888" text-anchor="middle" fill="#6B5E48" font-size="12" font-weight="600">Salle du Conseil</text>
+    <text x="480" y="904" text-anchor="middle" fill="#9A8C70" font-size="10">Collège des 7 (le mercredi)</text>
+    <ellipse cx="480" cy="1010" rx="78" ry="52" fill="#D8CFBE" stroke="#B0A488" stroke-width="2"/>
+    <g fill="#C9A45C">
+      <circle cx="480" cy="956" r="7"/><circle cx="542" cy="978" r="7"/><circle cx="556" cy="1032" r="7"/>
+      <circle cx="512" cy="1062" r="7"/><circle cx="448" cy="1062" r="7"/><circle cx="404" cy="1032" r="7"/><circle cx="418" cy="978" r="7"/>
+    </g>
+    <!-- Chancellerie -->
+    <rect x="626" y="862" width="248" height="118" fill="#E8E2D4" stroke="#B8AE98"/>
+    <text x="750" y="900" text-anchor="middle" fill="#2F4266" font-size="12" font-weight="600">Chancellerie</text>
+    <text x="750" y="916" text-anchor="middle" fill="#9A8C70" font-size="10">greffe du CE · navette</text>
+    <g stroke="#2F4266" stroke-width="1.5" fill="none" opacity="0.7">
+      <circle cx="726" cy="948" r="12"/><circle cx="746" cy="948" r="12"/>
+    </g>
+    <text x="792" y="952" fill="#2F4266" font-size="9">presse FAO</text>
+    <!-- CSG -->
+    <rect x="626" y="990" width="248" height="116" fill="#E8E2D4" stroke="#B8AE98"/>
+    <text x="750" y="1042" text-anchor="middle" fill="#6B5E48" font-size="11">Antichambre · CSG</text>
+    <text x="750" y="1058" text-anchor="middle" fill="#9A8C70" font-size="9">préavis du lundi</text>
+  </g>
+
+  <!-- ===== CATHÉDRALE ===== -->
+  <g>
+    <polygon points="150,742 178,700 206,742" fill="#B4674F" stroke="#8E5843" stroke-width="1.5"/>
+    <rect x="150" y="742" width="56" height="120" fill="#DCD2BE" stroke="#A89F8D" stroke-width="2"/>
+    <line x1="178" y1="742" x2="178" y2="862" stroke="#B8AE98"/>
+    <text x="178" y="884" text-anchor="middle" fill="#6B5E48" font-size="11">Cathédrale</text>
+    <text x="178" y="899" text-anchor="middle" fill="#9A8C70" font-size="9">le guet · 22 h</text>
+  </g>
+
+  <!-- ===== LAVAUX (est) ===== -->
+  <g>
+    <rect x="1000" y="820" width="160" height="300" fill="#A8B36B"/>
+    <g stroke="#87954F" stroke-width="3" fill="none">
+      <path d="M1000 852 Q1080 838 1160 852"/><path d="M1000 890 Q1080 876 1160 890"/>
+      <path d="M1000 928 Q1080 914 1160 928"/><path d="M1000 966 Q1080 952 1160 966"/>
+      <path d="M1000 1004 Q1080 990 1160 1004"/><path d="M1000 1042 Q1080 1028 1160 1042"/>
+      <path d="M1000 1080 Q1080 1066 1160 1080"/>
+    </g>
+    <text x="1080" y="1108" text-anchor="middle" fill="#4F5A2C" font-size="11" font-weight="600">Lavaux (vignes)</text>
+  </g>
+
+  <!-- ===== RUE DES DÉPARTEMENTS ===== -->
+  <text x="610" y="1168" text-anchor="middle" fill="#5C564A" font-size="12" font-weight="700" letter-spacing="1">RUE DES DÉPARTEMENTS — 7 hôtels administratifs</text>
+  <rect x="60" y="1256" width="1120" height="18" fill="#B8B2A6"/>
+  <!-- row A: 4 -->
+  <g>
+    <g>
+      <rect x="80" y="1184" width="230" height="66" fill="#DCD2BE" stroke="#8A7E64" stroke-width="2"/>
+      <rect x="80" y="1184" width="10" height="66" fill="#5C6E8A"/>
+      <text x="200" y="1210" text-anchor="middle" fill="#3A3226" font-size="12" font-weight="600">Département 1</text>
+      <text x="200" y="1234" text-anchor="middle" fill="#8A7C60" font-size="10">Chef · SG · services</text>
+    </g>
+    <g>
+      <rect x="368" y="1184" width="230" height="66" fill="#DCD2BE" stroke="#8A7E64" stroke-width="2"/>
+      <rect x="368" y="1184" width="10" height="66" fill="#8A6E5C"/>
+      <text x="488" y="1210" text-anchor="middle" fill="#3A3226" font-size="12" font-weight="600">Département 2</text>
+      <text x="488" y="1234" text-anchor="middle" fill="#8A7C60" font-size="10">Chef · SG · services</text>
+    </g>
+    <g>
+      <rect x="656" y="1184" width="230" height="66" fill="#DCD2BE" stroke="#8A7E64" stroke-width="2"/>
+      <rect x="656" y="1184" width="10" height="66" fill="#6E8A6E"/>
+      <text x="776" y="1210" text-anchor="middle" fill="#3A3226" font-size="12" font-weight="600">Département 3</text>
+      <text x="776" y="1234" text-anchor="middle" fill="#8A7C60" font-size="10">Chef · SG · services</text>
+    </g>
+    <g>
+      <rect x="944" y="1184" width="230" height="66" fill="#DCD2BE" stroke="#8A7E64" stroke-width="2"/>
+      <rect x="944" y="1184" width="10" height="66" fill="#7A6A8C"/>
+      <text x="1064" y="1210" text-anchor="middle" fill="#3A3226" font-size="12" font-weight="600">Département 4</text>
+      <text x="1064" y="1234" text-anchor="middle" fill="#8A7C60" font-size="10">Chef · SG · services</text>
+    </g>
+  </g>
+  <!-- row B: 3 -->
+  <g>
+    <g>
+      <rect x="224" y="1284" width="230" height="66" fill="#DCD2BE" stroke="#8A7E64" stroke-width="2"/>
+      <rect x="224" y="1284" width="10" height="66" fill="#5C7A8A"/>
+      <text x="344" y="1310" text-anchor="middle" fill="#3A3226" font-size="12" font-weight="600">Département 5</text>
+      <text x="344" y="1334" text-anchor="middle" fill="#8A7C60" font-size="10">Chef · SG · services</text>
+    </g>
+    <g>
+      <rect x="512" y="1284" width="230" height="66" fill="#DCD2BE" stroke="#8A7E64" stroke-width="2"/>
+      <rect x="512" y="1284" width="10" height="66" fill="#8A5C6E"/>
+      <text x="632" y="1310" text-anchor="middle" fill="#3A3226" font-size="12" font-weight="600">Département 6</text>
+      <text x="632" y="1334" text-anchor="middle" fill="#8A7C60" font-size="10">Chef · SG · services</text>
+    </g>
+    <g>
+      <rect x="800" y="1284" width="230" height="66" fill="#DCD2BE" stroke="#8A7E64" stroke-width="2"/>
+      <rect x="800" y="1284" width="10" height="66" fill="#8A7A5C"/>
+      <text x="920" y="1310" text-anchor="middle" fill="#3A3226" font-size="12" font-weight="600">Département 7</text>
+      <text x="920" y="1334" text-anchor="middle" fill="#8A7C60" font-size="10">Chef · SG · services</text>
+    </g>
+  </g>
+
+  <!-- ===== VILLE BASSE · OUCHY ===== -->
+  <g fill="#D8CFBE" stroke="#B0A488">
+    <polygon points="120,1420 150,1392 180,1420"/><polygon points="220,1420 250,1392 280,1420"/>
+    <polygon points="900,1420 930,1392 960,1420"/><polygon points="1000,1420 1030,1392 1060,1420"/>
+  </g>
+  <text x="300" y="1414" fill="#6B5E48" font-size="11">Ville basse</text>
+  <!-- Ouchy steamboat -->
+  <g>
+    <path d="M560 1410 h120 l-16 26 h-88 Z" fill="#E8E2D4" stroke="#8A7E64" stroke-width="1.5"/>
+    <rect x="590" y="1392" width="60" height="18" fill="#D8CFBE" stroke="#8A7E64"/>
+    <rect x="614" y="1374" width="10" height="18" fill="#C4453C"/>
+    <text x="620" y="1456" text-anchor="middle" fill="#5C564A" font-size="11" font-weight="600">Ouchy · embarcadère</text>
+  </g>
+
+  <!-- ===== LÉMAN (sud) ===== -->
+  <rect x="40" y="1460" width="1140" height="70" fill="#4C83AB"/>
+  <g stroke="#6BA4C8" stroke-width="2.5" fill="none" opacity="0.8">
+    <path d="M40 1482 Q120 1474 200 1482 T360 1482 T520 1482 T680 1482 T840 1482 T1000 1482 T1180 1482"/>
+    <path d="M40 1508 Q120 1500 200 1508 T360 1508 T520 1508 T680 1508 T840 1508 T1000 1508 T1180 1508"/>
+  </g>
+  <text x="610" y="1502" text-anchor="middle" fill="#EAF2F8" font-size="20" font-weight="700" letter-spacing="3">S  ·  L A C   L É M A N</text>
+
+  <!-- ===== CARTOUCHE (droite) ===== -->
+  <g>
+    <rect x="1200" y="30" width="330" height="1500" fill="#F5F1E7" stroke="#C9BCA3" stroke-width="2"/>
+    <text x="1365" y="80" text-anchor="middle" fill="#3A3226" font-size="26" font-weight="800" letter-spacing="1">STATE OF VD</text>
+    <text x="1365" y="106" text-anchor="middle" fill="#6B5E48" font-size="13">Plan de la carte — vue du dessus</text>
+    <line x1="1230" y1="126" x2="1500" y2="126" stroke="#C9BCA3" stroke-width="1.5"/>
+
+    <!-- compass -->
+    <circle cx="1365" cy="248" r="86" fill="#EFE9DB" stroke="#B8AE98" stroke-width="2"/>
+    <polygon points="1365,168 1352,250 1378,250" fill="#3E7A52"/>
+    <polygon points="1365,328 1352,250 1378,250" fill="#B8B2A6"/>
+    <text x="1365" y="160" text-anchor="middle" fill="#3A3226" font-size="14" font-weight="700">N</text>
+    <text x="1365" y="352" text-anchor="middle" fill="#3A3226" font-size="14" font-weight="700">S</text>
+    <text x="1460" y="254" text-anchor="middle" fill="#3A3226" font-size="14" font-weight="700">E</text>
+    <text x="1272" y="254" text-anchor="middle" fill="#3A3226" font-size="14" font-weight="700">O</text>
+    <text x="1365" y="230" text-anchor="middle" fill="#587058" font-size="9">Jura</text>
+    <text x="1365" y="286" text-anchor="middle" fill="#3E6E92" font-size="9">Léman</text>
+    <text x="1432" y="242" text-anchor="middle" fill="#6F7A3E" font-size="8.5">Lavaux</text>
+    <text x="1300" y="242" text-anchor="middle" fill="#8A7C60" font-size="8">Genève</text>
+
+    <line x1="1230" y1="372" x2="1500" y2="372" stroke="#C9BCA3" stroke-width="1.5"/>
+
+    <!-- legend -->
+    <text x="1230" y="404" fill="#3A3226" font-size="13" font-weight="700">LÉGENDE</text>
+    <g font-size="12" fill="#5C544A">
+      <rect x="1230" y="420" width="22" height="16" fill="#3E7A52"/><text x="1262" y="433">Grand Conseil (législatif)</text>
+      <rect x="1230" y="446" width="22" height="16" fill="#C9A45C"/><text x="1262" y="459">Conseil d'État (exécutif)</text>
+      <rect x="1230" y="472" width="22" height="16" fill="#2F4266"/><text x="1262" y="485">Chancellerie</text>
+      <rect x="1230" y="498" width="22" height="16" fill="#E8C15A" stroke="#B8860B"/><text x="1262" y="511">Navette · responsabilité</text>
+    </g>
+    <text x="1230" y="548" fill="#6B5E48" font-size="11" font-style="italic">Une salle = un organe du</text>
+    <text x="1230" y="564" fill="#6B5E48" font-size="11" font-style="italic">modèle civique (D-008).</text>
+
+    <line x1="1230" y1="586" x2="1500" y2="586" stroke="#C9BCA3" stroke-width="1.5"/>
+    <text x="1230" y="614" fill="#3A3226" font-size="13" font-weight="700">MATIÈRES</text>
+    <g font-size="12" fill="#5C544A">
+      <rect x="1230" y="630" width="22" height="16" fill="#DCD2BE" stroke="#A89F8D"/><text x="1262" y="643">Molasse (murs)</text>
+      <rect x="1230" y="656" width="22" height="16" fill="#A4553E"/><text x="1262" y="669">Brique (Château)</text>
+      <rect x="1230" y="682" width="22" height="16" fill="#B8B2A6"/><text x="1262" y="695">Pavés (esplanade)</text>
+      <rect x="1230" y="708" width="22" height="16" fill="#C8D9A8"/><text x="1262" y="721">Herbe · terrain</text>
+      <rect x="1230" y="734" width="22" height="16" fill="#4C83AB"/><text x="1262" y="747">Lac Léman</text>
+      <rect x="1230" y="760" width="22" height="16" fill="#A8B36B"/><text x="1262" y="773">Lavaux (vignes)</text>
+      <rect x="1230" y="786" width="22" height="16" fill="#6E8A6E"/><text x="1262" y="799">Jura (forêt)</text>
+    </g>
+
+    <line x1="1230" y1="826" x2="1500" y2="826" stroke="#C9BCA3" stroke-width="1.5"/>
+    <text x="1230" y="854" fill="#3A3226" font-size="13" font-weight="700">AXES</text>
+    <text x="1230" y="878" fill="#5C544A" font-size="12">N ↑ Jura  ·  S ↓ Léman</text>
+    <text x="1230" y="898" fill="#5C544A" font-size="12">E → Lavaux  ·  O ← Genève</text>
+    <text x="1230" y="920" fill="#5C544A" font-size="12">« Monter, c'est décider »</text>
+
+    <line x1="1230" y1="944" x2="1500" y2="944" stroke="#C9BCA3" stroke-width="1.5"/>
+    <text x="1230" y="972" fill="#3A3226" font-size="13" font-weight="700">DU NORD AU SUD</text>
+    <g font-size="11.5" fill="#5C544A">
+      <text x="1230" y="996">1 · Jura (frontière)</text>
+      <text x="1230" y="1016">2 · Palais de Rumine</text>
+      <text x="1230" y="1036">3 · Grand Conseil</text>
+      <text x="1230" y="1056">4 · Place du Château</text>
+      <text x="1230" y="1076">5 · Château Saint-Maire (CE)</text>
+      <text x="1230" y="1096">6 · Rue des Départements</text>
+      <text x="1230" y="1116">7 · Ville basse · Ouchy</text>
+      <text x="1230" y="1136">8 · Lac Léman</text>
+      <text x="1230" y="1156">+ Cathédrale (O) · Lavaux (E)</text>
+    </g>
+
+    <line x1="1230" y1="1180" x2="1500" y2="1180" stroke="#C9BCA3" stroke-width="1.5"/>
+    <rect x="1230" y="1200" width="270" height="150" fill="#FBF8F0" stroke="#E0D8C6"/>
+    <text x="1244" y="1224" fill="#8A6A16" font-size="11" font-weight="700">⚠ ESQUISSE v1 — à caler</text>
+    <g font-size="11" fill="#6B5E48">
+      <text x="1244" y="1248">Positions &amp; espacements =</text>
+      <text x="1244" y="1266">indicatifs. Géographie</text>
+      <text x="1244" y="1284">« grandes lignes », pas au</text>
+      <text x="1244" y="1302">cadastre. À figer ensuite</text>
+      <text x="1244" y="1320">sur la grille world.json</text>
+      <text x="1244" y="1338">(1 tuile = 24 px).</text>
+    </g>
+    <text x="1365" y="1420" text-anchor="middle" fill="#9A8C70" font-size="10">Draft · pixel art à venir</text>
+    <text x="1365" y="1438" text-anchor="middle" fill="#9A8C70" font-size="10">rendu = médium du jeu</text>
+  </g>
+</svg>

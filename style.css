@@ -1,0 +1,428 @@
+/* State of VD — full-bleed canvas + light glass HUD */
+html,
+body {
+  margin: 0;
+  height: 100%;
+  overflow: hidden;
+  font-family: "Segoe UI", Helvetica, Arial, sans-serif;
+  background: #d6e6f2;
+  color: #2f4266;
+}
+
+/* Shell local + embed iframe (macro HTML hôte) */
+.sovd-root,
+#sovd-root {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  min-height: 100%;
+  overflow: hidden;
+  background: #d6e6f2;
+  isolation: isolate;
+}
+/* Embed iframe : hauteur fixe (le body hôte n'est pas 100vh) */
+.sovd-root.sovd-embed,
+#sovd-root.sovd-embed {
+  height: min(900px, 92vh);
+  min-height: 640px;
+  max-height: 92vh;
+  border-radius: 10px;
+  border: 1px solid rgba(47, 66, 102, 0.12);
+  box-shadow: 0 2px 12px rgba(36, 48, 63, 0.08);
+}
+#sovd-root:fullscreen,
+#sovd-root:-webkit-full-screen,
+.sovd-root:fullscreen,
+.sovd-root:-webkit-full-screen,
+#sovd-root.is-fs-fake {
+  width: 100vw !important;
+  height: 100vh !important;
+  max-height: none !important;
+  min-height: 0 !important;
+  border: none !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  z-index: 99999;
+  background: #d6e6f2;
+}
+
+#game-host {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+
+/* ── Chrome haut-droite : plein écran + brand ── */
+#sovd-chrome {
+  position: absolute;
+  top: 14px;
+  right: 16px;
+  z-index: 30;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  pointer-events: none;
+}
+#sovd-chrome > * {
+  pointer-events: auto;
+}
+
+/* Bouton plein écran — juste avant le logo */
+.sovd-fs-btn {
+  --vd-green: #3c8a2e;
+  --vd-ink: #2f4266;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  padding: 0;
+  border-radius: 999px;
+  border: 1px solid rgba(60, 138, 46, 0.28);
+  background: linear-gradient(
+    160deg,
+    rgba(255, 255, 255, 0.92) 0%,
+    rgba(255, 255, 255, 0.78) 50%,
+    rgba(244, 250, 244, 0.72) 100%
+  );
+  color: var(--vd-ink);
+  cursor: pointer;
+  box-shadow:
+    0 6px 22px rgba(36, 48, 63, 0.08),
+    inset 0 1px 0 rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(12px) saturate(1.1);
+  -webkit-backdrop-filter: blur(12px) saturate(1.1);
+  transition: border-color 0.25s ease, box-shadow 0.25s ease, transform 0.25s ease,
+    color 0.2s ease, background 0.25s ease;
+}
+.sovd-fs-btn:hover {
+  border-color: rgba(60, 138, 46, 0.5);
+  color: var(--vd-green);
+  box-shadow:
+    0 8px 28px rgba(36, 48, 63, 0.11),
+    0 0 0 1px rgba(60, 138, 46, 0.12);
+  transform: translateY(-0.5px);
+}
+.sovd-fs-btn:focus-visible {
+  outline: 2px solid #3c8a2e;
+  outline-offset: 2px;
+}
+.sovd-fs-btn[aria-pressed="true"] {
+  background: #2f4266;
+  color: #fff;
+  border-color: #2f4266;
+}
+.sovd-fs-btn .sovd-fs-ico {
+  display: block;
+}
+.sovd-fs-btn[aria-pressed="true"] .sovd-fs-ico--enter {
+  display: none;
+}
+.sovd-fs-btn[aria-pressed="true"] .sovd-fs-ico--exit {
+  display: block !important;
+}
+.sovd-fs-btn[aria-pressed="false"] .sovd-fs-ico--exit {
+  display: none !important;
+}
+
+/* ── Brand mark — « State of » + écu VD (sans bordure) ── */
+#sovd-brand {
+  --vd-green: #3c8a2e;
+  --vd-green-deep: #2f7a24;
+  --vd-ink: #2f4266;
+  --vd-white: #ffffff;
+  position: relative;
+  top: auto;
+  right: auto;
+  z-index: 30;
+  display: inline-flex;
+  align-items: center;
+  gap: 0;
+  padding: 5px 10px 5px 12px;
+  text-decoration: none;
+  color: var(--vd-ink);
+  border-radius: 999px;
+  background: linear-gradient(
+    160deg,
+    rgba(255, 255, 255, 0.9) 0%,
+    rgba(255, 255, 255, 0.76) 45%,
+    rgba(244, 250, 244, 0.7) 100%
+  );
+  border: none;
+  box-shadow:
+    0 6px 22px rgba(36, 48, 63, 0.08),
+    inset 0 1px 0 rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(12px) saturate(1.1);
+  -webkit-backdrop-filter: blur(12px) saturate(1.1);
+  overflow: hidden;
+  isolation: isolate;
+  cursor: default;
+  pointer-events: auto;
+  user-select: none;
+  transition:
+    box-shadow 0.35s ease,
+    transform 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+#sovd-brand:hover {
+  box-shadow:
+    0 8px 28px rgba(36, 48, 63, 0.11),
+    inset 0 1px 0 rgba(255, 255, 255, 1);
+  transform: translateY(-0.5px);
+}
+
+#sovd-brand .sovd-brand__text {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  font-family: "Cormorant Garamond", "Palatino Linotype", Palatino, "Book Antiqua",
+    Georgia, serif;
+  font-size: 17px;
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  line-height: 1;
+  white-space: nowrap;
+  color: var(--vd-ink);
+}
+
+#sovd-brand .sovd-brand__text em {
+  font-style: italic;
+  font-weight: 500;
+  color: #3a4a3c;
+  opacity: 0.9;
+}
+
+/* Écu = le « VD » (remplace le texte fort) */
+#sovd-brand .sovd-brand__mark {
+  display: flex;
+  flex-shrink: 0;
+  width: 26px;
+  height: 32px;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: none;
+  border-radius: 0;
+  box-shadow: none;
+  transition: transform 0.35s ease;
+}
+
+#sovd-brand .sovd-brand__mark img {
+  width: 22px;
+  height: 28px;
+  display: block;
+  object-fit: contain;
+  filter: drop-shadow(0 1px 2px rgba(47, 66, 102, 0.12));
+}
+
+#sovd-brand:hover .sovd-brand__mark {
+  transform: scale(1.06);
+}
+
+/* Reflet chic — balayage de lumière au survol */
+#sovd-brand .sovd-brand__sheen {
+  position: absolute;
+  inset: -40% -60%;
+  background: linear-gradient(
+    105deg,
+    transparent 38%,
+    rgba(255, 255, 255, 0) 42%,
+    rgba(255, 255, 255, 0.55) 48%,
+    rgba(255, 255, 255, 0.18) 52%,
+    transparent 58%
+  );
+  transform: translateX(-45%) rotate(8deg);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s ease;
+  z-index: 2;
+}
+
+#sovd-brand:hover .sovd-brand__sheen {
+  opacity: 1;
+  animation: sovd-brand-sheen 1.05s cubic-bezier(0.22, 1, 0.36, 1) 1;
+}
+
+@keyframes sovd-brand-sheen {
+  0% {
+    transform: translateX(-55%) rotate(8deg);
+  }
+  100% {
+    transform: translateX(55%) rotate(8deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  #sovd-brand,
+  #sovd-brand .sovd-brand__mark,
+  #sovd-brand .sovd-brand__sheen {
+    transition: none;
+    animation: none !important;
+  }
+  #sovd-brand:hover .sovd-brand__sheen {
+    opacity: 0.25;
+    transform: none;
+  }
+}
+
+#game {
+  display: block;
+  width: 100%;
+  height: 100%;
+  touch-action: none;
+}
+
+/* TASK-097 K13: legacy #hud (clock + speed) removed — superseded by Mode Parcours */
+#hud,
+#hud-clock {
+  display: none !important;
+}
+
+/* TASK-095 #3: #fiche recap removed (inspector handles info) */
+#fiche {
+  display: none !important;
+}
+
+#qa-panel {
+  position: fixed;
+  right: 12px;
+  bottom: 12px;
+  z-index: 12;
+  width: min(420px, calc(100vw - 24px));
+  max-height: 42vh;
+  overflow: auto;
+  padding: 10px 12px;
+  border-radius: 12px;
+  background: rgba(20, 28, 40, 0.88);
+  color: #e8eef6;
+  font-family: ui-monospace, Consolas, monospace;
+  font-size: 11px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+#qa-panel h2 {
+  margin: 0 0 6px;
+  font-size: 12px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: #9db0c8;
+  font-weight: 700;
+}
+
+#qa-out {
+  margin: 0;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+/* TASK-095 #5: bottom help strip removed */
+
+#flow-hud {
+  /* Mode Parcours = barre bas (détail glasso dans scenario-panel injecté) */
+  position: fixed;
+  left: 50%;
+  right: auto;
+  top: auto;
+  bottom: 14px;
+  transform: translateX(-50%);
+  z-index: 22;
+  width: min(960px, calc(100vw - 28px));
+  padding: 10px 12px 8px;
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.34);
+  backdrop-filter: blur(18px) saturate(1.2);
+  -webkit-backdrop-filter: blur(18px) saturate(1.2);
+  border: 1px solid rgba(255, 255, 255, 0.55);
+  box-shadow:
+    0 10px 36px rgba(36, 48, 63, 0.12),
+    inset 0 1px 0 rgba(255, 255, 255, 0.45);
+  font-size: 13px;
+  color: #2f4266;
+  pointer-events: auto;
+}
+
+#flow-hud[hidden] {
+  display: none !important;
+}
+
+#flow-hud .flow-title {
+  font-weight: 700;
+  font-size: 15px;
+  margin-bottom: 6px;
+}
+
+#flow-hud .flow-obj {
+  font-size: 12.5px;
+  margin-bottom: 6px;
+  color: #3e7a52;
+  font-weight: 600;
+}
+
+#flow-hud .flow-next {
+  font-size: 12.5px;
+  margin-bottom: 8px;
+  line-height: 1.4;
+}
+
+#flow-hud .flow-clock {
+  font-variant-numeric: tabular-nums;
+  font-size: 12px;
+  color: #5e6c84;
+  margin-bottom: 10px;
+}
+
+#flow-hud .flow-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 8px;
+}
+
+#flow-hud .flow-btn {
+  border: 1px solid rgba(47, 66, 102, 0.2);
+  background: #2f4266;
+  color: #fff;
+  border-radius: 8px;
+  padding: 7px 12px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+#flow-hud .flow-btn.secondary {
+  background: rgba(255, 255, 255, 0.9);
+  color: #2f4266;
+}
+
+#flow-hud .flow-btn:disabled {
+  opacity: 0.45;
+  cursor: default;
+}
+
+#flow-hud .flow-stamp {
+  display: inline-block;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  font-size: 12px;
+  padding: 4px 10px;
+  border-radius: 6px;
+  margin-bottom: 6px;
+}
+
+#flow-hud .flow-stamp.ok {
+  background: #e6f4ea;
+  color: #1e6b3a;
+}
+
+#flow-hud .flow-stamp.ko {
+  background: #fdecea;
+  color: #8a2b22;
+}
+
+#flow-hud .flow-lesson {
+  font-size: 12px;
+  line-height: 1.45;
+  color: #42526e;
+}

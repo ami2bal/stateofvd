@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>State of VD — QA harness (2D)</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body data-mode="qa">
+  <div id="game-host" style="position:fixed;inset:0">
+    <canvas id="game"></canvas>
+  </div>
+  <!-- no legacy #hud — Mode Parcours / QA panel only -->
+  <div id="flow-hud" hidden></div>
+  <div id="qa-panel">
+    <h2>qa-out</h2>
+    <pre id="qa-out">booting…</pre>
+  </div>
+  <script src="../../scripts/jobs/vendor/pixi.min.js"></script>
+  <script type="module">
+    import { boot } from "./app.js";
+    import { writeQaOut } from "./engine/qa.js";
+
+    async function main() {
+      const params = new URLSearchParams(location.search);
+      const scenario = params.get("scenario") || "clock-week";
+      const ctx = await boot({ speed: 0 });
+      for (let i = 0; i < 8; i++) ctx.qa.renderOnce();
+      const r = await ctx.qa.runScenario(scenario);
+      writeQaOut(r);
+      document.body.dataset.qaReady = "1";
+    }
+    main().catch((e) => {
+      writeQaOut({ error: String((e && e.message) || e) });
+      console.error(e);
+    });
+  </script>
+</body>
+</html>

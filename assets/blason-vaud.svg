@@ -1,0 +1,60 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 80 100" fill="none" aria-hidden="true">
+  <!--
+    Marque State of VD — écu bicolore horizontal (demande produit) :
+    moitié SUPÉRIEURE blanche (argent), moitié INFÉRIEURE verte (sinople #3C8A2E).
+    Distinct du blason officiel à bande diagonale : ici lecture immédiate
+    « blanc / vert » en deux bandes.
+  -->
+  <defs>
+    <clipPath id="vd-ecu">
+      <path
+        d="M40 4
+           C52 4 64 6.5 70 9.5
+           C72 10.5 73.5 12.2 73.5 14.5
+           L73.5 42
+           C73.5 62 58 78 40 94
+           C22 78 6.5 62 6.5 42
+           L6.5 14.5
+           C6.5 12.2 8 10.5 10 9.5
+           C16 6.5 28 4 40 4 Z"
+      />
+    </clipPath>
+    <linearGradient id="vd-shine" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#fff" stop-opacity="0.4"/>
+      <stop offset="55%" stop-color="#fff" stop-opacity="0"/>
+      <stop offset="100%" stop-color="#fff" stop-opacity="0.1"/>
+    </linearGradient>
+  </defs>
+  <!-- Fond blanc (tout l'écu) -->
+  <path
+    d="M40 4
+       C52 4 64 6.5 70 9.5
+       C72 10.5 73.5 12.2 73.5 14.5
+       L73.5 42
+       C73.5 62 58 78 40 94
+       C22 78 6.5 62 6.5 42
+       L6.5 14.5
+       C6.5 12.2 8 10.5 10 9.5
+       C16 6.5 28 4 40 4 Z"
+    fill="#FFFFFF"
+  />
+  <!-- Moitié inférieure verte (ligne de coupe horizontale à y=49) -->
+  <g clip-path="url(#vd-ecu)">
+    <rect x="0" y="49" width="80" height="55" fill="#3C8A2E"/>
+  </g>
+  <!-- Contour + léger reflet -->
+  <path
+    d="M40 4
+       C52 4 64 6.5 70 9.5
+       C72 10.5 73.5 12.2 73.5 14.5
+       L73.5 42
+       C73.5 62 58 78 40 94
+       C22 78 6.5 62 6.5 42
+       L6.5 14.5
+       C6.5 12.2 8 10.5 10 9.5
+       C16 6.5 28 4 40 4 Z"
+    fill="url(#vd-shine)"
+    stroke="#3C8A2E"
+    stroke-width="2.2"
+  />
+</svg>

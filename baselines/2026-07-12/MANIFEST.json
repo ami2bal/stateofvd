@@ -1,0 +1,84 @@
+{
+  "label": "2026-07-12",
+  "generatedAt": "2026-07-12T21:53:49.655Z",
+  "note": "Baseline State of VD — ne pas modifier à la main. Régénérer via tools/write_baseline.mjs",
+  "playableScenarios": 19,
+  "scenarioKeys": [
+    "budget-annuel",
+    "credit-qui-fache",
+    "demande-de-grace",
+    "determination",
+    "empl-loi",
+    "initiative",
+    "initiative-populaire",
+    "interpellation",
+    "motion",
+    "petit-credit",
+    "petition",
+    "postulat",
+    "question-orale",
+    "referendum",
+    "resolution",
+    "revision-constitutionnelle",
+    "seance-ce",
+    "seance-gc",
+    "simple-question"
+  ],
+  "files": [
+    {
+      "path": "model/COVERAGE.md",
+      "bytes": 8983,
+      "sha256": "e34e78e4bbe6fda88966c1ad06294c1dc5cfe6b114641b17eb27b8cda7f3bb03"
+    },
+    {
+      "path": "model/coverage-matrix.json",
+      "bytes": 11006,
+      "sha256": "4b37a3754b7835be72fc21f158ea90de2627c7fe9ad8995605e10393ce295ef0"
+    },
+    {
+      "path": "model/profiles/vaud.json",
+      "bytes": 34612,
+      "sha256": "d65ac052831de8a7ead60336420972325ad8d879ad359323284ced15c2807d1f"
+    },
+    {
+      "path": "data/world.json",
+      "bytes": 31471,
+      "sha256": "26cbabd66e2104775423ed661743e025778af9b9f397c81cbc5785800321065c"
+    },
+    {
+      "path": "game/flows/index.js",
+      "bytes": 12688,
+      "sha256": "f2c57badcba93deaa81097578111015a684aee85d1160ee1582e28f5bf479083"
+    },
+    {
+      "path": "game/inspector-data.js",
+      "bytes": 15981,
+      "sha256": "95e6f10af7775925279265ec3b39d65c7b185673c9c1453591e2a31c7b21cb29"
+    },
+    {
+      "path": "game/resolve-target.js",
+      "bytes": 5296,
+      "sha256": "6e464d4d0bed289840f010bf2eb627765821902b455b4be400665d6bbed9ff5f"
+    },
+    {
+      "path": "engine/theme.js",
+      "bytes": 1944,
+      "sha256": "d3aee59626baa696a09df901d58cacee4fd26148f9a466f9e7b4e0f0333e4156"
+    },
+    {
+      "path": "engine/room-nomenclature.js",
+      "bytes": 5330,
+      "sha256": "08b157528025c8bd409b02b2f90935ea580dc50ab0f3b146add84aa001adc3fd"
+    },
+    {
+      "path": "ARCHITECTURE.md",
+      "bytes": 4455,
+      "sha256": "57bf9086d431a81512a6a49b2fd108ee0c969fe818875b782e2365842b7da08b"
+    }
+  ],
+  "kpis": {
+    "walkthroughApproxBytes": 55360,
+    "appApproxBytes": 28370,
+    "qaScenariosBytes": 40188
+  }
+}

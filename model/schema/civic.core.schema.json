@@ -1,0 +1,519 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://civic-model.local/core/0.1",
+  "title": "Civic model — agnostic core schema",
+  "description": "Generic parliamentary and governmental data model: entity shapes, closed catalogues, institutional structure.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["profileVersion", "catalogues", "structure"],
+  "properties": {
+    "profileVersion": {"type": "string", "description": "Semantic version of the profile document (e.g. 0.1.0)."},
+    "label": {"type": "string", "description": "Human-readable label of this profile instance."},
+    "catalogues": {"$ref": "#/$defs/Catalogues", "description": "Closed catalogues of object types, lifecycles, decision types and deadline types."},
+    "structure": {"$ref": "#/$defs/Structure", "description": "Institutional skeleton: institutions and bodies."},
+    "examples": {"$ref": "#/$defs/Examples", "description": "Optional synthetic fixtures for tests and demos (no real personal data)."}
+  },
+  "$defs": {
+    "kebabId": {"type": "string", "description": "Kebab-case identifier shared by catalogue entries and structural nodes.", "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$"},
+    "LegalRef": {
+      "type": "object",
+      "description": "Pointer to a legal article in the external legal index (source + article number).",
+      "additionalProperties": false,
+      "required": ["source", "art"],
+      "properties": {
+        "source": {"type": "string", "description": "Legal corpus key as used in the legal index (profile-defined)."},
+        "art": {"type": "string", "description": "Article number, including lettered suffixes (e.g. 126a)."}
+      }
+    },
+    "Source": {
+      "description": "Provenance entry: either a resolved legal reference or a named convention.",
+      "oneOf": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["type", "legal_ref"],
+          "properties": {
+            "type": {"const": "legal", "description": "Marks a legal provenance entry."},
+            "legal_ref": {"$ref": "#/$defs/LegalRef", "description": "Article reference to resolve against the legal index."}
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["type", "ref"],
+          "properties": {
+            "type": {"const": "convention", "description": "Marks a non-statutory convention or manual rule."},
+            "ref": {"type": "string", "description": "Human reference to the convention (document §, practice note)."}
+          }
+        }
+      ]
+    },
+    "Period": {
+      "type": "object",
+      "description": "Inclusive calendar period with ISO dates.",
+      "additionalProperties": false,
+      "required": ["start"],
+      "properties": {
+        "start": {"type": "string", "format": "date", "description": "Period start date (ISO-8601 date)."},
+        "end": {"type": "string", "format": "date", "description": "Optional period end date (ISO-8601 date)."}
+      }
+    },
+    "Person": {
+      "x-kind": "entity",
+      "type": "object",
+      "description": "Natural person who holds mandates or authors civic objects.",
+      "additionalProperties": false,
+      "required": ["id", "displayName"],
+      "properties": {
+        "id": {"$ref": "#/$defs/kebabId", "description": "Stable person identifier."},
+        "displayName": {"type": "string", "description": "Display name used in the UI (synthetic in fixtures)."}
+      }
+    },
+    "Body": {
+      "x-kind": "entity",
+      "type": "object",
+      "description": "Institutional organ (assembly, college, bureau, committee, department, service, registry).",
+      "additionalProperties": false,
+      "required": ["id", "kind", "institution", "label", "sources"],
+      "properties": {
+        "id": {"$ref": "#/$defs/kebabId", "description": "Stable body identifier."},
+        "kind": {
+          "type": "string",
+          "description": "Structural kind of the body.",
+          "enum": ["plenary", "executive-college", "bureau", "group", "committee", "department", "service", "registry"]
+        },
+        "institution": {"type": "string", "description": "Owning institution id.", "x-ref": "Institution"},
+        "parent": {"type": "string", "description": "Optional parent body id for hierarchical organs.", "x-ref": "Body"},
+        "label": {"type": "string", "description": "Human-readable body label."},
+        "generic": {"type": "boolean", "description": "True when this row is a type template rather than a single named organ."},
+        "acronym": {"type": "string", "description": "Optional short acronym for a named body (e.g. department code)."},
+        "legislature": {"type": "string", "description": "Optional legislature tag for time-bound named instances (e.g. 2022-2027)."},
+        "sources": {
+          "type": "array",
+          "description": "Non-empty provenance list for this body.",
+          "minItems": 1,
+          "items": {"$ref": "#/$defs/Source"}
+        }
+      }
+    },
+    "Institution": {
+      "type": "object",
+      "description": "Top-level constitutional institution that owns bodies (not a runtime entity).",
+      "additionalProperties": false,
+      "required": ["id", "label", "sources"],
+      "properties": {
+        "id": {"$ref": "#/$defs/kebabId", "description": "Stable institution identifier."},
+        "label": {"type": "string", "description": "Human-readable institution label."},
+        "sources": {
+          "type": "array",
+          "description": "Non-empty provenance list for this institution.",
+          "minItems": 1,
+          "items": {"$ref": "#/$defs/Source"}
+        }
+      }
+    },
+    "Mandate": {
+      "x-kind": "entity",
+      "type": "object",
+      "description": "Assignment of a person to a body in a given role for a period.",
+      "additionalProperties": false,
+      "required": ["id", "person", "body", "role", "period"],
+      "properties": {
+        "id": {"$ref": "#/$defs/kebabId", "description": "Stable mandate identifier."},
+        "person": {"type": "string", "description": "Person holding the mandate.", "x-ref": "Person"},
+        "body": {"type": "string", "description": "Body in which the mandate is exercised.", "x-ref": "Body"},
+        "role": {"type": "string", "description": "Role label or code within the body."},
+        "period": {"$ref": "#/$defs/Period", "description": "Validity period of the mandate."}
+      }
+    },
+    "Legislature": {
+      "x-kind": "entity",
+      "type": "object",
+      "description": "Legislative term with number and calendar bounds.",
+      "additionalProperties": false,
+      "required": ["id", "number", "start", "end"],
+      "properties": {
+        "id": {"$ref": "#/$defs/kebabId", "description": "Stable legislature identifier."},
+        "number": {"type": "integer", "description": "Ordinal number of the legislature."},
+        "start": {"type": "string", "format": "date", "description": "Legislature start date."},
+        "end": {"type": "string", "format": "date", "description": "Legislature end date."}
+      }
+    },
+    "CivicObject": {
+      "x-kind": "entity",
+      "type": "object",
+      "description": "Parliamentary or governmental object whose type points into the objectTypes catalogue.",
+      "additionalProperties": false,
+      "required": ["id", "objectType", "label", "state"],
+      "properties": {
+        "id": {"$ref": "#/$defs/kebabId", "description": "Stable civic object identifier."},
+        "objectType": {"type": "string", "description": "Catalogue objectTypes id.", "x-ref": "ObjectType"},
+        "label": {"type": "string", "description": "Short title of the object."},
+        "author": {"type": "string", "description": "Optional author person id.", "x-ref": "Person"},
+        "state": {"type": "string", "description": "Current lifecycle state id for the object type."}
+      }
+    },
+    "Dossier": {
+      "x-kind": "entity",
+      "type": "object",
+      "description": "Typed bundle of relations between civic objects; has no state of its own.",
+      "additionalProperties": false,
+      "required": ["id", "relations"],
+      "properties": {
+        "id": {"$ref": "#/$defs/kebabId", "description": "Stable dossier identifier."},
+        "label": {"type": "string", "description": "Optional dossier label."},
+        "relations": {
+          "type": "array",
+          "description": "Typed edges between objects in the dossier.",
+          "minItems": 1,
+          "items": {"$ref": "#/$defs/DossierRelation"}
+        }
+      }
+    },
+    "DossierRelation": {
+      "type": "object",
+      "description": "Single typed relation between two civic objects inside a dossier.",
+      "additionalProperties": false,
+      "required": ["kind", "from", "to"],
+      "properties": {
+        "kind": {"type": "string", "description": "Relation kind.", "enum": ["replies-to", "counter-proposal-of", "bundles"]},
+        "from": {"type": "string", "description": "Source civic object id.", "x-ref": "CivicObject"},
+        "to": {"type": "string", "description": "Target civic object id.", "x-ref": "CivicObject"}
+      }
+    },
+    "Sitting": {
+      "x-kind": "entity",
+      "type": "object",
+      "description": "Meeting of a body on a given date with a procedural state.",
+      "additionalProperties": false,
+      "required": ["id", "body", "date", "state"],
+      "properties": {
+        "id": {"$ref": "#/$defs/kebabId", "description": "Stable sitting identifier."},
+        "body": {"type": "string", "description": "Body holding the sitting.", "x-ref": "Body"},
+        "date": {"type": "string", "format": "date", "description": "Sitting calendar date."},
+        "state": {"type": "string", "description": "Procedural state of the sitting (profile vocabulary)."}
+      }
+    },
+    "AgendaItem": {
+      "x-kind": "entity",
+      "type": "object",
+      "description": "Ordered point on a sitting agenda, optionally linked to a civic object.",
+      "additionalProperties": false,
+      "required": ["id", "sitting", "order"],
+      "properties": {
+        "id": {"$ref": "#/$defs/kebabId", "description": "Stable agenda item identifier."},
+        "sitting": {"type": "string", "description": "Sitting that owns this agenda item.", "x-ref": "Sitting"},
+        "order": {"type": "integer", "minimum": 1, "description": "1-based order on the agenda."},
+        "object": {"type": "string", "description": "Optional civic object discussed at this point.", "x-ref": "CivicObject"},
+        "label": {"type": "string", "description": "Optional agenda label."}
+      }
+    },
+    "Decision": {
+      "x-kind": "entity",
+      "type": "object",
+      "description": "Formal decision of a given catalogue type, tied to an agenda item.",
+      "additionalProperties": false,
+      "required": ["id", "decisionType", "agendaItem"],
+      "properties": {
+        "id": {"$ref": "#/$defs/kebabId", "description": "Stable decision identifier."},
+        "decisionType": {"type": "string", "description": "Catalogue decisionTypes id.", "x-ref": "DecisionType"},
+        "agendaItem": {"type": "string", "description": "Agenda item that carries the decision.", "x-ref": "AgendaItem"},
+        "referralTarget": {"type": "string", "description": "Optional body to which the object is referred.", "x-ref": "Body"}
+      }
+    },
+    "Ballot": {
+      "x-kind": "entity",
+      "type": "object",
+      "description": "Vote on a subject; secret mode forbids individual vote records.",
+      "additionalProperties": false,
+      "required": ["id", "subject", "mode", "majority", "quorumObserved"],
+      "properties": {
+        "id": {"$ref": "#/$defs/kebabId", "description": "Stable ballot identifier."},
+        "subject": {"type": "string", "description": "Subject of the ballot (object or agenda item id)."},
+        "mode": {"type": "string", "description": "Voting mode.", "enum": ["show-of-hands", "electronic", "roll-call", "secret"]},
+        "majority": {"type": "string", "description": "Majority rule applied.", "enum": ["simple", "absolute-members", "two-thirds", "three-quarters"]},
+        "quorumObserved": {"type": "boolean", "description": "Whether quorum was observed for the ballot."},
+        "individualVotes": {
+          "type": "array",
+          "description": "Optional individual votes; forbidden when mode is secret.",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["person", "choice"],
+            "properties": {
+              "person": {"type": "string", "description": "Voter person id.", "x-ref": "Person"},
+              "choice": {"type": "string", "description": "Vote choice code (e.g. yes, no, abstain)."}
+            }
+          }
+        }
+      },
+      "if": {
+        "properties": {
+          "mode": {"const": "secret", "description": "Condition branch: ballot mode equals secret."}
+        },
+        "required": ["mode"]
+      },
+      "then": {
+        "not": {"required": ["individualVotes"]},
+        "description": "When mode is secret, individualVotes must be absent."
+      }
+    },
+    "Handover": {
+      "x-kind": "entity",
+      "type": "object",
+      "description": "Transmission of an object from one body to another, optionally starting deadlines.",
+      "additionalProperties": false,
+      "required": ["id", "object", "fromBody", "toBody"],
+      "properties": {
+        "id": {"$ref": "#/$defs/kebabId", "description": "Stable handover identifier."},
+        "object": {"type": "string", "description": "Civic object being transmitted.", "x-ref": "CivicObject"},
+        "fromBody": {"type": "string", "description": "Sending body.", "x-ref": "Body"},
+        "toBody": {"type": "string", "description": "Receiving body.", "x-ref": "Body"},
+        "deadlinesStarted": {
+          "type": "array",
+          "description": "Deadline type ids started by this handover.",
+          "items": {"type": "string", "x-ref": "DeadlineType"}
+        }
+      }
+    },
+    "Deadline": {
+      "x-kind": "entity",
+      "type": "object",
+      "description": "Running legal or procedural deadline tied to a catalogue deadline type.",
+      "additionalProperties": false,
+      "required": ["id", "deadlineType", "startDate", "state"],
+      "properties": {
+        "id": {"$ref": "#/$defs/kebabId", "description": "Stable deadline instance identifier."},
+        "deadlineType": {"type": "string", "description": "Catalogue deadlineTypes id.", "x-ref": "DeadlineType"},
+        "startDate": {"type": "string", "format": "date", "description": "Date from which the deadline runs."},
+        "computedDue": {"type": "string", "format": "date", "description": "Computed due date when duration is fixed."},
+        "state": {"type": "string", "description": "Runtime state of the deadline.", "enum": ["running", "overdue", "met", "extended"]},
+        "object": {"type": "string", "description": "Optional civic object this deadline applies to.", "x-ref": "CivicObject"}
+      }
+    },
+    "TextVersion": {
+      "x-kind": "satellite",
+      "type": "object",
+      "description": "Versioned text attachment of a civic object.",
+      "additionalProperties": false,
+      "required": ["id", "object", "number", "source"],
+      "properties": {
+        "id": {"$ref": "#/$defs/kebabId", "description": "Stable text version identifier."},
+        "object": {"type": "string", "description": "Owning civic object.", "x-ref": "CivicObject"},
+        "number": {"type": "integer", "minimum": 1, "description": "Version number."},
+        "source": {"type": "string", "description": "Origin of this text version (authoring path or import)."}
+      }
+    },
+    "Publication": {
+      "x-kind": "satellite",
+      "type": "object",
+      "description": "Published content channel entry for a civic object or decision.",
+      "additionalProperties": false,
+      "required": ["id", "content", "channel", "date"],
+      "properties": {
+        "id": {"$ref": "#/$defs/kebabId", "description": "Stable publication identifier."},
+        "content": {"type": "string", "description": "Content reference or short excerpt."},
+        "channel": {"type": "string", "description": "Publication channel.", "enum": ["gazette", "bulletin", "minutes", "compendium"]},
+        "date": {"type": "string", "format": "date", "description": "Publication date."},
+        "object": {"type": "string", "description": "Optional related civic object.", "x-ref": "CivicObject"}
+      }
+    },
+    "LifecycleState": {
+      "type": "object",
+      "description": "Named state inside a lifecycle.",
+      "additionalProperties": false,
+      "required": ["id", "label"],
+      "properties": {
+        "id": {"$ref": "#/$defs/kebabId", "description": "State identifier unique within the lifecycle."},
+        "label": {"type": "string", "description": "Human-readable state label."},
+        "initial": {"type": "boolean", "description": "True if this is the single initial state."},
+        "terminal": {"type": "boolean", "description": "True if this is a terminal state."}
+      }
+    },
+    "LifecycleTransition": {
+      "type": "object",
+      "description": "Directed transition between two states of the same lifecycle.",
+      "additionalProperties": false,
+      "required": ["from", "to", "by"],
+      "properties": {
+        "from": {"type": "string", "description": "Source state id."},
+        "to": {"type": "string", "description": "Target state id."},
+        "by": {"type": "string", "description": "Structural trigger: never free edit.", "enum": ["decision", "handover", "author-act"]},
+        "decisionType": {"type": "string", "description": "Required when by=decision: catalogue decisionTypes id.", "x-ref": "DecisionType"}
+      }
+    },
+    "Lifecycle": {
+      "type": "object",
+      "description": "Closed state machine for one family of civic objects.",
+      "additionalProperties": false,
+      "required": ["id", "states", "transitions"],
+      "properties": {
+        "id": {"$ref": "#/$defs/kebabId", "description": "Lifecycle catalogue identifier."},
+        "label": {"type": "string", "description": "Human-readable lifecycle label."},
+        "states": {
+          "type": "array",
+          "description": "Declared states of this lifecycle.",
+          "minItems": 2,
+          "items": {"$ref": "#/$defs/LifecycleState"}
+        },
+        "transitions": {
+          "type": "array",
+          "description": "Allowed transitions with structural triggers.",
+          "minItems": 1,
+          "items": {"$ref": "#/$defs/LifecycleTransition"}
+        },
+        "sources": {
+          "type": "array",
+          "description": "Provenance for this lifecycle definition.",
+          "minItems": 1,
+          "items": {"$ref": "#/$defs/Source"}
+        }
+      }
+    },
+    "ObjectType": {
+      "type": "object",
+      "description": "Catalogue entry for a kind of civic object.",
+      "additionalProperties": false,
+      "required": ["id", "family", "label", "sources"],
+      "properties": {
+        "id": {"$ref": "#/$defs/kebabId", "description": "Object type identifier."},
+        "family": {"type": "string", "description": "Broad family of the object type.", "enum": ["act", "instrument", "executive-issuance", "working-document"]},
+        "label": {"type": "string", "description": "Human-readable object type label."},
+        "lifecycle": {
+          "description": "Lifecycle id, or null when not modelled yet.",
+          "oneOf": [
+            {"type": "string", "description": "Reference to lifecycles.id."},
+            {"type": "null", "description": "Lifecycle deferred to a later profile version."}
+          ]
+        },
+        "legal_ref": {"$ref": "#/$defs/LegalRef", "description": "Optional primary legal anchor for this type."},
+        "sources": {
+          "type": "array",
+          "description": "Non-empty provenance list.",
+          "minItems": 1,
+          "items": {"$ref": "#/$defs/Source"}
+        }
+      }
+    },
+    "DecisionType": {
+      "type": "object",
+      "description": "Catalogue entry for a formal decision kind.",
+      "additionalProperties": false,
+      "required": ["id", "label", "sources"],
+      "properties": {
+        "id": {"$ref": "#/$defs/kebabId", "description": "Decision type identifier."},
+        "label": {"type": "string", "description": "Human-readable decision type label."},
+        "sources": {
+          "type": "array",
+          "description": "Non-empty provenance list.",
+          "minItems": 1,
+          "items": {"$ref": "#/$defs/Source"}
+        }
+      }
+    },
+    "DeadlineType": {
+      "type": "object",
+      "description": "Catalogue entry for a legal or procedural deadline kind.",
+      "additionalProperties": false,
+      "required": ["id", "label", "duration", "trigger", "legal_ref", "sources"],
+      "properties": {
+        "id": {"$ref": "#/$defs/kebabId", "description": "Deadline type identifier."},
+        "label": {"type": "string", "description": "Human-readable deadline type label."},
+        "duration": {"type": "string", "description": "ISO-8601 duration (P1Y, P3M, P4W, P5D, P60D, P15D, P2M, P2W) or fixed-date.", "pattern": "^(P\\d+[YMDW]|fixed-date)$"},
+        "fixedDate": {"type": "string", "description": "Calendar anchor when duration is fixed-date (e.g. 05-31 for 31 May)."},
+        "trigger": {"type": "string", "description": "Event that starts this deadline."},
+        "legal_ref": {"$ref": "#/$defs/LegalRef", "description": "Mandatory legal article for this deadline type."},
+        "sources": {
+          "type": "array",
+          "description": "Non-empty provenance list.",
+          "minItems": 1,
+          "items": {"$ref": "#/$defs/Source"}
+        }
+      }
+    },
+    "Catalogues": {
+      "type": "object",
+      "description": "Bundle of the four closed catalogues carried by every profile.",
+      "additionalProperties": false,
+      "required": ["objectTypes", "lifecycles", "decisionTypes", "deadlineTypes"],
+      "properties": {
+        "objectTypes": {
+          "type": "array",
+          "description": "Catalogue of civic object types.",
+          "minItems": 1,
+          "items": {"$ref": "#/$defs/ObjectType"}
+        },
+        "lifecycles": {
+          "type": "array",
+          "description": "Catalogue of lifecycles.",
+          "minItems": 1,
+          "items": {"$ref": "#/$defs/Lifecycle"}
+        },
+        "decisionTypes": {
+          "type": "array",
+          "description": "Catalogue of decision types.",
+          "minItems": 1,
+          "items": {"$ref": "#/$defs/DecisionType"}
+        },
+        "deadlineTypes": {
+          "type": "array",
+          "description": "Catalogue of deadline types.",
+          "minItems": 1,
+          "items": {"$ref": "#/$defs/DeadlineType"}
+        }
+      }
+    },
+    "Structure": {
+      "type": "object",
+      "description": "Institutional structure: institutions and their bodies.",
+      "additionalProperties": false,
+      "required": ["institutions", "bodies"],
+      "properties": {
+        "institutions": {
+          "type": "array",
+          "description": "Top-level institutions.",
+          "minItems": 1,
+          "items": {"$ref": "#/$defs/Institution"}
+        },
+        "bodies": {
+          "type": "array",
+          "description": "Bodies belonging to institutions.",
+          "minItems": 1,
+          "items": {"$ref": "#/$defs/Body"}
+        }
+      }
+    },
+    "Examples": {
+      "type": "object",
+      "description": "Synthetic mini-fixture set used by the validator and demos.",
+      "additionalProperties": false,
+      "properties": {
+        "persons": {
+          "type": "array",
+          "description": "Example persons.",
+          "items": {"$ref": "#/$defs/Person"}
+        },
+        "civicObjects": {
+          "type": "array",
+          "description": "Example civic objects.",
+          "items": {"$ref": "#/$defs/CivicObject"}
+        },
+        "dossiers": {
+          "type": "array",
+          "description": "Example dossiers.",
+          "items": {"$ref": "#/$defs/Dossier"}
+        },
+        "handovers": {
+          "type": "array",
+          "description": "Example handovers.",
+          "items": {"$ref": "#/$defs/Handover"}
+        },
+        "deadlines": {
+          "type": "array",
+          "description": "Example deadlines.",
+          "items": {"$ref": "#/$defs/Deadline"}
+        }
+      }
+    }
+  }
+}
