@@ -67,12 +67,21 @@ PATH_BY_MASK = {
     CN | CE | CS | CW: PATH_V,
 }
 
-# Roof gable kit — each piece faces a role on the gable silhouette
-ROOF_TL, ROOF_TR = 1217, 1218  # top-left / top-right peaks
-ROOF_ML, ROOF_MR = 1331, 1332  # mid left / right edges
-ROOF_BL, ROOF_BR = 1345, 1346  # bottom-left / bottom-right eaves
-ROOF_TOP = 1288  # top-center ridge fill (not a side triangle)
-ROOF_FILL = 1275  # body fill
+# Roof kit from sample_map house templates (3×3 module, Sample1 isometric slopes)
+# Row0: TL · TOP · TR | Row1: ML · MID · MR | Row2: BL · BOT · BR
+# Paint WALL mass first, then roof — transparency reveals beige gable (Sample1).
+ROOF_KIT = [
+    [1217, 1222, 1218],  # top peaks + ridge
+    [1274, 1279, 1275],  # mid slopes + fill
+    [1331, 1276, 1332],  # eaves L/R + bottom fill
+]
+WALL_FILL = 873
+WALL_L, WALL_R = 872, 874  # oriented side walls from sample houses
+DOOR_BUILDING = 331  # wood door in wall face (exterior) — NOT arched glass 201
+DOOR_ROOM = 168  # open interior doorway between rooms
+WINDOW_FRONT = 215  # front-facing window
+WINDOW_IN_WALL = 90  # window embedded in wall tile
+WINDOW_SIDE = 272  # side-oriented window frame
 
 
 # ── sheet helpers ───────────────────────────────────────────────────────────
@@ -246,29 +255,27 @@ def ortho_corridor(x0, y0, x1, y1):
 
 
 def build_path_set(sites, esplanade, W, H, occupied):
+    """Single-width orthogonal roads — no parallel double-tracks (avoids texture tears)."""
     path = set()
     avenue_y = S(15)
+    # One E–W avenue in front of departments
     for x in range(S(2), min(S(36), W - 2)):
         path.add((x, avenue_y))
-        if SCALE >= 2:
-            path.add((x, avenue_y + 1))  # 2-wide avenue
 
+    # Esplanade → avenue: single spine through plaza center
     if esplanade:
         mid_x = (esplanade["gx0"] + esplanade["gx1"]) // 2
         for y in range(esplanade["gy1"], avenue_y + 1):
             path.add((mid_x, y))
-            path.add((mid_x + 1, y))
 
+    # Each building entry → avenue (single vertical then join)
     for s in sites:
         ex, ey = s["entry"]["gx"], s["entry"]["gy"]
-        for cell in ortho_corridor(ex, ey, ex, avenue_y):
+        # door apron: one cell south of entry only
+        path.add((ex, ey + 1))
+        for cell in ortho_corridor(ex, ey + 1, ex, avenue_y):
             if 0 <= cell[0] < W and 0 <= cell[1] < H:
                 path.add(cell)
-                if SCALE >= 2:
-                    path.add((cell[0] + 1, cell[1]))
-        # apron south of door
-        for dx in range(-1, 2):
-            path.add((ex + dx, ey + 1))
 
     path -= occupied
     return path
@@ -299,27 +306,27 @@ def paint_oriented_paths(ground, sheet, path_cells, W, H):
             paste(ground, sheet, path_tile_for(tx, ty, path_cells), tx, ty)
 
 
-def roof_tile_for(lx, ly, gw, roof_rows):
-    """Gable-local orientation: which edge of this gable segment."""
-    is_l, is_r = lx == 0, lx == gw - 1
-    if ly == 0:
-        if is_l:
-            return ROOF_TL
-        if is_r:
-            return ROOF_TR
-        return ROOF_TOP
-    if ly == roof_rows - 1:
-        if is_l:
-            return ROOF_BL
-        if is_r:
-            return ROOF_BR
-        return ROOF_FILL
-    # mid rows
-    if is_l:
-        return ROOF_ML
-    if is_r:
-        return ROOF_MR
-    return ROOF_FILL
+def roof_tile_for(lx, fw, ly, roof_rows):
+    """Sample1 roof module: L=kit col0, R=col2, center=col1; rows map to 3-row kit."""
+    if lx == 0:
+        kx = 0
+    elif lx == fw - 1:
+        kx = 2
+    else:
+        kx = 1
+    if roof_rows <= 1:
+        ky = 0
+    elif roof_rows == 2:
+        ky = 0 if ly == 0 else 2
+    else:
+        # map ly across 3 kit rows
+        if ly == 0:
+            ky = 0
+        elif ly == roof_rows - 1:
+            ky = 2
+        else:
+            ky = 1
+    return ROOF_KIT[ky][kx]
 
 
 # ── trees ───────────────────────────────────────────────────────────────────
@@ -360,74 +367,82 @@ def place_trees(ground, sheet, roles, free, W, H, rng):
 
 
 def stamp_exterior(roofs, sheet, s, roles, rng, dept_tint=None):
-    """Sample1 house with oriented gable roof kit + south facade."""
+    """Sample1 house: wall mass first, then slope roof (transparency = gable)."""
     gx, gy, fw, fh = s["gx"], s["gy"], s["fw"], s["fh"]
-    # Keep roof dominant; short facade (Sample1 proportions)
-    wall_rows = 2 if fh <= 12 else 3
-    wall_rows = min(wall_rows, max(2, fh // 3))
+    # Sample1 proportions: ~3 roof rows + 2 facade rows (not a hangar of walls)
+    wall_rows = 2
+    if fh >= 10:
+        wall_rows = 3
     wall_rows = min(wall_rows, fh - 3)
-    roof_rows = max(3, fh - wall_rows)
-
-    wall = roles["wall_ext"]["ids"]
-    wall_top = roles["wall_top"]["ids"]
-    door = first(roles, "door")
-    windows = roles["window"]["ids"]
+    roof_rows = fh - wall_rows
 
     kind = s.get("kind")
     if kind == "parlement":
-        tw, tr, st = (70, 130, 95), (50, 110, 80), 0.18
+        tw, tr, st = (70, 130, 95), (50, 110, 80), 0.16
     elif kind == "chateau":
-        tw, tr, st = (210, 175, 100), (180, 100, 70), 0.22
+        tw, tr, st = (210, 175, 100), (180, 100, 70), 0.2
     else:
-        tw, tr, st = as_rgb(dept_tint), as_rgb(dept_tint), 0.26 if dept_tint else 0.0
+        tw, tr, st = as_rgb(dept_tint), as_rgb(dept_tint), 0.24 if dept_tint else 0.0
 
     ex = s["entry"]["gx"]
+    # clamp door onto south facade
+    door_x = min(max(ex, gx + 1), gx + fw - 2)
 
-    # Multi-gable: each segment is a full oriented house roof (Sample1 island)
-    gable_w = 6 if fw >= 12 else (5 if fw >= 8 else max(4, fw))
-
+    # 1) Full beige wall mass (shows through roof as gable)
     for ty in range(gy, gy + fh):
         for tx in range(gx, gx + fw):
-            ly, lx = ty - gy, tx - gx
-            is_l, is_r = lx == 0, lx == fw - 1
-            is_bot = ly == fh - 1
-
-            if ly < roof_rows:
-                # local coords inside current gable
-                seg_x0 = (lx // gable_w) * gable_w
-                local_w = min(gable_w, fw - seg_x0)
-                local_x = lx - seg_x0
-                idx = roof_tile_for(local_x, ly, local_w, roof_rows)
-                paste(roofs, sheet, idx, tx, ty, tr, st)
-                continue
-
-            # ── facade (south-facing elevation) ──
-            # Door faces south on bottom row
-            if is_bot and tx == ex:
-                paste(roofs, sheet, door, tx, ty)
-                continue
-            # Windows face south on the wall-top row under eaves (not on L/R corners)
-            if ly == roof_rows and not is_l and not is_r and (lx % 3) == 1:
-                paste(roofs, sheet, pick(rng, windows), tx, ty, tw, st * 0.35)
-                continue
-            # wall_top on the row under roof (horizontal top edge of facade)
-            # wall_fill on lower facade body
-            if ly == roof_rows:
-                idx = pick(rng, wall_top)
-                paste(roofs, sheet, idx, tx, ty, tw, st)
+            lx = tx - gx
+            if lx == 0:
+                paste(roofs, sheet, WALL_L, tx, ty, tw, st * 0.5)
+            elif lx == fw - 1:
+                paste(roofs, sheet, WALL_R, tx, ty, tw, st * 0.5)
             else:
-                paste(roofs, sheet, pick(rng, wall), tx, ty)
+                paste(roofs, sheet, WALL_FILL, tx, ty, tw, st * 0.5)
+
+    # 2) Roof slopes — multi-gable for wide buildings (repeated Sample1 houses)
+    #    gable_w ~5–6 so each module keeps isometric L/R slopes like Sample1
+    gable_w = fw if fw <= 6 else (5 if fw % 5 == 0 else 6)
+    if fw > 6 and fw % gable_w == 1:
+        gable_w = 5  # avoid 1-tile leftover sliver
+    for ly in range(roof_rows):
+        for lx in range(fw):
+            seg0 = (lx // gable_w) * gable_w
+            local_w = min(gable_w, fw - seg0)
+            local_x = lx - seg0
+            # last sliver <3 tiles: merge into previous gable visually via center fill
+            if local_w < 3 and seg0 > 0:
+                idx = ROOF_KIT[min(ly, 2) if roof_rows > 2 else (0 if ly == 0 else 2)][1]
+            else:
+                idx = roof_tile_for(local_x, local_w, ly, roof_rows)
+            paste(roofs, sheet, idx, gx + lx, gy + ly, tr, st)
+
+    # 3) Facade details on wall rows only (under eaves)
+    for ly in range(roof_rows, fh):
+        for lx in range(fw):
+            tx, ty = gx + lx, gy + ly
+            is_bot = ly == fh - 1
+            is_l, is_r = lx == 0, lx == fw - 1
+            # Exterior building door (wood in wall) — faces south
+            if is_bot and tx == door_x:
+                paste(roofs, sheet, DOOR_BUILDING, tx, ty)
+                continue
+            # Front windows on first wall row under roof
+            if ly == roof_rows and not is_l and not is_r and (lx % 3) == 1:
+                paste(roofs, sheet, WINDOW_FRONT, tx, ty)
+                continue
+            # keep wall already painted; reassert side walls
+            if is_l:
+                paste(roofs, sheet, WALL_L, tx, ty, tw, st * 0.4)
+            elif is_r:
+                paste(roofs, sheet, WALL_R, tx, ty, tw, st * 0.4)
 
 
 # ── Sample2 interior floor plan ─────────────────────────────────────────────
 
 
 def stamp_interior_sample2(interiors, sheet, s, roles, rng):
-    """Sample2: beige wall shell + room dividers + floors + furniture against walls."""
+    """Sample2 floor plan: thick wall shell, room floors, room doors ≠ building door."""
     gx, gy, fw, fh = s["gx"], s["gy"], s["fw"], s["fh"]
-    wall_ids = roles["wall_ext"]["ids"]
-    door = first(roles, "door")
-    windows = roles["window"]["ids"]
     chairs = roles["chair"]["ids"]
     tables = roles["table"]["ids"]
     cabinets = roles["cabinet"]["ids"]
@@ -439,97 +454,83 @@ def stamp_interior_sample2(interiors, sheet, s, roles, rng):
     }
     carpet = roles["carpet_green"]["ids"]
 
-    # 1) wall shell (full footprint beige first)
+    # 1) Wall shell — full footprint (N/E/S/W walls around building)
     for ty in range(gy, gy + fh):
         for tx in range(gx, gx + fw):
-            paste(interiors, sheet, pick(rng, wall_ids), tx, ty)
+            lx = tx - gx
+            if lx == 0:
+                paste(interiors, sheet, WALL_L, tx, ty)
+            elif lx == fw - 1:
+                paste(interiors, sheet, WALL_R, tx, ty)
+            else:
+                paste(interiors, sheet, WALL_FILL, tx, ty)
 
     rooms = room_layouts(s)
     if not rooms:
         return
 
-    # 2) floor each room (carves interior out of wall shell)
+    # 2) Carve room floors (leave 1-tile perimeter wall)
+    floor_cells = set()
     for rh in rooms:
         fids = floors.get(rh["floor"], floors["wood"])
         fid = pick(rng, fids)
         for ty in range(rh["gy"], rh["gy"] + rh["fh"]):
             for tx in range(rh["gx"], rh["gx"] + rh["fw"]):
                 paste(interiors, sheet, fid, tx, ty)
-
-    # 3) internal divider walls where rooms share an edge (Sample2 partitions)
-    floor_cells = set()
-    for rh in rooms:
-        for ty in range(rh["gy"], rh["gy"] + rh["fh"]):
-            for tx in range(rh["gx"], rh["gx"] + rh["fw"]):
                 floor_cells.add((tx, ty))
+
+    # 3) Internal partitions + ROOM doors (open doorway 168, not building door)
+    def paint_divider_v(wx, y0, y1):
+        for ty in range(y0, y1):
+            paste(interiors, sheet, WALL_FILL, wx, ty)
+            floor_cells.discard((wx, ty))
+        mid = (y0 + y1) // 2
+        paste(interiors, sheet, DOOR_ROOM, wx, mid)
+
+    def paint_divider_h(wy, x0, x1):
+        for tx in range(x0, x1):
+            paste(interiors, sheet, WALL_FILL, tx, wy)
+            floor_cells.discard((tx, wy))
+        mid = (x0 + x1) // 2
+        paste(interiors, sheet, DOOR_ROOM, mid, wy)
 
     for i, a in enumerate(rooms):
         for b in rooms[i + 1 :]:
-            # horizontal neighbors: wall on the shared vertical line (rightmost of left room)
             if a["gx"] + a["fw"] == b["gx"]:
-                y0 = max(a["gy"], b["gy"])
-                y1 = min(a["gy"] + a["fh"], b["gy"] + b["fh"])
+                y0, y1 = max(a["gy"], b["gy"]), min(a["gy"] + a["fh"], b["gy"] + b["fh"])
                 if y1 > y0:
-                    wx = a["gx"] + a["fw"] - 1
-                    for ty in range(y0, y1):
-                        paste(interiors, sheet, pick(rng, wall_ids), wx, ty)
-                        floor_cells.discard((wx, ty))
-                    # doorway gap mid-divider
-                    mid = (y0 + y1) // 2
-                    paste(interiors, sheet, door, wx, mid)
-                    floor_cells.add((wx, mid))
+                    paint_divider_v(a["gx"] + a["fw"] - 1, y0, y1)
             if b["gx"] + b["fw"] == a["gx"]:
-                y0 = max(a["gy"], b["gy"])
-                y1 = min(a["gy"] + a["fh"], b["gy"] + b["fh"])
+                y0, y1 = max(a["gy"], b["gy"]), min(a["gy"] + a["fh"], b["gy"] + b["fh"])
                 if y1 > y0:
-                    wx = b["gx"] + b["fw"] - 1
-                    for ty in range(y0, y1):
-                        paste(interiors, sheet, pick(rng, wall_ids), wx, ty)
-                        floor_cells.discard((wx, ty))
-                    mid = (y0 + y1) // 2
-                    paste(interiors, sheet, door, wx, mid)
-            # vertical neighbors: wall on shared horizontal line
+                    paint_divider_v(b["gx"] + b["fw"] - 1, y0, y1)
             if a["gy"] + a["fh"] == b["gy"]:
-                x0 = max(a["gx"], b["gx"])
-                x1 = min(a["gx"] + a["fw"], b["gx"] + b["fw"])
+                x0, x1 = max(a["gx"], b["gx"]), min(a["gx"] + a["fw"], b["gx"] + b["fw"])
                 if x1 > x0:
-                    wy = a["gy"] + a["fh"] - 1
-                    for tx in range(x0, x1):
-                        paste(interiors, sheet, pick(rng, wall_ids), tx, wy)
-                        floor_cells.discard((tx, wy))
-                    mid = (x0 + x1) // 2
-                    paste(interiors, sheet, door, mid, wy)
+                    paint_divider_h(a["gy"] + a["fh"] - 1, x0, x1)
             if b["gy"] + b["fh"] == a["gy"]:
-                x0 = max(a["gx"], b["gx"])
-                x1 = min(a["gx"] + a["fw"], b["gx"] + b["fw"])
+                x0, x1 = max(a["gx"], b["gx"]), min(a["gx"] + a["fw"], b["gx"] + b["fw"])
                 if x1 > x0:
-                    wy = b["gy"] + b["fh"] - 1
-                    for tx in range(x0, x1):
-                        paste(interiors, sheet, pick(rng, wall_ids), tx, wy)
-                        floor_cells.discard((tx, wy))
-                    mid = (x0 + x1) // 2
-                    paste(interiors, sheet, door, mid, wy)
+                    paint_divider_h(b["gy"] + b["fh"] - 1, x0, x1)
 
-    # 4) exterior door on south wall
-    ex = s["entry"]["gx"]
-    door_x = min(max(ex, gx + 1), gx + fw - 2)
+    # 4) Building exterior door on south shell (331 wood door)
+    door_x = min(max(s["entry"]["gx"], gx + 1), gx + fw - 2)
     door_y = gy + fh - 1
-    paste(interiors, sheet, door, door_x, door_y)
+    paste(interiors, sheet, DOOR_BUILDING, door_x, door_y)
     paste(interiors, sheet, pick(rng, floors["wood"]), door_x, door_y - 1)
 
-    # 5) windows ONLY on exterior wall shell (never on floor cells)
+    # 5) Windows spatialized: front (N/S) vs side (E/W)
     for tx in range(gx + 1, gx + fw - 1):
         if (tx - gx) % 3 == 1:
-            paste(interiors, sheet, pick(rng, windows), tx, gy)  # north wall
+            paste(interiors, sheet, WINDOW_FRONT, tx, gy)  # north wall face
     for ty in range(gy + 2, gy + fh - 2):
         if (ty - gy) % 3 == 1:
-            paste(interiors, sheet, pick(rng, windows), gx, ty)
-            paste(interiors, sheet, pick(rng, windows), gx + fw - 1, ty)
+            paste(interiors, sheet, WINDOW_SIDE, gx, ty)  # west lateral
+            paste(interiors, sheet, WINDOW_SIDE, gx + fw - 1, ty)  # east lateral
 
-    # 6) carpet + furniture (Sample2: table center, chairs around, cabinets on wall)
+    # 6) Furniture (never on walls)
     for rh in rooms:
         if rh["floor"] == "wood_carpet" and rh["fw"] >= 5 and rh["fh"] >= 4:
-            # Sample2 center carpet — always paint inset (ignore divider discards)
             for ty in range(rh["gy"] + 2, rh["gy"] + rh["fh"] - 2):
                 for tx in range(rh["gx"] + 2, rh["gx"] + rh["fw"] - 2):
                     paste(interiors, sheet, pick(rng, carpet), tx, ty)
@@ -539,18 +540,22 @@ def stamp_interior_sample2(interiors, sheet, s, roles, rng):
             for dx, dy in [(-1, 0), (1, 0), (0, -1), (0, 1), (-2, 0), (2, 0)]:
                 paste(interiors, sheet, pick(rng, chairs), cx + dx, cy + dy)
             continue
-
         if rh["fw"] >= 3 and rh["fh"] >= 3:
             cx = rh["gx"] + rh["fw"] // 2
             cy = rh["gy"] + rh["fh"] // 2
             paste(interiors, sheet, pick(rng, tables), cx, cy)
-            paste(interiors, sheet, pick(rng, chairs), max(rh["gx"], cx - 1), cy)
+            paste(interiors, sheet, pick(rng, chairs), max(rh["gx"] + 1, cx - 1), cy)
             if rh["fw"] >= 4:
-                paste(interiors, sheet, pick(rng, chairs), min(rh["gx"] + rh["fw"] - 1, cx + 1), cy)
-            # cabinet against north wall of room (on floor just inside, not on exterior wall tile)
-            paste(interiors, sheet, pick(rng, cabinets), rh["gx"] + 1, rh["gy"])
+                paste(interiors, sheet, pick(rng, chairs), min(rh["gx"] + rh["fw"] - 2, cx + 1), cy)
+            paste(interiors, sheet, pick(rng, cabinets), rh["gx"] + 1, rh["gy"] + 1)
         elif rh["fw"] >= 2 and rh["fh"] >= 2:
-            paste(interiors, sheet, pick(rng, chairs), rh["gx"] + rh["fw"] // 2, rh["gy"] + rh["fh"] // 2)
+            paste(
+                interiors,
+                sheet,
+                pick(rng, chairs),
+                rh["gx"] + rh["fw"] // 2,
+                rh["gy"] + rh["fh"] // 2,
+            )
 
 
 # ── hotspots ────────────────────────────────────────────────────────────────
@@ -625,7 +630,7 @@ def build():
     rng = random.Random(13)
     sheet = load_sheet()
 
-    print(f"Roguelike v6 — orientation-aware · grid {W}×{H} (scale×{SCALE})")
+    print(f"Roguelike v7 — Sample1 roofs + single paths · grid {W}×{H}")
 
     occupied = set()
     for s in sites:
@@ -734,15 +739,16 @@ def build():
         ("water", [water]),
         ("treeC", [first(roles, "tree_canopy")]),
         ("treeT", [first(roles, "tree_trunk")]),
-        ("rTL", [ROOF_TL]),
-        ("rTR", [ROOF_TR]),
-        ("rML", [ROOF_ML]),
-        ("rMR", [ROOF_MR]),
-        ("rBL", [ROOF_BL]),
-        ("rBR", [ROOF_BR]),
-        ("wall", roles["wall_ext"]["ids"]),
-        ("door", [first(roles, "door")]),
-        ("win", roles["window"]["ids"]),
+        ("rTL", [ROOF_KIT[0][0]]),
+        ("rTOP", [ROOF_KIT[0][1]]),
+        ("rTR", [ROOF_KIT[0][2]]),
+        ("rBL", [ROOF_KIT[2][0]]),
+        ("rBR", [ROOF_KIT[2][2]]),
+        ("wall", [WALL_FILL, WALL_L, WALL_R]),
+        ("doorB", [DOOR_BUILDING]),
+        ("doorR", [DOOR_ROOM]),
+        ("winF", [WINDOW_FRONT]),
+        ("winS", [WINDOW_SIDE]),
         ("wood", roles["floor_wood"]["ids"]),
         ("chair", roles["chair"]["ids"]),
     ]
@@ -762,13 +768,14 @@ def build():
         "grid": {"w": W, "h": H},
         "scale": SCALE,
         "source": "roguelike-rpg-pack",
-        "playbook": "roguelike_playbook.json v6",
+        "playbook": "roguelike_playbook.json v7",
         "packs": ["Roguelike RPG Pack — Kenney CC0 (sole art source)"],
         "credit": "Assets by Kenney (www.kenney.nl) CC0 — Roguelike RPG Pack.",
         "da": {
-            "orientation": "paths H/V/corners; roofs TL/TR/ML/MR/BL/BR; trees canopy>trunk",
-            "exterior": "Sample1 — oriented gables + facade",
-            "interior": "Sample2 — wall shell + floors + furniture",
+            "paths": "single-width H/V/corners — no parallel double tracks",
+            "roofs": "Sample1 kit 1217/1222/1218… wall-under-roof gables",
+            "doors": "building=331 wood · room=168 open",
+            "windows": "front=215 · side=272",
             "lod": "crossfade roofs↔interiors on zoom",
             "scale": f"×{SCALE} from world.json",
         },
@@ -786,7 +793,7 @@ def build():
         "Sample1 exterior + Sample2 interior dual LOD (playbook v5).\n",
         encoding="utf-8",
     )
-    print(f"OK v6 {W}×{H}px={W*TW}×{H*TW} hotspots={n_hs} paths={len(path_cells)}")
+    print(f"OK v7 {W}×{H}px={W*TW}×{H*TW} hotspots={n_hs} paths={len(path_cells)}")
 
 
 if __name__ == "__main__":

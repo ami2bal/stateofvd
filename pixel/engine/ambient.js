@@ -26,7 +26,8 @@ export function installAmbient(layer) {
     clouds.push(g);
   }
 
-  // boat
+  // boat — on the lake (south band), never mid-campus
+  const lakeY0 = () => Math.floor(MAP_H * 0.90);
   const boat = new PIXI.Graphics();
   boat.beginFill(C.boisLite);
   boat.drawPolygon([0, 6, 22, 6, 18, 12, 4, 12]);
@@ -34,19 +35,20 @@ export function installAmbient(layer) {
   boat.beginFill(0xf2f0e8);
   boat.drawPolygon([10, 6, 10, -6, 18, 6]);
   boat.endFill();
-  boat.x = 300;
-  boat.y = 340;
+  boat.x = MAP_W * 0.45;
+  boat.y = lakeY0() + 8;
   layer.addChild(boat);
 
-  // smoke stacks (departments area)
+  // smoke stacks (department row — relative to map height)
   const smokes = [];
-  for (const x of [90, 200, 320]) {
+  const deptY = () => Math.floor(MAP_H * 0.72);
+  for (const frac of [0.15, 0.35, 0.55]) {
     const s = new PIXI.Graphics();
     s.beginFill(0xd0d8e0, 0.45);
     s.drawCircle(0, 0, 3);
     s.endFill();
-    s.x = x;
-    s.y = 284;
+    s.x = MAP_W * frac;
+    s.y = deptY();
     s.__t = rng() * 10;
     layer.addChild(s);
     smokes.push(s);
@@ -72,19 +74,21 @@ export function installAmbient(layer) {
         c.y += Math.sin(t * 0.4 + c.__phase) * 0.02;
         if (c.x > MAP_W + 40) c.x = -50;
       }
-      boat.x = 280 + Math.sin(t * 0.35) * 28;
-      boat.y = 338 + Math.sin(t * 1.2) * 1.5;
+      const ly = lakeY0();
+      boat.x = MAP_W * 0.42 + Math.sin(t * 0.35) * Math.min(40, MAP_W * 0.06);
+      boat.y = ly + 6 + Math.sin(t * 1.2) * 1.5;
       boat.rotation = Math.sin(t * 0.8) * 0.04;
 
       for (const s of smokes) {
         s.__t += dt;
         const u = (s.__t % 3) / 3;
-        s.y = 284 - u * 18;
+        const baseY = deptY();
+        s.y = baseY - u * 18;
         s.alpha = 0.5 * (1 - u);
         s.scale.set(1 + u * 1.4);
         if (u > 0.98) {
           s.__t = 0;
-          s.x = 70 + Math.floor(rng() * 300);
+          s.x = MAP_W * (0.12 + rng() * 0.5);
         }
       }
 
