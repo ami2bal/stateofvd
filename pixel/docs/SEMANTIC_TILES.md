@@ -1,62 +1,62 @@
-# Orientation spatiale des textures (playbook v6)
+# Dictionnaire sémantique v9 — plan d’architecte animé
 
-## Grille de lecture
+> **But** : serious game 2D type plan d’architecte (Sample1 outdoor / Sample2 indoor).  
+> **SSOT** : `assets/kenney/roguelike_playbook.json`  
+> **Preuve visuelle** : `assets/kenney/refs/atlas_v9/`
 
-Chaque tuile structurelle a une **orientation** (2 ou 4 directions).  
-On ne place **jamais** une tuile « au hasard » : le choix dépend du **rôle spatial** (bord, coin, axe).
+## Critères de qualification (chaque sprite)
 
-```
-        N (1)
-         │
-  W (8) ─┼─ E (2)
-         │
-        S (4)
-```
-
-## Chemins (4-way)
-
-| Masque voisins path | Tuile | Sens |
-|---|---|---|
-| N, S, N+S | `408` | grain **vertical** |
-| E, W, E+W | `465` | grain **horizontal** |
-| N+E | `407` | coin NE |
-| E+S | `406` | coin ES |
-| S+W | `464` | coin SW |
-| N+W | `636` | coin NW |
-| T NSW / ESW | `405` / `404` | jonctions (sample_map) |
-
-Source : fréquences `sample_map.tmx` Objects + validation visuelle.
-
-## Toits (kit gable 2-way L/R × 3 rangs)
-
-| Rôle | ID | Face |
-|---|---|---|
-| TL / TR | 1217 / 1218 | pignon haut gauche / droite |
-| ML / MR | 1331 / 1332 | rive gauche / droite |
-| BL / BR | 1345 / 1346 | égout gauche / droite |
-| TOP / FILL | 1288 / 1275 | faîtage / corps |
-
-Multi-pignons = **répéter** le kit par segment (pas un fill aléatoire).
-
-## Arbres (2-way vertical)
-
-| Rôle | ID |
+| Critère | Question |
 |---|---|
-| Cime (au-dessus) | 586 |
-| Tronc (en dessous) | 643 |
+| **role** | mur / sol / ouverture / meuble / terrain / toit ? |
+| **subtype** | office_floor, hall_wood, door_building, window_ew… |
+| **orientation** | N/S/E/W ou isotrope |
+| **layer** | ground · roofs · interiors |
+| **assembly** | fill · replace · overlay · ring |
+| **forbidden** | IDs ressemblants mais faux rôle |
 
-## Façade / intérieurs
+## Ouvertures (point faible corrigé)
 
-- Porte **face sud** (entrée)
-- Fenêtres extérieures sur rang mur sous égout (face sud)
-- Fenêtres intérieures **uniquement** sur coque mur N/W/E (Sample2)
-- `wall_top` (871) = arase sous toit · `wall` (873) = corps
+| Rôle | ID | Mur | Assemble |
+|---|---|---|---|
+| Porte bâtiment | **331** | façade d’entrée | **remplace** cellule mur |
+| Porte salle | **168** | cloison entre 2 sols | **remplace** milieu de cloison |
+| Fenêtre N/S | **215** | mur horizontal | **remplace** sur arête N/S |
+| Fenêtre E/W | **158** | mur vertical | **remplace** sur arête E/W (arche latérale) |
 
-## Dual LOD
+**Interdits** : `201` comme porte · `215`/`272` sur murs E/W · flotter une ouverture hors mur.
 
-| Zoom | Calque | Réf. |
+## Sols
+
+| Programme salle | ID | Illustre |
 |---|---|---|
-| out | ground + roofs | Sample1 orienté |
-| in | ground + interiors | Sample2 plans |
+| `dept` / `office` / `corridor` | **120** (alt 119) | bureau pierre grise |
+| `hemicycle` / `college` / `meeting` | **698** (alt 756) | hall bois |
+| tapis conseil | **922** (alt 923) | carpet vert inset — **pas** 983 |
 
-Preuves : `preview_roofs.png`, `preview_dual_lod.png`, `role_usage_sheet.png`.
+## Murs — grammaire d’assemblage
+
+```
+1. paint WALL mass sur tout le footprint
+2. carve FLOOR dans chaque room rect (déjà inset)
+3. partitions = bande WALL entre rooms + DOOR_ROOM
+4. openings extérieures = REPLACE sur le shell (NS/EW)
+5. door_building en dernier (gagne sur fenêtre)
+6. furniture OVERLAY sols uniquement
+```
+
+## Façade / chemin
+
+- `door_facade()` : entrée world au **nord** du footprint → porte **N** (dépts) ; au sud → porte **S** (GC/CE)
+- Chemin mono-voie jusqu’à `outside_of_door()`
+- Toit Sample1 : bande façade d’entrée **sans** toit
+
+## Programmes de salles
+
+| id | sol | mobilier |
+|---|---|---|
+| hemicycle | bois + carpet | table + chaises conseil |
+| college | bois | table + chaises |
+| meeting | bois | table + chaises |
+| dept / office | pierre grise | bureau + chaise + armoire |
+| corridor | pierre | — |

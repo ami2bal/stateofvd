@@ -75,23 +75,26 @@ ROOF_KIT = [
     [1274, 1279, 1275],  # mid slopes + fill
     [1331, 1276, 1332],  # eaves L/R + bottom fill
 ]
+# ── Architect-plan dictionary (playbook v9) — qualified IDs only ────────────
 WALL_FILL = 873
-WALL_L, WALL_R = 872, 874  # side wall columns (sample houses)
-WALL_INNER = 868  # Sample2 indoor wall tone
-# Doors — never confuse with arched glass window-doors (201)
-DOOR_BUILDING = 331  # wood door in wall (exterior entrance)
-DOOR_ROOM = 168  # open doorway between rooms (interior)
-# Windows by wall orientation (Sample2 indoor objects)
-# N/S wall (faces north or south into room / façade sud-nord) → rectangular
-WINDOW_NS = 215
-# E/W wall (faces east or west — lateral) → tall arched 158/159, NOT 215/272
-WINDOW_EW = 158
-# Floors (Sample2 Floor layer frequencies)
-FLOOR_STONE = 119  # grey tile offices
-FLOOR_STONE_B = 120
-FLOOR_WOOD = 698  # warm wood — hemicycle / collège / halls
-FLOOR_WOOD_B = 756
-FLOOR_CARPET = 922  # solid green carpet (Sample2); 983 is pale wood-like
+WALL_INNER = 868
+WALL_L, WALL_R = 872, 874
+DOOR_BUILDING = 331  # wood door leaf in wall — NOT 201
+DOOR_ROOM = 168  # open passage between rooms — NOT 331
+WINDOW_NS = 215  # rectangular multi-pane on N/S walls
+WINDOW_EW = 158  # tall arched on E/W walls (lateral) — NOT 215/272
+FLOOR_OFFICE = 120  # grey stone (departments, offices)
+FLOOR_OFFICE_B = 119
+FLOOR_HALL = 698  # warm wood (hémicycle, collège, meeting)
+FLOOR_HALL_B = 756
+FLOOR_CARPET = 922  # green council carpet — NOT 983
+CHAIR = (190, 191)
+TABLE = (192, 193, 311)
+DESK = 311
+CABINET = (196, 29)
+# legacy aliases
+FLOOR_STONE, FLOOR_STONE_B = FLOOR_OFFICE, FLOOR_OFFICE_B
+FLOOR_WOOD, FLOOR_WOOD_B = FLOOR_HALL, FLOOR_HALL_B
 
 
 
@@ -262,13 +265,15 @@ def room_layouts(site):
 
     if kind == "department" and rooms:
         n = max(1, len(rooms))
-        # leave 1-row wall between stacked rooms
+        # leave 1-row wall between stacked rooms (architect partitions)
         usable = ih - (n - 1)
         rh0 = max(2, usable // n)
         ry = iy
         for i, r in enumerate(rooms):
             rh = rh0 if i < n - 1 else (iy + ih - ry)
-            add(r["id"], r.get("label") or r["id"], ix, ry, iw, max(2, rh), "dept")
+            # last room = small meeting (wood); others = grey offices
+            prog = "meeting" if i == n - 1 and n >= 2 else "dept"
+            add(r["id"], r.get("label") or r["id"], ix, ry, iw, max(2, rh), prog)
             ry += rh + 1  # +1 wall gap
         return out
 
@@ -501,43 +506,38 @@ def stamp_exterior(roofs, sheet, s, roles, rng, dept_tint=None):
 
 
 def floor_tile_for(kind, rng):
-    """Semantic floor by room role (Sample2 materials)."""
-    if kind == "hemicycle":
-        return FLOOR_WOOD  # wood hall + carpet later
-    if kind == "college":
-        return FLOOR_WOOD  # collège CE = council wood hall
-    if kind == "dept":
-        return FLOOR_WOOD if rng.random() < 0.5 else FLOOR_WOOD_B
-    if kind == "office":
-        return FLOOR_STONE if rng.random() < 0.5 else FLOOR_STONE_B
-    if kind == "corridor":
-        return FLOOR_STONE
-    return FLOOR_WOOD
+    """Architect-plan floors from dictionary room_programs."""
+    if kind in ("hemicycle", "college", "meeting"):
+        return FLOOR_HALL if rng.random() < 0.7 else FLOOR_HALL_B
+    if kind in ("office", "dept", "corridor"):
+        return FLOOR_OFFICE  # pure grey stone only (119 is brownish)
+    return FLOOR_OFFICE
+
+
+def paint_wall_cell(interiors, sheet, tx, ty, gx, fw):
+    lx = tx - gx
+    if lx == 0:
+        paste(interiors, sheet, WALL_L, tx, ty)
+    elif lx == fw - 1:
+        paste(interiors, sheet, WALL_R, tx, ty)
+    else:
+        paste(interiors, sheet, WALL_INNER, tx, ty)
 
 
 def stamp_interior_sample2(interiors, sheet, s, roles, rng):
-    """Sample2: continuous wall structure around every room + oriented openings."""
+    """Architect floor-plan (Sample2 grammar): wall mass → floors → openings → furniture."""
     gx, gy, fw, fh = s["gx"], s["gy"], s["fw"], s["fh"]
-    chairs = roles["chair"]["ids"]
-    tables = roles["table"]["ids"]
-    cabinets = roles["cabinet"]["ids"]
 
-    # 1) Solid wall fill for whole building (Sample2 wall body)
+    # ── 1. Wall mass (entire footprint = solid wall) ────────────────────────
     for ty in range(gy, gy + fh):
         for tx in range(gx, gx + fw):
-            lx = tx - gx
-            if lx == 0:
-                paste(interiors, sheet, WALL_L, tx, ty)
-            elif lx == fw - 1:
-                paste(interiors, sheet, WALL_R, tx, ty)
-            else:
-                paste(interiors, sheet, WALL_INNER, tx, ty)
+            paint_wall_cell(interiors, sheet, tx, ty, gx, fw)
 
     rooms = room_layouts(s)
     if not rooms:
         return
 
-    # 2) Carve floors per room (walls remain as ring + between rooms)
+    # ── 2. Carve room floors (room_layouts already inset inside outer shell) ─
     floor_cells = set()
     for rh in rooms:
         fid = floor_tile_for(rh["floor"], rng)
@@ -546,109 +546,94 @@ def stamp_interior_sample2(interiors, sheet, s, roles, rng):
                 paste(interiors, sheet, fid, tx, ty)
                 floor_cells.add((tx, ty))
 
-    # 3) Reinforce wall rings around each room (1-cell border if inside building)
-    #    Any cell adjacent to a floor cell that isn't floor → ensure wall
-    for rh in rooms:
-        for ty in range(rh["gy"] - 1, rh["gy"] + rh["fh"] + 1):
-            for tx in range(rh["gx"] - 1, rh["gx"] + rh["fw"] + 1):
-                if not (gx <= tx < gx + fw and gy <= ty < gy + fh):
-                    continue
-                if (tx, ty) in floor_cells:
-                    continue
-                # perimeter cell of this room
-                if (
-                    rh["gx"] - 1 <= tx <= rh["gx"] + rh["fw"]
-                    and rh["gy"] - 1 <= ty <= rh["gy"] + rh["fh"]
-                ):
-                    paste(interiors, sheet, WALL_INNER, tx, ty)
-
-    # 4) Room doors on shared walls (DOOR_ROOM ≠ building door)
-    def open_room_door(ax, ay, bx, by):
-        # midpoint of shared edge
-        if ax + ay:  # noqa: silence
-            pass
-        mx, my = (ax + bx) // 2, (ay + by) // 2
-        paste(interiors, sheet, DOOR_ROOM, mx, my)
-
+    # ── 3. Partitions between rooms (wall strip + room door) ───────────────
     for i, a in enumerate(rooms):
         for b in rooms[i + 1 :]:
-            # vertical shared edge
-            if a["gx"] + a["fw"] + 1 == b["gx"] or b["gx"] + b["fw"] + 1 == a["gx"]:
-                left, right = (a, b) if a["gx"] < b["gx"] else (b, a)
-                wx = left["gx"] + left["fw"]  # wall column between
-                y0 = max(left["gy"], right["gy"])
-                y1 = min(left["gy"] + left["fh"], right["gy"] + right["fh"])
-                if y1 > y0 and gx <= wx < gx + fw:
+            # gap column between horizontally adjacent rooms
+            if a["gx"] + a["fw"] < b["gx"]:
+                wx = a["gx"] + a["fw"]
+                y0 = max(a["gy"], b["gy"])
+                y1 = min(a["gy"] + a["fh"], b["gy"] + b["fh"])
+                if y1 > y0 and a["gx"] + a["fw"] + 1 == b["gx"]:
                     for ty in range(y0, y1):
-                        paste(interiors, sheet, WALL_INNER, wx, ty)
+                        paint_wall_cell(interiors, sheet, wx, ty, gx, fw)
                     paste(interiors, sheet, DOOR_ROOM, wx, (y0 + y1) // 2)
-            # horizontal shared edge
-            if a["gy"] + a["fh"] + 1 == b["gy"] or b["gy"] + b["fh"] + 1 == a["gy"]:
-                top, bot = (a, b) if a["gy"] < b["gy"] else (b, a)
-                wy = top["gy"] + top["fh"]
-                x0 = max(top["gx"], bot["gx"])
-                x1 = min(top["gx"] + top["fw"], bot["gx"] + bot["fw"])
-                if x1 > x0 and gy <= wy < gy + fh:
+            if b["gx"] + b["fw"] < a["gx"] and b["gx"] + b["fw"] + 1 == a["gx"]:
+                wx = b["gx"] + b["fw"]
+                y0 = max(a["gy"], b["gy"])
+                y1 = min(a["gy"] + a["fh"], b["gy"] + b["fh"])
+                if y1 > y0:
+                    for ty in range(y0, y1):
+                        paint_wall_cell(interiors, sheet, wx, ty, gx, fw)
+                    paste(interiors, sheet, DOOR_ROOM, wx, (y0 + y1) // 2)
+            # gap row between vertically adjacent rooms
+            if a["gy"] + a["fh"] < b["gy"] and a["gy"] + a["fh"] + 1 == b["gy"]:
+                wy = a["gy"] + a["fh"]
+                x0 = max(a["gx"], b["gx"])
+                x1 = min(a["gx"] + a["fw"], b["gx"] + b["fw"])
+                if x1 > x0:
                     for tx in range(x0, x1):
-                        paste(interiors, sheet, WALL_INNER, tx, wy)
+                        paint_wall_cell(interiors, sheet, tx, wy, gx, fw)
+                    paste(interiors, sheet, DOOR_ROOM, (x0 + x1) // 2, wy)
+            if b["gy"] + b["fh"] < a["gy"] and b["gy"] + b["fh"] + 1 == a["gy"]:
+                wy = b["gy"] + b["fh"]
+                x0 = max(a["gx"], b["gx"])
+                x1 = min(a["gx"] + a["fw"], b["gx"] + b["fw"])
+                if x1 > x0:
+                    for tx in range(x0, x1):
+                        paint_wall_cell(interiors, sheet, tx, wy, gx, fw)
                     paste(interiors, sheet, DOOR_ROOM, (x0 + x1) // 2, wy)
 
-    # 5) Building entrance on correct façade (aligned with path)
+    # ── 4. Exterior openings REPLACE wall cells (never float) ───────────────
     door_x, door_y, face = door_facade(s)
-    paste(interiors, sheet, DOOR_BUILDING, door_x, door_y)
-    # floor just inside door
-    if face == "N" and door_y + 1 < gy + fh:
-        paste(interiors, sheet, FLOOR_WOOD, door_x, door_y + 1)
-    elif face == "S" and door_y - 1 >= gy:
-        paste(interiors, sheet, FLOOR_WOOD, door_x, door_y - 1)
-
-    # 6) Windows by wall orientation
-    # N wall (horizontal strip) → WINDOW_NS ; S wall → WINDOW_NS
+    # N/S windows on horizontal exterior walls
     for tx in range(gx + 1, gx + fw - 1):
-        if (tx - gx) % 3 == 1:
-            paste(interiors, sheet, WINDOW_NS, tx, gy)  # north exterior
-            paste(interiors, sheet, WINDOW_NS, tx, gy + fh - 1)  # south exterior
-    # E/W walls (vertical strips) → WINDOW_EW (arched lateral)
+        if (tx - gx) % 2 == 1 and not (tx == door_x and gy == door_y):
+            paste(interiors, sheet, WINDOW_NS, tx, gy)
+        if (tx - gx) % 2 == 1 and not (tx == door_x and gy + fh - 1 == door_y):
+            paste(interiors, sheet, WINDOW_NS, tx, gy + fh - 1)
+    # E/W lateral arched windows on vertical exterior walls
     for ty in range(gy + 1, gy + fh - 1):
-        if (ty - gy) % 3 == 1:
-            paste(interiors, sheet, WINDOW_EW, gx, ty)
-            paste(interiors, sheet, WINDOW_EW, gx + fw - 1, ty)
-    # don't cover building door with window
+        if (ty - gy) % 2 == 1:
+            if not (gx == door_x and ty == door_y):
+                paste(interiors, sheet, WINDOW_EW, gx, ty)
+            if not (gx + fw - 1 == door_x and ty == door_y):
+                paste(interiors, sheet, WINDOW_EW, gx + fw - 1, ty)
+    # Building door last (wins over window)
     paste(interiors, sheet, DOOR_BUILDING, door_x, door_y)
+    # Floor just inside entrance
+    ix, iy = door_x, door_y + (1 if face == "N" else -1 if face == "S" else 0)
+    if face in ("E", "W"):
+        ix = door_x + (1 if face == "W" else -1)
+        iy = door_y
+    if gx < ix < gx + fw - 1 and gy < iy < gy + fh - 1:
+        paste(interiors, sheet, FLOOR_HALL, ix, iy)
 
-    # 7) Furniture + hemicycle carpet (Sample2 board room)
+    # ── 5. Furniture by room program ────────────────────────────────────────
     for rh in rooms:
-        if rh["floor"] == "hemicycle" and rh["fw"] >= 5 and rh["fh"] >= 4:
-            for ty in range(rh["gy"] + 2, rh["gy"] + rh["fh"] - 2):
-                for tx in range(rh["gx"] + 2, rh["gx"] + rh["fw"] - 2):
+        prog = rh["floor"]
+        cx = rh["gx"] + rh["fw"] // 2
+        cy = rh["gy"] + rh["fh"] // 2
+        if prog == "hemicycle" and rh["fw"] >= 5 and rh["fh"] >= 4:
+            for ty in range(rh["gy"] + 1, rh["gy"] + rh["fh"] - 1):
+                for tx in range(rh["gx"] + 1, rh["gx"] + rh["fw"] - 1):
                     paste(interiors, sheet, FLOOR_CARPET, tx, ty)
-            cx = rh["gx"] + rh["fw"] // 2
-            cy = rh["gy"] + rh["fh"] // 2
-            paste(interiors, sheet, pick(rng, tables), cx, cy)
+            paste(interiors, sheet, DESK, cx, cy)  # long table stand-in
             for dx, dy in [(-1, 0), (1, 0), (0, -1), (0, 1), (-2, 0), (2, 0)]:
-                paste(interiors, sheet, pick(rng, chairs), cx + dx, cy + dy)
-            continue
-        if rh["floor"] == "college" and rh["fw"] >= 4 and rh["fh"] >= 4:
-            cx = rh["gx"] + rh["fw"] // 2
-            cy = rh["gy"] + rh["fh"] // 2
-            paste(interiors, sheet, pick(rng, tables), cx, cy)
+                paste(interiors, sheet, CHAIR[abs(dx + dy) % 2], cx + dx, cy + dy)
+        elif prog in ("college", "meeting") and rh["fw"] >= 3 and rh["fh"] >= 3:
+            paste(interiors, sheet, pick(rng, list(TABLE)), cx, cy)
             for dx, dy in [(-1, 0), (1, 0), (0, -1), (0, 1)]:
-                paste(interiors, sheet, pick(rng, chairs), cx + dx, cy + dy)
-            continue
-        if rh["fw"] >= 3 and rh["fh"] >= 3:
-            cx = rh["gx"] + max(1, rh["fw"] // 2)
-            cy = rh["gy"] + max(1, rh["fh"] // 2)
-            paste(interiors, sheet, pick(rng, tables), cx, cy)
-            paste(interiors, sheet, pick(rng, chairs), cx - 1, cy)
-            paste(interiors, sheet, pick(rng, cabinets), rh["gx"] + 1, rh["gy"] + 1)
-        elif rh["fw"] >= 2 and rh["fh"] >= 2:
-            paste(
-                interiors,
-                sheet,
-                pick(rng, chairs),
-                rh["gx"] + rh["fw"] // 2,
-                rh["gy"] + rh["fh"] // 2,
-            )
+                paste(interiors, sheet, CHAIR[0], cx + dx, cy + dy)
+        elif prog in ("office", "dept") and rh["fw"] >= 2 and rh["fh"] >= 2:
+            # desk against wall + chair
+            dx0 = rh["gx"] + 1
+            dy0 = rh["gy"] + 1
+            paste(interiors, sheet, DESK, dx0 + max(0, rh["fw"] // 2 - 1), dy0)
+            paste(interiors, sheet, CHAIR[0], dx0 + max(0, rh["fw"] // 2 - 1), dy0 + 1)
+            if rh["fw"] >= 3:
+                paste(interiors, sheet, CABINET[0], rh["gx"] + rh["fw"] - 1, rh["gy"])
+        # corridor: no furniture
 
 
 # ── hotspots ────────────────────────────────────────────────────────────────
@@ -723,7 +708,7 @@ def build():
     rng = random.Random(13)
     sheet = load_sheet()
 
-    print(f"Roguelike v8 — semantic dico · grid {W}×{H}")
+    print(f"Roguelike v9 — architect plan · grid {W}×{H}")
 
     occupied = set()
     for s in sites:
@@ -842,10 +827,11 @@ def build():
         ("doorR", [DOOR_ROOM]),
         ("winNS", [WINDOW_NS]),
         ("winEW", [WINDOW_EW]),
-        ("wood", [FLOOR_WOOD, FLOOR_WOOD_B]),
-        ("stone", [FLOOR_STONE, FLOOR_STONE_B]),
+        ("office", [FLOOR_OFFICE, FLOOR_OFFICE_B]),
+        ("hall", [FLOOR_HALL, FLOOR_HALL_B]),
         ("carpet", [FLOOR_CARPET]),
-        ("chair", roles["chair"]["ids"]),
+        ("chair", list(CHAIR)),
+        ("desk", [DESK]),
     ]
     img = Image.new("RGBA", (260, len(pairs) * 22), (18, 20, 26, 255))
     dr = ImageDraw.Draw(img)
@@ -863,16 +849,15 @@ def build():
         "grid": {"w": W, "h": H},
         "scale": SCALE,
         "source": "roguelike-rpg-pack",
-        "playbook": "roguelike_playbook.json v7",
+        "playbook": "roguelike_playbook.json v9",
         "packs": ["Roguelike RPG Pack — Kenney CC0 (sole art source)"],
         "credit": "Assets by Kenney (www.kenney.nl) CC0 — Roguelike RPG Pack.",
         "da": {
-            "paths": "single-width H/V/corners — no parallel double tracks",
-            "roofs": "Sample1 kit 1217/1222/1218… wall-under-roof gables",
-            "doors": "building=331 wood · room=168 open",
-            "windows": "front=215 · side=272",
-            "lod": "crossfade roofs↔interiors on zoom",
-            "scale": f"×{SCALE} from world.json",
+            "goal": "serious-game architect floor-plan",
+            "walls": "mass→carve→partition→openings replace",
+            "openings": "331 building / 168 room / 215 NS / 158 EW",
+            "floors": "office=120 hall=698 carpet=922",
+            "furniture": "desk offices / council table halls",
         },
         "layers": {
             "ground": "ground.png",
@@ -885,10 +870,10 @@ def build():
     (OUT / "CREDITS.txt").write_text(
         "Roguelike RPG Pack by Kenney (www.kenney.nl) — CC0 1.0\n"
         "https://kenney.nl/assets/roguelike-rpg-pack\n"
-        "Sample1 exterior + Sample2 interior dual LOD (playbook v5).\n",
+        "Architect plan dual LOD — playbook v9 semantic dictionary.\n",
         encoding="utf-8",
     )
-    print(f"OK v8 {W}×{H}px={W*TW}×{H*TW} hotspots={n_hs} paths={len(path_cells)}")
+    print(f"OK v9 {W}×{H}px={W*TW}×{H*TW} hotspots={n_hs} paths={len(path_cells)}")
 
 
 if __name__ == "__main__":

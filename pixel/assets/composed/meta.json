@@ -8,18 +8,17 @@
   },
   "scale": 2,
   "source": "roguelike-rpg-pack",
-  "playbook": "roguelike_playbook.json v7",
+  "playbook": "roguelike_playbook.json v9",
   "packs": [
     "Roguelike RPG Pack \u2014 Kenney CC0 (sole art source)"
   ],
   "credit": "Assets by Kenney (www.kenney.nl) CC0 \u2014 Roguelike RPG Pack.",
   "da": {
-    "paths": "single-width H/V/corners \u2014 no parallel double tracks",
-    "roofs": "Sample1 kit 1217/1222/1218\u2026 wall-under-roof gables",
-    "doors": "building=331 wood \u00b7 room=168 open",
-    "windows": "front=215 \u00b7 side=272",
-    "lod": "crossfade roofs\u2194interiors on zoom",
-    "scale": "\u00d72 from world.json"
+    "goal": "serious-game architect floor-plan",
+    "walls": "mass\u2192carve\u2192partition\u2192openings replace",
+    "openings": "331 building / 168 room / 215 NS / 158 EW",
+    "floors": "office=120 hall=698 carpet=922",
+    "furniture": "desk offices / council table halls"
   },
   "layers": {
     "ground": "ground.png",

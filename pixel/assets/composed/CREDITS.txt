@@ -1,3 +1,3 @@
 Roguelike RPG Pack by Kenney (www.kenney.nl) — CC0 1.0
 https://kenney.nl/assets/roguelike-rpg-pack
-Sample1 exterior + Sample2 interior dual LOD (playbook v5).
+Architect plan dual LOD — playbook v9 semantic dictionary.
