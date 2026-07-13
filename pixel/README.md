@@ -1,9 +1,7 @@
-# State of — Pixel edition
+# State of — Pixel edition (agent art pass)
 
-Structure aligned with the main State of VD world (Parlement, Château, 7 departments — **no Rumine**).
+World-aligned map (Parlement · Château · 7 depts). Dual LOD: zoom opens roofs.
 
 **Play:** https://ami2bal.github.io/stateofvd/pixel/
 
-Zoom in to open roofs · scenarios use real room ids (`plenum-gc`, `college-ce`, …).
-
-See `docs/QUALITY_ROADMAP.md` for how to reach concept-art quality.
+Regenerate art: `python tools/gen_art_pass.py` (in full repo).

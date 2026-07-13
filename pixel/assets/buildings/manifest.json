@@ -1,0 +1,94 @@
+{
+  "buildings": [
+    {
+      "id": "parlement",
+      "kind": "parlement",
+      "x": 48,
+      "y": 32,
+      "w": 224,
+      "h": 144,
+      "roof": "buildings/parlement_roof.png",
+      "interior": "buildings/parlement_interior.png"
+    },
+    {
+      "id": "chateau",
+      "kind": "chateau",
+      "x": 336,
+      "y": 32,
+      "w": 192,
+      "h": 144,
+      "roof": "buildings/chateau_roof.png",
+      "interior": "buildings/chateau_interior.png"
+    },
+    {
+      "id": "dep-dits",
+      "kind": "department",
+      "x": 32,
+      "y": 256,
+      "w": 48,
+      "h": 80,
+      "roof": "buildings/dep-dits_roof.png",
+      "interior": "buildings/dep-dits_interior.png"
+    },
+    {
+      "id": "dep-deiep",
+      "kind": "department",
+      "x": 112,
+      "y": 256,
+      "w": 48,
+      "h": 80,
+      "roof": "buildings/dep-deiep_roof.png",
+      "interior": "buildings/dep-deiep_interior.png"
+    },
+    {
+      "id": "dep-def",
+      "kind": "department",
+      "x": 192,
+      "y": 256,
+      "w": 48,
+      "h": 80,
+      "roof": "buildings/dep-def_roof.png",
+      "interior": "buildings/dep-def_interior.png"
+    },
+    {
+      "id": "dep-dsas",
+      "kind": "department",
+      "x": 272,
+      "y": 256,
+      "w": 48,
+      "h": 80,
+      "roof": "buildings/dep-dsas_roof.png",
+      "interior": "buildings/dep-dsas_interior.png"
+    },
+    {
+      "id": "dep-dcirh",
+      "kind": "department",
+      "x": 352,
+      "y": 256,
+      "w": 48,
+      "h": 80,
+      "roof": "buildings/dep-dcirh_roof.png",
+      "interior": "buildings/dep-dcirh_interior.png"
+    },
+    {
+      "id": "dep-djes",
+      "kind": "department",
+      "x": 432,
+      "y": 256,
+      "w": 48,
+      "h": 80,
+      "roof": "buildings/dep-djes_roof.png",
+      "interior": "buildings/dep-djes_interior.png"
+    },
+    {
+      "id": "dep-dfa",
+      "kind": "department",
+      "x": 512,
+      "y": 256,
+      "w": 48,
+      "h": 80,
+      "roof": "buildings/dep-dfa_roof.png",
+      "interior": "buildings/dep-dfa_interior.png"
+    }
+  ]
+}
