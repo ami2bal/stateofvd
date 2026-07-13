@@ -285,7 +285,7 @@ async function main() {
   if (boot) boot.classList.add("is-done");
   const srcMsg =
     map.source === "kenney-composed"
-      ? `${tour.list.length} parcours · Kenney mix · zoom = intérieurs`
+      ? `${tour.list.length} parcours · Roguelike RPG Pack · zoom = intérieurs`
       : map.source?.includes("tiled")
         ? `${tour.list.length} parcours · zoom pour ouvrir les toits`
         : "Mode procédural (fallback)";

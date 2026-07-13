@@ -6,85 +6,16 @@
     "w": 38,
     "h": 24
   },
-  "source": "kenney-semantic-v2",
-  "playbook": "semantic_playbook.json",
+  "source": "roguelike-rpg-pack",
+  "playbook": "roguelike_playbook.json v3",
   "packs": [
-    "Tiny Town (Kenney CC0)",
-    "RPG Urban Pack (Kenney CC0) \u2014 sidewalk + brick only",
-    "Tiny Dungeon (Kenney CC0) \u2014 floors/furniture"
+    "Roguelike RPG Pack \u2014 Kenney CC0 (sole art source)"
   ],
-  "credit": "Assets by Kenney (www.kenney.nl) CC0. Semantic composition State of VD.",
+  "credit": "Assets by Kenney (www.kenney.nl) CC0 \u2014 Roguelike RPG Pack only.",
+  "da": "Sample1 outdoor + Sample2 indoor modular kit; furniture = props only",
   "layers": {
     "ground": "ground.png",
     "roofs": "roofs.png",
     "interiors": "interiors.png"
-  },
-  "ids": {
-    "grass": [
-      0,
-      1,
-      2
-    ],
-    "path": [
-      12,
-      13,
-      14,
-      24,
-      36,
-      37,
-      38
-    ],
-    "water": [
-      48,
-      49
-    ],
-    "road": [
-      8,
-      9,
-      10,
-      11,
-      12,
-      13,
-      14,
-      15
-    ],
-    "brick": [
-      16,
-      17,
-      18,
-      19,
-      20,
-      21,
-      22
-    ],
-    "roof": [
-      43,
-      44,
-      45,
-      46,
-      47,
-      48,
-      49
-    ],
-    "door": [
-      54,
-      55,
-      56,
-      57
-    ],
-    "floor": [
-      0,
-      1,
-      2,
-      3,
-      16,
-      17,
-      18,
-      19,
-      20,
-      21,
-      22,
-      23
-    ]
   }
 }

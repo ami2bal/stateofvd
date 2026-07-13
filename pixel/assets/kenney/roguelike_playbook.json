@@ -1,0 +1,161 @@
+{
+  "version": 3,
+  "pack": "roguelike-rpg-pack",
+  "source": "Kenney Roguelike RPG Pack (CC0) — IDs from sample_map.tmx + sample_indoor.tmx + visual sheet",
+  "sheet": "Spritesheet/roguelikeSheet_transparent.png",
+  "tile": 16,
+  "spacing": 1,
+  "columns": 57,
+  "method": "TMX frequency + visual confirmation on building_kit.png; furniture NEVER used as structure",
+  "roles": {
+    "grass": {
+      "ids": [62],
+      "note": "solid green grass — sample_map Ground 9858×"
+    },
+    "dirt_path": {
+      "ids": [408, 465],
+      "note": "brown dirt path — sample Objects overlay"
+    },
+    "dirt_soft": {
+      "ids": [578, 579, 635],
+      "note": "softer dirt / path edge"
+    },
+    "cobble": {
+      "ids": [920, 919],
+      "note": "grey cobble — esplanade"
+    },
+    "water_fill": {
+      "ids": [60],
+      "note": "blue water fill"
+    },
+    "water_edge": {
+      "ids": [61, 2, 3, 57, 59],
+      "note": "water shore variants (optional)"
+    },
+    "tree": {
+      "ids": [586, 643],
+      "note": "pine trees only — sample Objects top trees"
+    },
+    "tree_alt": {
+      "ids": [583, 592, 640],
+      "note": "bush / alternate canopy sparingly"
+    },
+    "wall_beige": {
+      "ids": [873, 872],
+      "note": "solid beige wall — sample building language"
+    },
+    "wall_beige_alt": {
+      "ids": [868, 869, 871],
+      "note": "beige variants for slight variation"
+    },
+    "wall_stone": {
+      "ids": [807],
+      "note": "grey stone wall fill"
+    },
+    "roof_fill": {
+      "ids": [1275, 1288, 1274],
+      "note": "solid brown roof body"
+    },
+    "roof_peak_l": {
+      "ids": [1217],
+      "note": "left roof peak / slope"
+    },
+    "roof_peak_r": {
+      "ids": [1218],
+      "note": "right roof peak / slope"
+    },
+    "roof_eave_l": {
+      "ids": [1331, 1345],
+      "note": "left eave / lower slope"
+    },
+    "roof_eave_r": {
+      "ids": [1332, 1346],
+      "note": "right eave / lower slope"
+    },
+    "roof_mid": {
+      "ids": [1231, 1232],
+      "note": "mid roof ridge pieces"
+    },
+    "door": {
+      "ids": [201],
+      "note": "arched wood door — sample_indoor Objects"
+    },
+    "window": {
+      "ids": [215, 216, 217, 218],
+      "note": "framed glass windows — exterior wall accent only (furn_ids visual)"
+    },
+    "floor_stone": {
+      "ids": [119, 120],
+      "note": "grey stone floor indoor"
+    },
+    "floor_beige": {
+      "ids": [868, 873],
+      "note": "beige floor / indoor wall tone"
+    },
+    "floor_wood": {
+      "ids": [698, 756],
+      "note": "warm wood floor"
+    },
+    "carpet_green": {
+      "ids": [983, 982, 984],
+      "note": "green carpet — plenum"
+    },
+    "furniture_chair": {
+      "ids": [180, 181, 188, 189, 190, 191],
+      "note": "wooden chairs/stools — props only, never flood"
+    },
+    "furniture_table": {
+      "ids": [160, 161, 162, 163, 292, 293],
+      "note": "tables/desks — props only"
+    },
+    "furniture_cabinet": {
+      "ids": [148, 149, 196, 197],
+      "note": "cabinets/shelves — rare accent"
+    },
+    "furniture_misc": {
+      "ids": [192, 193, 29],
+      "note": "beds / misc — rare accent"
+    }
+  },
+  "building_recipes": {
+    "parlement": {
+      "wall": "wall_beige",
+      "roof_fill": "roof_fill",
+      "door": "door",
+      "window": "window",
+      "tint_wall": [70, 130, 95],
+      "tint_roof": [50, 110, 80],
+      "tint_strength": 0.22,
+      "roof_rows": 2,
+      "window_every": 3
+    },
+    "chateau": {
+      "wall": "wall_beige",
+      "roof_fill": "roof_fill",
+      "door": "door",
+      "window": "window",
+      "tint_wall": [210, 175, 100],
+      "tint_roof": [180, 100, 70],
+      "tint_strength": 0.28,
+      "roof_rows": 2,
+      "window_every": 3
+    },
+    "department": {
+      "wall": "wall_beige",
+      "roof_fill": "roof_fill",
+      "door": "door",
+      "window": "window",
+      "tint_wall": null,
+      "tint_roof": null,
+      "tint_strength": 0.32,
+      "roof_rows": 1,
+      "window_every": 2
+    }
+  },
+  "invariants": [
+    "Furniture IDs never appear in wall/roof/ground fill",
+    "One pack only — Roguelike RPG Pack",
+    "Buildings = modular kit (roof peaks + fill + beige walls + door/window accents)",
+    "Interiors = floor fill + sparse props (≤3 per room)"
+  ]
+}
