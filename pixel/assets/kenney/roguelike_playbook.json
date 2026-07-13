@@ -1,55 +1,44 @@
 {
-  "version": 6,
+  "version": 8,
   "pack": "roguelike-rpg-pack",
-  "principle": "Every structural tile has a spatial orientation (2-way or 4-way). Placement is never orientation-random.",
+  "principle": "Semantic dictionary: every tile has role + orientation + assembly rules.",
   "scale": 2,
-  "refs": {
-    "exterior": "Sample1 official",
-    "interior": "Sample2 official",
-    "method": "sample_map.tmx neighbor masks + visual sheet"
-  },
-  "orientation": {
+  "dictionary": {
     "path": {
-      "bits": "N=1 E=2 S=4 W=8",
-      "V": 408,
-      "H": 465,
+      "V": 408, "H": 465,
       "corners": { "NE": 407, "ES": 406, "SW": 464, "NW": 636 },
-      "T": { "NSW": 405, "ESW": 404 },
-      "note": "Grain follows corridor direction; corners face grass"
+      "rule": "single-width; mask neighbors; path meets door apron"
     },
-    "roof_gable": {
-      "TL": 1217, "TR": 1218,
-      "ML": 1331, "MR": 1332,
-      "BL": 1345, "BR": 1346,
-      "TOP": 1288, "FILL": 1275,
-      "note": "Per-gable local coords; multi-gable = repeated oriented houses"
+    "door": {
+      "building": 331, "room": 168,
+      "rule": "door_facade: depts=N GC/CE=S; never 201 as door"
     },
-    "tree": { "canopy_above": 586, "trunk_below": 643 },
-    "facade": {
-      "door_faces": "south",
-      "windows_on": "south wall-top row under eaves",
-      "wall_top": "row under roof",
-      "wall_body": "lower facade"
+    "window": {
+      "NS": 215, "EW": 158,
+      "rule": "N/S walls=215; E/W lateral=158 arched"
     },
-    "interior_walls": {
-      "windows_on": "exterior shell only (N/W/E faces)",
-      "door_on": "south shell + internal dividers"
-    }
+    "wall": { "fill": 873, "inner": 868, "L": 872, "R": 874 },
+    "roof_kit": [[1217, 1222, 1218], [1274, 1279, 1275], [1331, 1276, 1332]],
+    "floor": {
+      "hemicycle": 698, "college": 698, "dept": [698, 756],
+      "office": [119, 120], "corridor": 119, "carpet": 922
+    },
+    "tree": { "canopy": 586, "trunk": 643 },
+    "terrain": { "grass": 62, "water": 60, "cobble": 920 }
   },
   "roles": {
     "grass": { "ids": [62] },
-    "cobble": { "ids": [920] },
     "water": { "ids": [60] },
+    "cobble": { "ids": [920] },
     "tree_canopy": { "ids": [586] },
     "tree_trunk": { "ids": [643] },
-    "wall_ext": { "ids": [873, 872] },
-    "wall_top": { "ids": [871, 869] },
-    "door": { "ids": [201] },
-    "window": { "ids": [215, 216] },
-    "floor_stone": { "ids": [119, 120] },
+    "wall_ext": { "ids": [873, 872, 874] },
+    "door": { "ids": [331] },
+    "window": { "ids": [215, 158] },
     "floor_wood": { "ids": [698, 756] },
+    "floor_stone": { "ids": [119, 120] },
     "floor_beige": { "ids": [868] },
-    "carpet_green": { "ids": [983, 982, 984] },
+    "carpet_green": { "ids": [922, 923] },
     "chair": { "ids": [190, 191] },
     "table": { "ids": [192, 193, 311] },
     "cabinet": { "ids": [196, 197, 29] }

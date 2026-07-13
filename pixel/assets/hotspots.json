@@ -33,13 +33,13 @@
       "sub": "Parlement",
       "gx": 7,
       "gy": 5,
-      "fw": 18,
+      "fw": 17,
       "fh": 13,
       "x": 112,
       "y": 80,
-      "w": 288,
+      "w": 272,
       "h": 208,
-      "cx": 256.0,
+      "cx": 248.0,
       "cy": 184.0
     },
     {
@@ -105,13 +105,13 @@
       "sub": "Parlement",
       "gx": 7,
       "gy": 18,
-      "fw": 18,
+      "fw": 17,
       "fh": 3,
       "x": 112,
       "y": 288,
-      "w": 288,
+      "w": 272,
       "h": 48,
-      "cx": 256.0,
+      "cx": 248.0,
       "cy": 312.0
     },
     {
@@ -140,13 +140,13 @@
       "sub": "Château Saint-Maire",
       "gx": 43,
       "gy": 5,
-      "fw": 15,
+      "fw": 14,
       "fh": 16,
       "x": 688,
       "y": 80,
-      "w": 240,
+      "w": 224,
       "h": 256,
-      "cx": 808.0,
+      "cx": 800.0,
       "cy": 208.0
     },
     {
@@ -228,15 +228,15 @@
       "siteKind": "department",
       "sub": "DITS — Institutions, territoire et sport",
       "gx": 5,
-      "gy": 35,
+      "gy": 36,
       "fw": 4,
       "fh": 2,
       "x": 80,
-      "y": 560,
+      "y": 576,
       "w": 64,
       "h": 32,
       "cx": 112.0,
-      "cy": 576.0
+      "cy": 592.0
     },
     {
       "id": "dep-dits-projet",
@@ -246,15 +246,15 @@
       "siteKind": "department",
       "sub": "DITS — Institutions, territoire et sport",
       "gx": 5,
-      "gy": 37,
+      "gy": 39,
       "fw": 4,
-      "fh": 4,
+      "fh": 2,
       "x": 80,
-      "y": 592,
+      "y": 624,
       "w": 64,
-      "h": 64,
+      "h": 32,
       "cx": 112.0,
-      "cy": 624.0
+      "cy": 640.0
     },
     {
       "id": "dep-deiep",
@@ -299,15 +299,15 @@
       "siteKind": "department",
       "sub": "DEIEP — Économie, innovation, emploi et patrimoine",
       "gx": 15,
-      "gy": 35,
+      "gy": 36,
       "fw": 4,
       "fh": 2,
       "x": 240,
-      "y": 560,
+      "y": 576,
       "w": 64,
       "h": 32,
       "cx": 272.0,
-      "cy": 576.0
+      "cy": 592.0
     },
     {
       "id": "dep-deiep-projet",
@@ -317,15 +317,15 @@
       "siteKind": "department",
       "sub": "DEIEP — Économie, innovation, emploi et patrimoine",
       "gx": 15,
-      "gy": 37,
+      "gy": 39,
       "fw": 4,
-      "fh": 4,
+      "fh": 2,
       "x": 240,
-      "y": 592,
+      "y": 624,
       "w": 64,
-      "h": 64,
+      "h": 32,
       "cx": 272.0,
-      "cy": 624.0
+      "cy": 640.0
     },
     {
       "id": "dep-def",
@@ -370,15 +370,15 @@
       "siteKind": "department",
       "sub": "DEF — Enseignement et formation professionnelle",
       "gx": 25,
-      "gy": 35,
+      "gy": 36,
       "fw": 4,
       "fh": 2,
       "x": 400,
-      "y": 560,
+      "y": 576,
       "w": 64,
       "h": 32,
       "cx": 432.0,
-      "cy": 576.0
+      "cy": 592.0
     },
     {
       "id": "dep-def-projet",
@@ -388,15 +388,15 @@
       "siteKind": "department",
       "sub": "DEF — Enseignement et formation professionnelle",
       "gx": 25,
-      "gy": 37,
+      "gy": 39,
       "fw": 4,
-      "fh": 4,
+      "fh": 2,
       "x": 400,
-      "y": 592,
+      "y": 624,
       "w": 64,
-      "h": 64,
+      "h": 32,
       "cx": 432.0,
-      "cy": 624.0
+      "cy": 640.0
     },
     {
       "id": "dep-dsas",
@@ -441,15 +441,15 @@
       "siteKind": "department",
       "sub": "DSAS — Santé et action sociale",
       "gx": 35,
-      "gy": 35,
+      "gy": 36,
       "fw": 4,
       "fh": 2,
       "x": 560,
-      "y": 560,
+      "y": 576,
       "w": 64,
       "h": 32,
       "cx": 592.0,
-      "cy": 576.0
+      "cy": 592.0
     },
     {
       "id": "dep-dsas-projet",
@@ -459,15 +459,15 @@
       "siteKind": "department",
       "sub": "DSAS — Santé et action sociale",
       "gx": 35,
-      "gy": 37,
+      "gy": 39,
       "fw": 4,
-      "fh": 4,
+      "fh": 2,
       "x": 560,
-      "y": 592,
+      "y": 624,
       "w": 64,
-      "h": 64,
+      "h": 32,
       "cx": 592.0,
-      "cy": 624.0
+      "cy": 640.0
     },
     {
       "id": "dep-dcirh",
@@ -512,15 +512,15 @@
       "siteKind": "department",
       "sub": "DCIRH — Culture, infrastructures et ressources humaines",
       "gx": 45,
-      "gy": 35,
+      "gy": 36,
       "fw": 4,
       "fh": 2,
       "x": 720,
-      "y": 560,
+      "y": 576,
       "w": 64,
       "h": 32,
       "cx": 752.0,
-      "cy": 576.0
+      "cy": 592.0
     },
     {
       "id": "dep-dcirh-projet",
@@ -530,15 +530,15 @@
       "siteKind": "department",
       "sub": "DCIRH — Culture, infrastructures et ressources humaines",
       "gx": 45,
-      "gy": 37,
+      "gy": 39,
       "fw": 4,
-      "fh": 4,
+      "fh": 2,
       "x": 720,
-      "y": 592,
+      "y": 624,
       "w": 64,
-      "h": 64,
+      "h": 32,
       "cx": 752.0,
-      "cy": 624.0
+      "cy": 640.0
     },
     {
       "id": "dep-djes",
@@ -583,15 +583,15 @@
       "siteKind": "department",
       "sub": "DJES — Jeunesse, environnement et sécurité",
       "gx": 55,
-      "gy": 35,
+      "gy": 36,
       "fw": 4,
       "fh": 2,
       "x": 880,
-      "y": 560,
+      "y": 576,
       "w": 64,
       "h": 32,
       "cx": 912.0,
-      "cy": 576.0
+      "cy": 592.0
     },
     {
       "id": "dep-djes-projet",
@@ -601,15 +601,15 @@
       "siteKind": "department",
       "sub": "DJES — Jeunesse, environnement et sécurité",
       "gx": 55,
-      "gy": 37,
+      "gy": 39,
       "fw": 4,
-      "fh": 4,
+      "fh": 2,
       "x": 880,
-      "y": 592,
+      "y": 624,
       "w": 64,
-      "h": 64,
+      "h": 32,
       "cx": 912.0,
-      "cy": 624.0
+      "cy": 640.0
     },
     {
       "id": "dep-dfa",
@@ -654,15 +654,15 @@
       "siteKind": "department",
       "sub": "DFA — Finances et agriculture",
       "gx": 65,
-      "gy": 35,
+      "gy": 36,
       "fw": 4,
       "fh": 2,
       "x": 1040,
-      "y": 560,
+      "y": 576,
       "w": 64,
       "h": 32,
       "cx": 1072.0,
-      "cy": 576.0
+      "cy": 592.0
     },
     {
       "id": "dep-dfa-projet",
@@ -672,15 +672,15 @@
       "siteKind": "department",
       "sub": "DFA — Finances et agriculture",
       "gx": 65,
-      "gy": 37,
+      "gy": 39,
       "fw": 4,
-      "fh": 4,
+      "fh": 2,
       "x": 1040,
-      "y": 592,
+      "y": 624,
       "w": 64,
-      "h": 64,
+      "h": 32,
       "cx": 1072.0,
-      "cy": 624.0
+      "cy": 640.0
     }
   ]
 }
