@@ -38,6 +38,14 @@ export class SoftCamera {
     setMapSize(w, h);
   }
 
+  /** World pixel → screen (relative to game-host / canvas). */
+  worldToScreen(wx, wy) {
+    return {
+      x: wx * this.scale + this.x,
+      y: wy * this.scale + this.y,
+    };
+  }
+
   bind() {
     if (this._bound) return;
     this._bound = true;

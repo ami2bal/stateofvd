@@ -18,7 +18,7 @@ Crossfade inchangé (`engine/tiled.js` → `applyLod`).
 
 ## Grille
 
-- SSOT structure : `../state-of-vd/data/world.json`
+- SSOT structure : `../data/world.json`
 - **Scale ×2** → grille pixel **76×48** (1216×768 px @ 16) pour des salles Sample2 spacieuses
 - Hotspots régénérés par le compose
 
@@ -35,6 +35,11 @@ Crossfade inchangé (`engine/tiled.js` → `applyLod`).
 python serve.py 8771
 ```
 
+→ **http://127.0.0.1:8771/pixel/**  
+
+Le serveur monte la racine `` pour servir **à la fois** le pixel et les modules métier `state-of-vd/` (flows, flow-engine, inspector) — requis pour l’iso fonctionnel.
+
+
 ## Rebuild
 
 ```bash
@@ -43,3 +48,4 @@ python tools/screenshot_review.py
 ```
 
 Crédit : *Assets by [Kenney](https://www.kenney.nl) (CC0)*.
+

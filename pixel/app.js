@@ -1,5 +1,6 @@
 /**
- * State of VD Pixel — M0–M5 runtime (asset-driven + LOD + tour + SFX).
+ * State of VD Pixel — runtime (carte pixel + Mode Parcours glass).
+ * UX alignée sur state-of-vd (barre bas, drawer, fiche contextuelle).
  */
 /* global PIXI */
 import { applyNearest, MAP_W, MAP_H } from "./engine/pixel.js";
@@ -8,6 +9,12 @@ import { buildPixelMap } from "./engine/map.js";
 import { loadTiledMap } from "./engine/tiled.js";
 import { installAmbient } from "./engine/ambient.js";
 import { installTour } from "./game/tour.js";
+import { installContextUi } from "./game/context-ui.js";
+import { installFlowBridge } from "./game/flow-bridge.js";
+import { installAriane } from "./game/ariane.js";
+import { installStepBadges } from "./game/step-badges.js";
+import { installConnections } from "./game/connections.js";
+import { loadPathGraph } from "./engine/path-route.js";
 import { sfx } from "./engine/sfx.js";
 
 const reduced =
@@ -65,139 +72,284 @@ function installFullscreen(root) {
   sync();
 }
 
-function fillScenarioList(tour) {
-  const host = $("scenario-list");
-  if (!host) return;
-  host.innerHTML = "";
-  const groups = {
-    dpt: "Département",
-    ce: "Conseil d'État",
-    gc: "Grand Conseil",
-    citoyen: "Citoyen",
-  };
-  const by = {};
-  for (const s of tour.list) {
-    (by[s.entry] ||= []).push(s);
+const ENTRY_GROUPS = [
+  { id: "dpt", label: "Département", hint: "Instruction · saisine de projets" },
+  { id: "ce", label: "Conseil d'État", hint: "Collège · Chancellerie · publication" },
+  { id: "gc", label: "Grand Conseil", hint: "Instruments · délibération · contrôle" },
+  { id: "citoyen", label: "Citoyen / tiers", hint: "Saisine hors État" },
+];
+
+function installScenarioPanel(tour) {
+  const picker = $("sp-picker");
+  const drawerBtn = $("sp-drawer-btn");
+  const drawerStack = $("sp-drawer-stack");
+  const drawerClose = $("sp-drawer-close");
+  if (!picker) return;
+
+  // Tip panel (info légale) — iso main drawer
+  let tip = document.getElementById("sp-scen-tip");
+  if (!tip && drawerStack) {
+    tip = document.createElement("div");
+    tip.id = "sp-scen-tip";
+    tip.className = "sp-scen-tip";
+    tip.hidden = true;
+    tip.innerHTML = `
+      <div class="sp-tip-title" id="sp-tip-title"></div>
+      <p class="sp-tip-sum" id="sp-tip-sum"></p>
+      <p class="sp-tip-cond"><span>Conditions</span> <span id="sp-tip-cond"></span></p>
+      <p class="sp-tip-legal"><span>Source</span> <a id="sp-tip-legal" href="#" target="_blank" rel="noopener"></a></p>`;
+    drawerStack.appendChild(tip);
   }
-  for (const [eid, label] of Object.entries(groups)) {
-    const items = by[eid];
-    if (!items?.length) continue;
-    const g = document.createElement("div");
-    g.className = "sc-group";
-    g.innerHTML = `<div class="sc-group__label">${label}</div>`;
-    for (const s of items) {
-      const b = document.createElement("button");
-      b.type = "button";
-      b.className = "sc-card";
-      b.dataset.id = s.id;
-      b.innerHTML = `<p class="sc-card__title">${s.label}</p><p class="sc-card__meta">${s.summary}</p>`;
-      b.addEventListener("click", () => {
-        host.querySelectorAll(".sc-card").forEach((c) => {
-          c.classList.toggle("is-active", c === b);
-          c.classList.toggle("is-dim", c !== b);
-        });
-        tour.start(s.id);
-        toast(`Parcours · ${s.short}`);
-      });
-      g.appendChild(b);
-    }
-    host.appendChild(g);
-  }
-}
 
-function bindTransport(tour) {
-  $("btn-play")?.addEventListener("click", () => {
-    if (tour.status === "pause") tour.resume();
-    else if (tour.status === "done" && tour.scenario) tour.start(tour.scenario.id);
-    else if (tour.status === "idle") {
-      tour.start(tour.list[0].id);
-      document
-        .querySelector(`.sc-card[data-id="${tour.list[0].id}"]`)
-        ?.classList.add("is-active");
-    } else tour.resume();
-  });
-  $("btn-pause")?.addEventListener("click", () => tour.pause());
-  $("btn-stop")?.addEventListener("click", () => {
-    tour.stop();
-    document.querySelectorAll(".sc-card").forEach((c) => {
-      c.classList.remove("is-active", "is-dim");
-    });
-  });
-}
-
-function bindHotspots(markers, camera) {
-  const tip = $("tip");
-  const pin = $("pin");
-  const pinTitle = $("pin-title");
-  const pinSub = $("pin-sub");
-  const pinBadge = $("pin-badge");
-
-  function showTip(hs, sx, sy) {
+  function showTip(s) {
     if (!tip) return;
     tip.hidden = false;
-    tip.textContent = hs.label;
-    tip.style.left = `${sx}px`;
-    tip.style.top = `${sy}px`;
+    const t = tip.querySelector("#sp-tip-title");
+    const sum = tip.querySelector("#sp-tip-sum");
+    const cond = tip.querySelector("#sp-tip-cond");
+    const legal = tip.querySelector("#sp-tip-legal");
+    if (t) t.textContent = s.label;
+    if (sum) sum.textContent = s.summary || "";
+    if (cond) cond.textContent = s.conditions || "—";
+    if (legal) {
+      legal.textContent = s.legal || "—";
+      legal.href = s.legalUrl || "#";
+    }
   }
   function hideTip() {
     if (tip) tip.hidden = true;
   }
-  function openPin(hs) {
-    if (!pin) return;
-    pin.hidden = false;
-    pinTitle.textContent = hs.label;
-    pinSub.textContent = hs.sub;
-    pinBadge.textContent = hs.kind;
-    pinBadge.style.background =
-      hs.kind === "parlement" || hs.siteKind === "parlement"
-        ? "#3e7a52"
-        : hs.kind === "chateau" || hs.siteKind === "chateau"
-          ? "#a08040"
-          : hs.kind === "department" || hs.siteKind === "department" || hs.kind === "room"
-            ? "#5c6e8a"
-            : hs.kind === "nature"
-              ? "#4c83ab"
-              : "#2f4266";
-    sfx.pin();
+
+  function closeDrawer() {
+    if (drawerStack) drawerStack.hidden = true;
+    if (drawerBtn) drawerBtn.setAttribute("aria-expanded", "false");
+    document.getElementById("sovd-root")?.classList.remove("sovd-drawer-open");
+    hideTip();
+  }
+  function openDrawer() {
+    if (drawerStack) drawerStack.hidden = false;
+    if (drawerBtn) drawerBtn.setAttribute("aria-expanded", "true");
+    document.getElementById("sovd-root")?.classList.add("sovd-drawer-open");
+  }
+  function toggleDrawer() {
+    if (drawerStack?.hidden) openDrawer();
+    else closeDrawer();
   }
 
-  $("pin-close")?.addEventListener("click", () => {
-    if (pin) pin.hidden = true;
+  drawerBtn?.addEventListener("click", toggleDrawer);
+  drawerClose?.addEventListener("click", closeDrawer);
+
+  picker.innerHTML = "";
+  const by = {};
+  for (const s of tour.list) {
+    (by[s.entry] ||= []).push(s);
+  }
+  for (const g of ENTRY_GROUPS) {
+    const items = by[g.id];
+    if (!items?.length) continue;
+    const block = document.createElement("div");
+    block.className = "sp-entry-group";
+    block.innerHTML = `<div class="sp-entry-h"><span class="sp-entry-tag">${g.label}</span><span class="sp-entry-hint">${g.hint}</span></div>`;
+    for (const s of items) {
+      const b = document.createElement("button");
+      b.type = "button";
+      b.className = "sp-scen";
+      b.dataset.id = s.id;
+      b.innerHTML = `<span class="sp-scen-name">${s.label}<span class="sp-scen-meta">${s.short || ""} · ${s.steps.length} ét.</span></span><span class="sp-scen-steps">${s.steps.length}&nbsp;ét.</span>`;
+      b.addEventListener("mouseenter", () => showTip(s));
+      b.addEventListener("focus", () => showTip(s));
+      b.addEventListener("click", () => {
+        picker.querySelectorAll(".sp-scen").forEach((c) => {
+          c.classList.toggle("is-active", c === b);
+        });
+        tour.start(s.id);
+        // Iso main : Mode Parcours = walkthrough (step-card + Ariane), PAS le panneau
+        // « Machine de flux » (FlowEngine / Agir) — réservé QA / hors parcours.
+        window.__SOVD_PIXEL__?.flowBridge?.stop?.();
+        closeDrawer();
+        toast(`Parcours · ${s.short || s.label}`);
+      });
+      block.appendChild(b);
+    }
+    picker.appendChild(block);
+  }
+
+  $("sp-play")?.addEventListener("click", () => {
+    if (tour.status === "pause") tour.resume();
+    else if (tour.status === "done" && tour.scenario) tour.start(tour.scenario.id);
+    else if (tour.status === "idle" || !tour.scenario) {
+      openDrawer();
+    } else tour.resume();
   });
+  $("sp-pause")?.addEventListener("click", () => tour.pause());
+  $("sp-stop")?.addEventListener("click", () => {
+    tour.stop();
+    window.__SOVD_PIXEL__?.flowBridge?.stop?.();
+    window.__SOVD_PIXEL__?.connections?.clear?.();
+    picker.querySelectorAll(".sp-scen").forEach((c) => c.classList.remove("is-active"));
+  });
+
+  const speedBtn = $("sp-speed");
+  function paintSpeed(i) {
+    if (!speedBtn) return;
+    const idx = i ?? tour.getSpeedIndex();
+    const steps = [0.6, 1, 1.6];
+    const val = steps[idx] ?? 1;
+    const lab = `×${String(val).replace(".", ",")}`;
+    speedBtn.dataset.speedI = String(idx);
+    speedBtn.title = `Vitesse ${lab}`;
+    const labEl = speedBtn.querySelector(".sp-speed-lab");
+    if (labEl) labEl.textContent = lab;
+    speedBtn.querySelectorAll(".sp-speed-bars i").forEach((el, j) => {
+      el.classList.toggle("on", j <= idx);
+    });
+  }
+  speedBtn?.addEventListener("click", () => {
+    const next = (tour.getSpeedIndex() + 1) % 3;
+    const { label } = tour.setSpeedIndex(next);
+    paintSpeed(next);
+    toast(`Vitesse ${label}`);
+  });
+  paintSpeed();
+
+  // Escape closes drawer / inspector
   window.addEventListener("keydown", (e) => {
-    if (e.key === "Escape" && pin) pin.hidden = true;
+    if (e.key === "Escape") {
+      closeDrawer();
+      const insp = $("inspector");
+      if (insp) insp.hidden = true;
+    }
+  });
+}
+
+/**
+ * Politique UI iso main (ui-mode) — dérivée de l'état tour + pin.
+ * @param {{ status?: string, scenario?: object|null }} tour
+ * @param {{ isPinned?: boolean, getState?: () => object }} contextUi
+ */
+function uiPolicy(tour, contextUi) {
+  const st = tour?.status;
+  const playing = st === "play" || st === "step";
+  const paused = st === "pause";
+  // PARCOURS_PLAYING
+  if (playing) {
+    return {
+      allowsPin: false,
+      allowsHoverFlow: false,
+      showInstitutionInspector: false,
+      silentInspector: true,
+      lockBoard: true,
+    };
+  }
+  // PARCOURS_PAUSED (carte / pause — récit = step-card)
+  if (paused) {
+    return {
+      allowsPin: true,
+      allowsHoverFlow: true,
+      showInstitutionInspector: false,
+      silentInspector: true,
+      lockBoard: false,
+    };
+  }
+  // PINNED
+  if (contextUi?.isPinned || contextUi?.getState?.()?.pinned) {
+    return {
+      allowsPin: true,
+      allowsHoverFlow: true,
+      showInstitutionInspector: true,
+      silentInspector: false,
+      lockBoard: false,
+    };
+  }
+  // EXPLORE
+  return {
+    allowsPin: true,
+    allowsHoverFlow: false,
+    showInstitutionInspector: true,
+    silentInspector: false,
+    lockBoard: false,
+  };
+}
+
+function bindHotspots(markers, camera, contextUi, connections, getTour) {
+  const legacy = $("inspector");
+  if (legacy) legacy.hidden = true;
+  // Tooltip noir #tip retiré : la fiche glass (showHover/pin) suffit.
+
+  function pol() {
+    return uiPolicy(getTour?.() || null, contextUi);
+  }
+
+  /**
+   * Clic = pin (fiche enrichie + flux RBAC) — iso main pinFocus.
+   */
+  function openPlace(hs, opts = {}) {
+    if (!hs) return;
+    const p = pol();
+    const fromParcours = !!opts.silentInspector;
+
+    if (fromParcours || p.lockBoard) {
+      connections?.clear?.();
+      contextUi?.hide?.();
+    } else if (p.silentInspector) {
+      // pause parcours : flux OK, pas de modal institution
+      connections?.showFor?.(hs);
+      contextUi?.hide?.();
+    } else {
+      contextUi?.pin?.(hs);
+      connections?.showFor?.(hs);
+    }
+
+    sfx.pin();
+    camera.focusOn({
+      x: hs.cx,
+      y: hs.cy,
+      scale: Math.max(camera.scale, hs.kind === "room" ? 2.8 : 2.2),
+      ms: reduced ? 200 : 750,
+    });
+  }
+
+  contextUi?.setOnFocusRoom((roomId) => {
+    const m = markers[roomId];
+    if (m?.__hs) openPlace(m.__hs);
+  });
+
+  document.getElementById("ctx-close")?.addEventListener("click", () => {
+    connections?.clear?.();
   });
 
   for (const id of Object.keys(markers)) {
     const m = markers[id];
     const hs = m.__hs;
-    m.on("pointerover", (ev) => {
+    m.on("pointerover", () => {
       m.__ring.visible = true;
       m.__ring.alpha = 0.85;
-      showTip(hs, ev.clientX, ev.clientY);
+      const p = pol();
+      if (!p.showInstitutionInspector) return;
+      if (contextUi?.isPinned || contextUi?.getState?.()?.pinned) return;
+      contextUi?.showHover?.(hs);
     });
     m.on("pointerout", () => {
-      hideTip();
       if (!m.__tourLock) m.__ring.visible = false;
+      const p = pol();
+      if (!p.showInstitutionInspector) return;
+      if (contextUi?.isPinned || contextUi?.getState?.()?.pinned) return;
+      contextUi?.scheduleHide?.();
     });
     m.on("pointertap", () => {
-      openPin(hs);
-      camera.focusOn({
-        x: hs.cx,
-        y: hs.cy,
-        scale: Math.max(camera.scale, 2.5),
-        ms: reduced ? 200 : 750,
-      });
-      hideTip();
+      const p = pol();
+      if (p.lockBoard && !p.allowsPin) return;
+      openPlace(hs);
     });
   }
+
+  return { openPlace, uiPolicy: pol };
 }
 
 async function loadWorld() {
   const tiledUrl = new URL("./assets/map/world.json", import.meta.url).href;
   try {
-    const m = await loadTiledMap(tiledUrl);
-    return m;
+    return await loadTiledMap(tiledUrl);
   } catch (e) {
     console.warn("[pixel] Tiled load failed, procedural fallback", e);
     const m = buildPixelMap();
@@ -243,18 +395,96 @@ async function main() {
   camera.fit();
   if (map.applyLod) map.applyLod(camera.scale, reduced);
 
-  // LOD on scale change (wheel) + continuous soft update
+  const lodChip = $("lod-chip");
+  const lodLabel = $("lod-label");
+  let lastLodMode = "";
+  function syncLodChip(scale) {
+    if (!lodChip || !lodLabel) return;
+    let mode, text;
+    if (scale < 1.65) {
+      mode = "roofs";
+      text = "Toits";
+    } else if (scale > 2.45) {
+      mode = "plans";
+      text = "Plans";
+    } else {
+      mode = "blend";
+      text = "Transition";
+    }
+    if (mode === lastLodMode) return;
+    lastLodMode = mode;
+    lodChip.classList.toggle("is-plans", mode === "plans");
+    lodChip.classList.toggle("is-blend", mode === "blend");
+    lodLabel.textContent = text;
+  }
+  syncLodChip(camera.scale);
+
+  const contextUi = installContextUi({
+    root: rootEl,
+    camera,
+    markers: map.markers,
+    getScale: () => camera.scale,
+  });
+
+  // Path graph for RBAC connections (tour loads its own copy too)
+  let pathGraph = null;
+  loadPathGraph().then((g) => {
+    pathGraph = g;
+  });
+
+  /** @type {ReturnType<typeof installTour>|null} */
+  let tour = null;
+
+  const connections = installConnections({
+    fxLayer: map.fxLayer,
+    markers: map.markers,
+    getPathGraph: () => pathGraph || tour?.getPathGraph?.() || null,
+    mount: rootEl,
+  });
+
+  const stepBadges = installStepBadges({
+    mount: rootEl,
+    camera,
+    markers: map.markers,
+  });
+
+  // Ariane → hooks tour (goTo / preview / branches / fin)
+  const ariane = installAriane({
+    mount: rootEl,
+    onSelect: (i) => tour?.goTo?.(i),
+    onPreview: (i) => tour?.previewStep?.(i),
+    onPreviewEnd: () => tour?.endPreview?.(),
+    onAccept: () => tour?.acceptBranch?.(),
+    onReject: () => tour?.rejectBranch?.(),
+    onReplay: () => {
+      const id = tour?.scenario?.id;
+      if (id) tour.start(id);
+    },
+    onDismiss: () => {
+      tour?.stop?.();
+      connections.clear();
+    },
+  });
+
   const prevOnScale = camera.onScaleChange;
   camera.onScaleChange = (s) => {
     if (prevOnScale) prevOnScale(s);
     if (map.applyLod) map.applyLod(s, reduced);
+    syncLodChip(s);
+    contextUi.updateLabels();
+    contextUi.reposition?.();
+    stepBadges.update();
+    tour?.repositionCard?.();
   };
 
-  const tour = installTour({
+  tour = installTour({
     camera,
     markers: map.markers,
     fxLayer: map.fxLayer,
     reduced,
+    contextUi,
+    ariane,
+    stepBadges,
   });
 
   for (const m of Object.values(map.markers)) {
@@ -265,10 +495,96 @@ async function main() {
     });
   }
 
-  fillScenarioList(tour);
-  bindTransport(tour);
-  bindHotspots(map.markers, camera);
+  const flowBridge = installFlowBridge({
+    mount: rootEl,
+    toast,
+    focusPlace: (siteId, roomId) => {
+      const id = roomId || siteId;
+      const m = map.markers[id] || map.markers[siteId];
+      if (m?.__hs) {
+        const p = uiPolicy(tour, contextUi);
+        if (p.showInstitutionInspector) contextUi.pin?.(m.__hs);
+        else contextUi.hide?.();
+        if (!p.lockBoard) connections.showFor(m.__hs);
+        else connections.clear();
+        camera.focusOn({
+          x: m.__hs.cx,
+          y: m.__hs.cy,
+          scale: Math.max(camera.scale, 2.4),
+          ms: reduced ? 200 : 700,
+        });
+      }
+    },
+  });
+
+  // Expose early so scenario panel can start flow machine
+  window.__SOVD_PIXEL__ = {
+    app,
+    camera,
+    map,
+    tour,
+    sfx,
+    contextUi,
+    flowBridge,
+    connections,
+    ariane,
+    stepBadges,
+  };
+
+  installScenarioPanel(tour);
+  bindHotspots(map.markers, camera, contextUi, connections, () => tour);
   installFullscreen(rootEl);
+  contextUi.updateLabels();
+
+  // Hover flux RBAC (tip + highlight) quand pin — iso main app.js pointermove
+  const canvasEl = app.view;
+  canvasEl.addEventListener("pointermove", (e) => {
+    if (camera._drag) {
+      connections.clearHover?.();
+      return;
+    }
+    const p = uiPolicy(tour, contextUi);
+    if (p.lockBoard) {
+      connections.clearHover?.();
+      return;
+    }
+    if (!connections.active || !p.allowsHoverFlow) {
+      // en EXPLORE sans pin : pas de tip flux
+      if (!contextUi?.isPinned && !contextUi?.getState?.()?.pinned) {
+        connections.clearHover?.();
+      }
+      return;
+    }
+    if (!(contextUi?.isPinned || contextUi?.getState?.()?.pinned)) {
+      connections.clearHover?.();
+      return;
+    }
+    const rect = canvasEl.getBoundingClientRect();
+    const sx = e.clientX - rect.left;
+    const sy = e.clientY - rect.top;
+    const wx = (sx - camera.x) / camera.scale;
+    const wy = (sy - camera.y) / camera.scale;
+    const thr = Math.max(8, 14 / Math.max(0.4, camera.scale));
+    const hit = connections.hoverAt?.(wx, wy, e.clientX, e.clientY, thr);
+    if (!hit) connections.clearHover?.();
+  });
+  canvasEl.addEventListener("pointerleave", () => {
+    connections.clearHover?.();
+  });
+
+  // Esc / close : fiche + flux RBAC
+  const origCtxClose = contextUi.close.bind(contextUi);
+  contextUi.close = () => {
+    origCtxClose();
+    connections.clear();
+  };
+  const origHide = contextUi.hide?.bind(contextUi);
+  if (origHide) {
+    contextUi.hide = () => {
+      origHide();
+      // ne clear les flux que si unpin explicite via close — hide hover ne touche pas
+    };
+  }
 
   window.addEventListener("resize", () => {
     const w = host.clientWidth;
@@ -276,6 +592,10 @@ async function main() {
     if (w > 0 && h > 0) app.renderer.resize(w, h);
     camera.resize();
     if (map.applyLod) map.applyLod(camera.scale, reduced);
+    contextUi.updateLabels();
+    contextUi.reposition?.();
+    tour.repositionCard?.();
+    stepBadges.update();
   });
 
   const boot = $("boot");
@@ -283,17 +603,19 @@ async function main() {
   camera.introFly(reduced ? 400 : 1600);
   await new Promise((r) => setTimeout(r, reduced ? 250 : 850));
   if (boot) boot.classList.add("is-done");
-  const srcMsg =
+  const bootHint = $("boot-hint");
+  if (bootHint) bootHint.hidden = true;
+  toast(
     map.source === "kenney-composed"
-      ? `${tour.list.length} parcours · Roguelike RPG Pack · zoom = intérieurs`
-      : map.source?.includes("tiled")
-        ? `${tour.list.length} parcours · zoom pour ouvrir les toits`
-        : "Mode procédural (fallback)";
-  toast(srcMsg, 3600);
+      ? `${tour.list.length} parcours · Ariane · RBAC · Agir`
+      : "Mode procédural (fallback)",
+    3600
+  );
   if (map.credit) console.info(map.credit);
 
   let last = performance.now();
   let lodT = 0;
+  let labelT = 0;
   app.ticker.add(() => {
     const now = performance.now();
     const dt = Math.min(0.05, (now - last) / 1000);
@@ -301,15 +623,48 @@ async function main() {
     camera.tick(now);
     ambient.tick(dt, reduced);
     tour.tick(now, dt);
-    // smooth LOD while camera animates
+    flowBridge.tick(dt);
+    connections.tick(now, reduced);
     lodT += dt;
+    labelT += dt;
     if (lodT > 0.05 && map.applyLod) {
       lodT = 0;
       map.applyLod(camera.scale, reduced);
+      syncLodChip(camera.scale);
+    }
+    // labels follow camera (pan/zoom)
+    if (labelT > 0.04) {
+      labelT = 0;
+      contextUi.updateLabels();
+      contextUi.reposition?.();
+      tour.repositionCard?.();
+      stepBadges.update();
     }
   });
 
-  window.__SOVD_PIXEL__ = { app, camera, map, tour, sfx };
+  window.addEventListener("keydown", (e) => {
+    if (e.key === "Escape") {
+      contextUi.close();
+      connections.clear();
+    }
+  });
+
+  // Stop parcours → clear badges/ariane already in tour; clear RBAC lines
+  const stopBtn = $("sp-stop");
+  stopBtn?.addEventListener("click", () => connections.clear());
+
+  window.__SOVD_PIXEL__ = {
+    app,
+    camera,
+    map,
+    tour,
+    sfx,
+    contextUi,
+    flowBridge,
+    connections,
+    ariane,
+    stepBadges,
+  };
 }
 
 main().catch((e) => {

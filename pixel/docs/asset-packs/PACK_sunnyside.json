@@ -1,0 +1,85 @@
+{
+  "pack": "Sunnyside World Asset Pack",
+  "version": "2.1",
+  "analyzed": "2026-07-13",
+  "root": "assets/packs/sunnyside/Sunnyside_World_ASSET_PACK_V2.1/Sunnyside_World_Assets",
+  "tile_size": 16,
+  "palette": "chaude, cohérente, ombrée (style « golden hour »)",
+  "license": {
+    "status": "NON TROUVÉE dans l'archive",
+    "action": "⚠ VÉRIFIER les termes avant usage (Sunnyside World = souvent pack payant, licence commerciale possible via itch.io/DanielDiggle). Ne pas présumer.",
+    "no_license_file": true
+  },
+  "counts": {
+    "png_total_archive": 6231,
+    "gamemaker_duplicate_IGNORE": 5439,
+    "usable_assets_approx": 792,
+    "note": "Le dossier Sunnyside_World_Gamemaker/ = export projet GameMaker (doublon per-frame). NE PAS le crawler. Tout est déjà dans Sunnyside_World_Assets/."
+  },
+  "tilesets": {
+    "main_16px": {
+      "file": "Tileset/spr_tileset_sunnysideworld_16px.png",
+      "size_px": [1024, 1024],
+      "grid": [64, 64],
+      "index_formula": "col + row*64 (ou raisonner en (col,row))",
+      "reference_grid_image": "assets/packs/_catalog/sunnyside_tileset_grid.png (grille coordonnées, axes rouges tous les 4 tiles)",
+      "regions_approx": {
+        "terrain_autotiles": {"cols": [0, 24], "rows": [0, 8], "content": "herbe / terre / sable — blocs autotile (bitmask), transitions"},
+        "water_and_edges": {"cols": [18, 26], "rows": [0, 8], "alt": {"cols": [0, 8], "rows": [16, 24]}, "content": "eau + bords/berges"},
+        "snow_ice": {"cols": [0, 8], "rows": [16, 24], "content": "tuiles neige/glace"},
+        "floors": {"cols": [0, 14], "rows": [8, 16], "content": "planchers BOIS (brun) + PIERRE/pavés (gris) — sols intérieurs/extérieurs"},
+        "trees_bushes": {"cols": [48, 63], "rows": [0, 8], "content": "arbres (grands) + buissons"},
+        "crops_small": {"cols": [26, 46], "rows": [0, 2], "content": "légumes/plantes miniatures (redondant avec Elements/Crops)"},
+        "fences_wood": {"cols": [34, 42], "rows": [0, 8], "content": "clôtures / treillis bois"},
+        "stone_rails": {"cols": [42, 48], "rows": [0, 8], "content": "rails/tuyaux pierre-métal"},
+        "BUILDINGS_5_colors": {
+          "cols": [12, 36], "rows": [8, 48],
+          "content": "★ 5 KITS DE BÂTIMENT COMPLETS (1 par couleur de toit) — modulaires : toits pentus (ridge/pentes/coins/avant-toits) + corps mur beige + portes + fenêtres + variante TOUR étroite.",
+          "color_bands": {"blue": [8, 16], "green": [16, 24], "orange": [24, 32], "red": [32, 40], "purple": [40, 48]},
+          "usage_jeu": "coder les institutions par couleur de toit (ex. Grand Conseil=vert, Conseil d'État=rouge/orange, départements=bleu/violet/…)."
+        },
+        "furniture_props": {"cols": [36, 58], "rows": [8, 40], "content": "tonneaux, caisses, étals de marché, fontaine, statue, panneaux, tables, chaises, lits, étagères, TAPIS ornemental, plantes en pot"},
+        "food_items": {"cols": [48, 63], "rows": [8, 18], "content": "fruits/légumes/objets d'inventaire"},
+        "rocks_boulders": {"cols": [48, 58], "rows": [22, 30], "content": "rochers gris (plusieurs tailles)"},
+        "ui_icons_inline": {"cols": [36, 46], "rows": [44, 52], "content": "curseurs/flèches/outils/coches (doublon partiel avec UI/)"}
+      },
+      "note_regions": "Coordonnées APPROX (à ±1-2 tiles). Pour l'exact, lire assets/packs/_catalog/sunnyside_tileset_grid.png. Zoom bâtiments : assets/packs/_catalog/sunnyside_buildings_zoom.png."
+    },
+    "forest_32px": {
+      "file": "Tileset/spr_tileset_sunnysideworld_forest_32px.png",
+      "size_px": [320, 576], "grid_16": [20, 36], "content": "décor forêt (résolution 32px pour certains éléments)"
+    }
+  },
+  "characters": {
+    "convention": {
+      "format": "spritesheet STRIP horizontale : `<variant>_<state>_strip<N>.png`",
+      "example": "base_walk_strip8.png = 768×64 → 8 frames de 96×64 (perso centré dans le cadre)",
+      "layering": "SYSTÈME EN COUCHES : base (corps) + overlay cheveux + tools. Superposer base + une variante cheveux pour customiser.",
+      "directions": "généralement 4 dir encodées dans les strips selon l'état (à confirmer par état)."
+    },
+    "Human": {
+      "states_20": ["ATTACK", "AXE", "CARRY", "CASTING", "CAUGHT", "DEATH", "DIG", "DOING", "HAMMERING", "HURT", "IDLE", "JUMP", "MINING", "REELING", "ROLL", "RUN", "SWIMMING", "WAITING", "WALKING", "WATERING"],
+      "layers_8": ["base", "bowlhair", "curlyhair", "longhair", "mophair", "shorthair", "spikeyhair", "tools"],
+      "usage_jeu": "★ PARFAIT pour les personnages qui circulent (huissiers, députés, conseillers). IDLE/WALKING/CARRY (porter un dossier !) directement exploitables."
+    },
+    "Goblin": {"path": "Characters/Goblin/PNG", "note": "PNG + GIF preview"},
+    "Skeleton": {"path": "Characters/Skeleton/PNG"}
+  },
+  "elements": {
+    "Crops": {"count": 78, "content": "cultures avec stades de croissance (beetroot_00..03, etc.) — sprites miniatures individuels"},
+    "Animals": {"count": 7, "content": "oiseau/poule/vache animés (strip4)"},
+    "Plants": {"count": 6, "content": "champignons bleus/rouges animés (strip4)"},
+    "Other": {"count": 5, "content": "windmill (strip9 animé), coracle (barque)"},
+    "VFX": {"count": 9, "content": "★ fumée de cheminée (strip5), feu (strip), glint — parfait pour animer les bâtiments (cheminée qui fume)"}
+  },
+  "ui": {
+    "count": 102,
+    "9slice_box": {"path": "UI/9slice_box_white/", "count": 27, "usage_jeu": "★ panneaux glassmorphiques/inspecteur redimensionnables (9-slice)"},
+    "icons": "flèches, barres (bluebar/…), axe, basket, outils — pour HUD/transport"
+  },
+  "fit_for_our_game": {
+    "verdict": "TRÈS ADAPTÉ",
+    "atouts": ["buildings 5 couleurs = institutions par couleur", "persos animés (dossier porté = CARRY)", "sols bois+pierre = plans de salle", "9-slice UI = panneaux", "VFX fumée = vie des bâtiments", "palette cohérente premium"],
+    "reserves": ["licence à vérifier", "pas de plan-d'architecte intérieur natif (composer les sols/murs comme pour Kenney)", "gros pack (ignorer le doublon GameMaker)"]
+  }
+}

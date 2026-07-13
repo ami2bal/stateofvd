@@ -1,0 +1,158 @@
+{
+ "combinatorics": "State of VD — règles d'assemblage machine (TASK-117)",
+ "version": 2,
+ "reads_with": "library.json (les IDs référencés ici DOIVENT y exister)",
+ "tile_size": 16,
+ "z_order": [
+  "ground",
+  "paths",
+  "walls",
+  "furniture",
+  "entities",
+  "roofs",
+  "vfx",
+  "ui"
+ ],
+ "dual_lod": {
+  "zoom_out": "ground + paths + ROOFS (bâtiments fermés, toits visibles) — cf. DA da_cible_toits.jpg",
+  "zoom_in": "ground + paths + WALLS + floors intérieurs + furniture + entities (plan ouvert) — cf. DA da_cible_ouvert.jpg",
+  "rule": "un bâtiment = 2 rendus superposés ; on bascule la couche roofs (alpha) selon le zoom"
+ },
+ "building_kit": {
+  "principle": "5 kits palette-swap, mise en page IDENTIQUE : mêmes colonnes 15-35, rows relatives 0-7 par bande (blue=8, green=16, orange=24, red=32, purple=40). Toute règle ci-dessous vaut pour les 5 couleurs en substituant la bande.",
+  "recipe_roof_EW": {
+   "desc": "toit principal (faîtage Est-Ouest) pour un bâtiment de largeur W ≥ 4",
+   "rows_top_to_bottom": [
+    {
+     "row": "roof_top_edge (rel 1, cols 22-27)",
+     "repeat": "tuiles fill en boucle sur W"
+    },
+    {
+     "row": "ridge_chevron / ridge_chevron_peak (rel 2)",
+     "note": "alterner ; peaks aux tiers"
+    },
+    {
+     "row": "slope_edge_W (21, rel 3) + [shingles | roof_face_light] × (W-2) + slope_edge_E (28, rel 3)"
+    },
+    {
+     "row": "idem rel 4 (2e rangée de pente pour bâtiments profonds)",
+     "optional": true
+    },
+    {
+     "row": "eaves_beam (rel 5) sur W",
+     "note": "poutre d'avant-toit au-dessus de la façade"
+    },
+    {
+     "row": "eaves_shingle_bottom (rel 6-7)",
+     "note": "goutte de bardeaux, optionnelle"
+    }
+   ]
+  },
+  "recipe_facade": {
+   "desc": "façade sous l'avant-toit (couche walls, visible en zoom_out sous le toit)",
+   "pieces": [
+    "wall_plain (30, rel 6)",
+    "wall_door (21, rel 5) — UNE porte, alignée sur le chemin d'entrée",
+    "window_dark_panel (13,14 abs, bande bleue) en overlay symétrique",
+    "shutters_red (12-13, rows 11-13 abs) en accents optionnels"
+   ],
+   "rule_door": "porte TOUJOURS au niveau de la rangée de façade la plus basse, jamais dans le toit"
+  },
+  "recipe_tower": {
+   "desc": "tour étroite (1 col) — pour marquer une institution (ex. tour du Château)",
+   "stack_top_to_bottom": [
+    "tower_cap (30, rel 1)",
+    "tower_shaft ×N (30, rel 2-4)",
+    "tower_wall_window (30, rel 5)",
+    "wall_plain (30, rel 6)",
+    "tower_base (30-31, rel 7)"
+   ]
+  },
+  "recipe_gablefront": {
+   "desc": "annexe étroite pignon en façade (2 cols)",
+   "stack": [
+    "gablefront_cap (33, rel 1)",
+    "gablefront_peak (33, rel 2)",
+    "gablefront_slope_W+E (33-34, rel 3)",
+    "gablefront_roofwall (33-34, rel 4)",
+    "gablefront_wall_door (33, rel 5)",
+    "wall_plain_b (33, rel 6)"
+   ]
+  },
+  "recipe_annex_NS": {
+   "desc": "aile étroite orientée N-S (colonne de faîtage)",
+   "stack": [
+    "ridge_col_N (16, rel 1)",
+    "ridge_col_mid ×N (16, rel 2-4)",
+    "ridge_col_S (16, rel 5)"
+   ]
+  },
+  "chimney": {
+   "pieces": [
+    "chimney_a (12,9)",
+    "chimney_b (13,9)"
+   ],
+   "layer": "roofs",
+   "vfx": "poser vfx_smoke (Elements/VFX/Chimney Smoke, strip5) 1 tuile AU-DESSUS de la cheminée"
+  },
+  "status": "INDICATIF — préférer building_prefabs (v2) ; l assemblage per-tile from scratch a échoué visuellement (proofs v1)"
+ },
+ "interiors": {
+  "grammar": "héritée de Kenney TASK-116 : 1) masse mur sur le footprint 2) sols de salle découpés 3) cloisons = bande mur + TROUÉE (porte de salle) 4) meubles overlay UNIQUEMENT sur sol",
+  "floors": {
+   "hall/hemicycle/college": "wood_plain (9,8)/(10,8) fill + wood_deck_edge_* en bordure",
+   "bureaux/départements/corridor": "stone_plateau (9,15)/(10,15) ou cobble_dark (1,15)",
+   "tapis": "furniture_carpets (région cols 36-52 rows 30-40) en overlay centré"
+  },
+  "walls_interior": "réutiliser wall_plain du kit couleur du bâtiment (cohérence façade/intérieur)",
+  "furniture": "furniture_props (tables/chaises/étagères/lits/tonneaux) — 1 signature par programme de salle",
+  "authoritative_example": "prefab_01_14x11 (interieur meuble demo) — imiter sa structure : sols bois, murs fins bruns, tapis, meubles"
+ },
+ "exterior_terrain": {
+  "grass": "terrain_grass_autotile (cols 0-18 rows 0-8) — fill + transitions bitmask",
+  "water": "water_fill (cols 30-34 rows 0-8) + water_edges (cols 18-30) en berges bitmask",
+  "paths": "sols pierre (floor_stone) en allées OU sprout_paths_autotile (appoint, ATTENTION palette)",
+  "trees": "trees_bushes (cols 48-63 rows 0-8) en overlay sur herbe, jamais sur chemin",
+  "rocks": "rocks_boulders — accents rivage/montagne",
+  "rule_paths": "UNE seule largeur d'allée ; portes de bâtiments ALIGNÉES sur les allées (acquis Kenney)"
+ },
+ "characters": {
+  "compose": "frame i de base_<state>_strip8 + frame i de <hair>_<state>_strip8 (même index, même position)",
+  "anchor": "frame 96×64, personnage ancré bas-centre ; échelle 1 perso ≈ 1,5 tuile de haut — NE PAS upscaler",
+  "states_for_game": {
+   "idle": "attente en salle",
+   "walking": "circulation sur chemins",
+   "carry": "transport de dossier (fil conducteur du Mode Parcours)"
+  }
+ },
+ "ui": {
+  "panels": "ui_9slice (27 tuiles 9-slice) pour tout panneau redimensionnable",
+  "icons": "ui_icons (flèches/barres) pour HUD/transport"
+ },
+ "forbidden": [
+  "mélanger les palettes Sunnyside et Sprout dans une même scène sans validation DA",
+  "poser une porte dans une rangée de toit",
+  "poser un meuble hors d'un sol",
+  "utiliser ui_inline (curseurs du tileset) comme props de scène",
+  "étirer les frames de personnages (toujours taille native ×zoom entier)"
+ ],
+ "building_prefabs": {
+  "AUTHORITATIVE": true,
+  "source": "room1_ground_truth.json — 25 prefabs extraits de la demo officielle GameMaker (Room1, 86x48)",
+  "method": "tamponner le prefab ENTIER (base + overlays) — c est le dessin de l artiste, veracite par construction",
+  "key_prefabs": {
+   "prefab_01_14x11": "INTERIEUR meuble complet (vue ouverte DA) — sols bois + lits/tapis/etageres",
+   "prefab_02_9x13": "grande maison toit orange multi-corps",
+   "prefab_04_11x6": "maison toit rouge",
+   "prefab_05_9x6": "maison toit bleu (utilisee preuves P1/P3)",
+   "prefab_09_7x5": "petite maison toit vert (gabarit departement/institution, preuve P5)"
+  },
+  "color_transposition": {
+   "rule": "pour toute tuile de bande kit (cols 15-35, rows 8-48) : row2 = row - band_src + band_dst (bands: blue=8, green=16, orange=24, red=32, purple=40) ; tuiles hors bande inchangees (bois/communs)",
+   "fallback": "si le slot cible est VIDE (ex. verriere cyan, bleu uniquement) -> garder la tuile source ; ~12 replis constates sur prefab_05, rendu OK (preuve P3)",
+   "proof": "proofs/proof_3_transposition_gc_ce.png (bleu->green GC, bleu->red CE)"
+  },
+  "scaling": "largeur variable = dupliquer les colonnes CENTRALES du prefab (jamais les bords/pignons) ; hauteur = dupliquer les rangees de pente medianes",
+  "note_per_tile": "les subtypes fins du template kit (library.json) restent INDICATIFS pour retoucher un prefab ; l assemblage tuile-par-tuile from scratch est DECONSEILLE (preuve : echec proofs v1)"
+ }
+}

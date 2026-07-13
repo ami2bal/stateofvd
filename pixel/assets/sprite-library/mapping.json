@@ -1,0 +1,162 @@
+{
+ "mapping": "State of VD — DA cible ↔ plan de masse ↔ librairie (TASK-117)",
+ "version": 2,
+ "reads_with": [
+  "library.json",
+  "combinatorics.json"
+ ],
+ "sources": {
+  "plan_de_masse": "proto/state-of-vd/data/world.json (LECTURE SEULE — grille 38×24, 9 sites)",
+  "da_toits": "proto/state-of-vd/design/da_cible_toits.jpg (LOD dézoom)",
+  "da_ouvert": "proto/state-of-vd/design/da_cible_ouvert.jpg (LOD zoom)",
+  "scale_note": "le compose actuel projette world.json en ×2 → 76×48 tuiles"
+ },
+ "da_checklist": [
+  "cadre N→S : Jura + pics enneigés + forêt (N) · Léman + rive sable + quai + barque (S) · vignes Lavaux (E) · cathédrale (O)",
+  "toits pentus tuilés ; GC = accent VERT (lanterne) ; CE = toit ROUGE + vigne en façade ; corps molasse",
+  "esplanade pavée + STATUE DORÉE centrale (l'or = navette/responsabilité, couleur réservée)",
+  "départements = rangée d'échoppes à AUVENTS colorés",
+  "chemins ocre/pavés, arbres/pins, fleurs",
+  "vue ouverte : sols bois chauds, salles meublées (pupitres/étagères/tables), même cadre",
+  "cheminées fumantes (vie des bâtiments)"
+ ],
+ "sites": {
+  "parlement": {
+   "kit_color": "green",
+   "rationale": "vert = couleur institutionnelle du Grand Conseil (DA : lanterne verte)",
+   "roof": "recipe_roof_EW (largeur 14) + recipe_annex_NS en aile + chimney×2 + vfx_smoke",
+   "facade": "wall_plain + wall_door alignée esplanade + window_dark_panel symétriques",
+   "signature": "accent vert du kit = la lanterne DA",
+   "prefab_hint": "grand prefab (02/03) transpose GREEN, elargi a fw=14"
+  },
+  "chateau": {
+   "kit_color": "red",
+   "rationale": "DA : Château Saint-Maire à toit ROUGE + vigne en façade",
+   "roof": "recipe_roof_EW (largeur 12) + recipe_tower (tour du Château) + chimney + vfx_smoke",
+   "facade": "wall_plain + wall_door + shutters_red + plants (vigne) en overlay",
+   "signature": "recipe_tower = la tour du Château",
+   "prefab_hint": "prefab 04/05 transpose RED + tour, elargi a fw=12"
+  },
+  "dep-dits": {
+   "kit_color": "blue",
+   "awning": true,
+   "prefab_hint": "prefab_09_7x5 transpose (3x5 -> reduit) OU gablefront"
+  },
+  "dep-deiep": {
+   "kit_color": "orange",
+   "awning": true,
+   "prefab_hint": "prefab_09_7x5 transpose (3x5 -> reduit) OU gablefront"
+  },
+  "dep-def": {
+   "kit_color": "purple",
+   "awning": true,
+   "prefab_hint": "prefab_09_7x5 transpose (3x5 -> reduit) OU gablefront"
+  },
+  "dep-dsas": {
+   "kit_color": "blue",
+   "awning": true,
+   "prefab_hint": "prefab_09_7x5 transpose (3x5 -> reduit) OU gablefront"
+  },
+  "dep-dcirh": {
+   "kit_color": "orange",
+   "awning": true,
+   "prefab_hint": "prefab_09_7x5 transpose (3x5 -> reduit) OU gablefront"
+  },
+  "dep-djes": {
+   "kit_color": "purple",
+   "awning": true,
+   "prefab_hint": "prefab_09_7x5 transpose (3x5 -> reduit) OU gablefront"
+  },
+  "dep-dfa": {
+   "kit_color": "blue",
+   "awning": true,
+   "prefab_hint": "prefab_09_7x5 transpose (3x5 -> reduit) OU gablefront"
+  },
+  "_dept_note": "DA : échoppes à auvents colorés → kits alternés blue/orange/purple (green réservé GC, red réservé CE) + étal/auvent depuis furniture_props en façade ; recipe_gablefront convient aux 3×5"
+ },
+ "room_programs": {
+  "plenum-gc": {
+   "floor": "wood_plain",
+   "signature": "rangées de bancs/tables en arc (furniture_props)",
+   "carpet": true
+  },
+  "bureau-gc": {
+   "floor": "wood_plain",
+   "signature": "table + chaises"
+  },
+  "commission": {
+   "floor": "wood_plain",
+   "signature": "longue table de travail"
+  },
+  "sgc": {
+   "floor": "stone_plateau",
+   "signature": "pupitres + étagères (archives/PV)"
+  },
+  "pas-perdus": {
+   "floor": "stone_plateau",
+   "signature": "corridor nu (circulation)"
+  },
+  "college-ce": {
+   "floor": "wood_plain",
+   "signature": "grande table du collège (7)",
+   "carpet": true
+  },
+  "csg": {
+   "floor": "stone_plateau",
+   "signature": "pupitres (coordination)"
+  },
+  "chancellerie": {
+   "floor": "stone_plateau",
+   "signature": "étagères + presse (publication FAO)"
+  },
+  "dep-*-cabinet": {
+   "floor": "wood_plain",
+   "signature": "pupitre + chaise (chef de département)"
+  },
+  "dep-*-sg": {
+   "floor": "stone_plateau",
+   "signature": "pupitre + étagère (instruction)"
+  },
+  "dep-*-projet": {
+   "floor": "stone_plateau",
+   "signature": "table de projet (EMPD)"
+  }
+ },
+ "exterior": {
+  "jura_N": {
+   "tiles": "trees_bushes (rangs serrés) + rocks_boulders + snow_ice (bande sommets)",
+   "gap": "pas de tileset montagne dédié — composer rochers+neige OU garder la frange stylisée"
+  },
+  "lake_S": {
+   "tiles": "water_fill + water_edges (berges) + terrain sable (terrain_islands) ; QUAI = floor_wood_deck + bords ; barque = deco_large/spr_deco_coracle"
+  },
+  "lavaux_E": {
+   "tiles": "rangs de vigne = fences_wood (treillis) + plants/crops en overlay"
+  },
+  "cathedrale_O": {
+   "gap": "pas de cathédrale native — À COMPOSER : recipe_tower (kit purple) + gablefront + window_dark_panel ; flaggé pour validation DA"
+  },
+  "esplanade": {
+   "tiles": "floor_stone (stone_plateau fill + edges)"
+  },
+  "paths": {
+   "tiles": "floor_stone en allées UNE largeur, portes alignées ; ocre DA ≈ wood_plain ou sprout_paths (⚠ palette)"
+  },
+  "statue_or": {
+   "gap": "STATUE DORÉE centrale : l'or est RÉSERVÉ (navette/responsabilité). Pas de statue dorée native → sprite custom à produire OU statue grise furniture_props + halo doré runtime. Flaggé."
+  }
+ },
+ "assembly_pipeline_for_grok": [
+  "1. lire world.json (sites gx/gy/fw/fh ×2, rooms) — LECTURE SEULE",
+  "2. sol : herbe fill + bordures jura/lake/lavaux (exterior.*) + esplanade + allées (portes alignées)",
+  "3. par site : façade (walls) puis toit (roofs) selon kit_color + recettes combinatorics.building_kit",
+  "4. par salle : sol du room_program + cloisons (wall_plain du kit) + trouées + meuble signature + tapis",
+  "5. props/vie : arbres, cheminées+vfx_smoke, auvents dépts, barque, quai",
+  "6. dual-LOD : couche roofs basculable (toits ↔ plan ouvert)",
+  "7. valider : python tools/validate_sprite_library.py (toutes les références doivent résoudre)"
+ ],
+ "assembly_method": {
+  "AUTHORITATIVE": "PREFABS (room1_ground_truth.json) + transposition couleur — cf. combinatorics.json v2 building_prefabs",
+  "sites_note": "chaque site = tamponner un prefab gabarit transpose vers kit_color, redimensionne par duplication des colonnes centrales ; interieurs = imiter prefab_01_14x11 (vue ouverte)"
+ }
+}

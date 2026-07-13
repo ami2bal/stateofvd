@@ -1,0 +1,58 @@
+{
+  "pack": "Sprout Lands — Basic pack",
+  "author": "Cup Nooble",
+  "analyzed": "2026-07-13",
+  "root": "assets/packs/sprout-lands/Sprout Lands - Sprites - Basic pack",
+  "tile_size": 16,
+  "palette": "douce, pastel, farming cozy (palette fournie : Sprout Lands color pallet/)",
+  "license": {
+    "status": "FOURNIE (read_me.txt)",
+    "commercial": false,
+    "terms": "Non-commercial UNIQUEMENT. Modification OK. Interdit : NFT, entraînement IA, redistribution/revente du pack. OK de distribuer TON projet (jeu) fait avec.",
+    "flag": "⚠ Si le jeu doit un jour être commercialisé → licence incompatible. Pour un serious-game interne non-commercial → OK."
+  },
+  "counts": {"png": 40, "note": "quelques doublons (versions espaces vs underscores, ex. 'Basic Furniture.png' == 'Basic_Furniture.png')"},
+  "categories": {
+    "tilesets": {
+      "note": "déjà SPLIT par fonction — sémantique = nom de fichier (facile). Tuiles 16×16.",
+      "files": {
+        "Tilesets/Grass.png": {"grid": [11, 7], "role": "terrain herbe + transitions (autotile)"},
+        "Tilesets/Hills.png": {"grid": [11, 9], "role": "collines/élévations (autotile)"},
+        "Tilesets/Water.png": {"grid": [4, 1], "role": "eau (animée 4 frames)"},
+        "Tilesets/Tilled Dirt*.png": {"grid": [11, 7], "role": "terre labourée (plusieurs variantes/largeurs)"},
+        "Objects/Paths.png": {"grid": [4, 4], "role": "chemins (autotile 4×4 = coins/bords)"},
+        "Tilesets/Fences.png": {"grid": [4, 4], "role": "clôtures"},
+        "Tilesets/Doors.png": {"grid": [1, 4], "role": "portes (4 frames anim ouverture)"},
+        "Tilesets/Wooden House.png": {"grid": [7, 5], "role": "★ maison bois COMPLÈTE (murs+toit)"},
+        "Tilesets/Wooden_House_Roof_Tilset.png": {"grid": [7, 5], "role": "toit maison bois (kit)"},
+        "Tilesets/Wooden_House_Walls_Tilset.png": {"grid": [5, 3], "role": "murs maison bois (kit)"},
+        "Tilesets/Bitmask references 1-2.png": {"grid": [30, 16], "role": "GUIDE bitmask autotile (référence, pas des assets à poser)"}
+      }
+    },
+    "objects": {
+      "files": {
+        "Objects/Basic Furniture.png": {"grid": [9, 6], "role": "mobilier (tables/chaises/lit/étagères…)"},
+        "Objects/Basic Grass Biom things.png": {"grid": [9, 5], "role": "props herbe (buissons, cailloux, souche…)"},
+        "Objects/Basic Plants.png": {"grid": [6, 2], "role": "plantes déco"},
+        "Objects/Chest.png": {"grid": [15, 6], "role": "coffre (animé)"},
+        "Objects/Wood Bridge.png": {"grid": [5, 3], "role": "pont bois"},
+        "Objects/Free_Chicken_House.png": {"grid": [3, 3], "role": "poulailler"},
+        "Objects/Basic tools and meterials.png": {"grid": [3, 2], "role": "outils/matériaux"}
+      }
+    },
+    "characters": {
+      "files": {
+        "Characters/Basic Charakter Spritesheet.png": {"grid": [12, 12], "role": "★ perso de base (marche 4 dir + idle) — 1 seul modèle, non-layered"},
+        "Characters/Basic Charakter Actions.png": {"grid": [6, 36], "role": "actions du perso (arroser, hacher…)"},
+        "Characters/Tools.png": {"grid": [6, 6], "role": "outils tenus"},
+        "Characters/Free Cow Sprites.png": {"grid": [6, 4], "role": "vache"},
+        "Characters/Free Chicken Sprites.png": {"grid": [4, 2], "role": "poule"}
+      }
+    }
+  },
+  "fit_for_our_game": {
+    "verdict": "LIMITÉ mais propre",
+    "atouts": ["tuiles déjà splittées par fonction (sémantique triviale)", "16×16 net", "autotiles grass/paths avec guide bitmask fourni", "kit maison bois murs+toit", "palette cozy douce"],
+    "reserves": ["1 SEUL style de maison (bois) — pas de variété de couleurs pour coder les institutions", "1 seul perso, non-layered, peu d'états", "peu de mobilier/props", "★ licence NON-COMMERCIALE (bloquant si commercialisation)"]
+  }
+}

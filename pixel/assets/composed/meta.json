@@ -8,7 +8,7 @@
   },
   "scale": 2,
   "source": "roguelike-rpg-pack",
-  "playbook": "roguelike_playbook.json v9",
+  "playbook": "roguelike_playbook.json v10",
   "packs": [
     "Roguelike RPG Pack \u2014 Kenney CC0 (sole art source)"
   ],
@@ -16,9 +16,17 @@
   "da": {
     "goal": "serious-game architect floor-plan",
     "walls": "mass\u2192carve\u2192partition\u2192openings replace",
-    "openings": "331 building / 168 room / 215 NS / 158 EW",
-    "floors": "office=120 hall=698 carpet=922",
-    "furniture": "desk offices / council table halls"
+    "openings": "door=150 / room=trou\u00e9e / window=215; architect rhythm (spacing 4\u20135, clear_door\u22652, clear corners, max 2 on depts)",
+    "floors": "office=120 hall=698 carpet=980",
+    "furniture": "desk+chair+cabinet on floor, inset from walls",
+    "roof": "Sample1 bulk roof + thin fa\u00e7ade; corners transparent over grass",
+    "spatial_invariants": [
+      "no opening outside wall_cells",
+      "no furniture outside floor_cells",
+      "no free-floating props on esplanade",
+      "roof covers bulk; fa\u00e7ade \u22642 rows",
+      "windows never adjacent to door; E/W sparser than main fa\u00e7ade"
+    ]
   },
   "layers": {
     "ground": "ground.png",

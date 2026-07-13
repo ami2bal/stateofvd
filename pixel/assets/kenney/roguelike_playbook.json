@@ -1,5 +1,5 @@
 {
-  "version": 9,
+  "version": 10.1,
   "pack": "roguelike-rpg-pack",
   "goal": "Serious-game animated architect floor-plan (Sample1 outdoor / Sample2 indoor)",
   "scale": 2,
@@ -13,93 +13,296 @@
   },
   "dictionary": {
     "terrain": {
-      "grass": { "id": 62, "orient": "none", "assembly": "fill" },
-      "water": { "id": 60, "orient": "none", "assembly": "fill" },
-      "path_V": { "id": 408, "orient": "NS", "assembly": "fill", "note": "vertical grain" },
-      "path_H": { "id": 465, "orient": "EW", "assembly": "fill", "note": "horizontal grain" },
-      "path_corners": { "NE": 407, "ES": 406, "SW": 464, "NW": 636 },
-      "cobble": { "id": 920, "orient": "none", "assembly": "fill", "use": "esplanade outdoor only" }
+      "grass": {
+        "id": 62,
+        "orient": "none",
+        "assembly": "fill"
+      },
+      "water": {
+        "id": 60,
+        "orient": "none",
+        "assembly": "fill"
+      },
+      "path_V": {
+        "id": 408,
+        "orient": "NS",
+        "assembly": "fill",
+        "note": "vertical grain"
+      },
+      "path_H": {
+        "id": 465,
+        "orient": "EW",
+        "assembly": "fill",
+        "note": "horizontal grain"
+      },
+      "path_corners": {
+        "NE": 407,
+        "ES": 406,
+        "SW": 464,
+        "NW": 636
+      },
+      "cobble": {
+        "id": 920,
+        "orient": "none",
+        "assembly": "fill",
+        "use": "esplanade outdoor only"
+      }
     },
     "wall": {
-      "fill": { "id": 873, "orient": "none", "assembly": "fill", "illustrates": "solid interior/exterior wall body" },
-      "inner": { "id": 868, "orient": "none", "assembly": "fill", "illustrates": "Sample2 indoor wall tone" },
-      "edge_L": { "id": 872, "orient": "W", "assembly": "replace", "illustrates": "west column of building" },
-      "edge_R": { "id": 874, "orient": "E", "assembly": "replace", "illustrates": "east column of building" },
+      "fill": {
+        "id": 873,
+        "orient": "none",
+        "assembly": "fill",
+        "illustrates": "solid interior/exterior wall body"
+      },
+      "inner": {
+        "id": 868,
+        "orient": "none",
+        "assembly": "fill",
+        "illustrates": "Sample2 indoor wall tone"
+      },
+      "edge_L": {
+        "id": 872,
+        "orient": "W",
+        "assembly": "replace",
+        "illustrates": "west column of building"
+      },
+      "edge_R": {
+        "id": 874,
+        "orient": "E",
+        "assembly": "replace",
+        "illustrates": "east column of building"
+      },
       "rule": "1) paint full footprint wall 2) carve room floors 3) keep 1-tile rings & partitions 4) openings REPLACE wall cells"
     },
     "opening": {
       "door_building": {
-        "id": 331,
-        "orient": "faces entry",
-        "assembly": "replace wall",
-        "illustrates": "main entrance with wood door leaf",
-        "forbidden_substitutes": [201, 158, 215, 168]
+        "ids_pair": [
+          372,
+          373
+        ],
+        "ids_single": [
+          90,
+          33
+        ],
+        "orient": "facade, alignee chemin",
+        "assembly": "replace wall cell(s) at facade base",
+        "proven": true,
+        "proof": "TMX sample_map couche Doors/windows/roof : 372/373 @(52-53,29) sur chemin 977 ; 90 @(34,36) au rez sous fenetre 331 ; crop verify_doors_outdoor.png",
+        "note": "porte double=372+373 ; portes simples=90 (imposte grise) / 33 (arrondie). 484/485=vantaux grange sombres (variante)."
       },
       "door_room": {
-        "id": 168,
+        "id": null,
         "orient": "in partition",
-        "assembly": "replace wall on shared edge mid",
+        "assembly": "trouée (floor through wall)",
         "illustrates": "open passage between rooms",
-        "forbidden_substitutes": [331, 201, 215]
+        "forbidden_substitutes": [
+          331,
+          201,
+          215,
+          168
+        ],
+        "status": "GAP",
+        "note": "trouée dans cloison, pas de sprite (168 = tentures décoratives, non porte)"
       },
       "window_ns": {
         "id": 215,
         "orient": "N or S",
         "assembly": "replace wall on N/S edge",
         "illustrates": "rectangular multi-pane window on horizontal wall",
-        "alts": [216, 217, 218]
+        "alts": [
+          216,
+          217,
+          218
+        ],
+        "proven": true
       },
       "window_ew": {
         "id": 158,
         "orient": "E or W",
         "assembly": "replace wall on E/W edge",
         "illustrates": "tall arched window/doorway on vertical wall (lateral)",
-        "alts": [159, 156],
-        "forbidden_substitutes": [215, 272, 273, 274]
+        "alts": [
+          159,
+          156
+        ],
+        "forbidden_substitutes": [
+          215,
+          272,
+          273,
+          274
+        ],
+        "status": "DISPROVEN",
+        "note": "158 = coiffe HAUTE de fenêtre, pas latéral"
+      },
+      "window": {
+        "model": "stack",
+        "cap": 158,
+        "body": 215,
+        "note": "coiffe arquée sur corps ; PAS d orientation E/W",
+        "lit_variants": {
+          "orange": [
+            159,
+            216
+          ],
+          "green": [
+            160,
+            218
+          ],
+          "small_cap": 156,
+          "alt_body": 217
+        }
+      },
+      "door_barn": {
+        "ids_pair": [
+          484,
+          485
+        ],
+        "proven": true,
+        "note": "grande porte grange double sombre (maison gauche Sample1)"
+      },
+      "window_ext_stack": {
+        "up": 331,
+        "down_door": 90,
+        "proven": true,
+        "note": "facade 2 niveaux : fenetre 331 a l etage AU-DESSUS de la porte 90 au rez (maison bas-centre Sample1)"
       }
     },
     "floor": {
       "office": {
         "id": 120,
-        "alt": 119,
-        "assembly": "fill room interior",
-        "illustrates": "grey stone office — departments & secondary rooms",
-        "use": ["dept", "office", "corridor"]
+        "orient": "none",
+        "assembly": "fill",
+        "proven": true,
+        "illustrates": "sol pierre grise bureaux/dépts"
       },
       "hall_wood": {
         "id": 698,
-        "alt": 756,
-        "assembly": "fill room interior",
-        "illustrates": "warm wood hall — hemicycle, collège CE, meeting",
-        "use": ["hemicycle", "college", "meeting"]
+        "family": [
+          697,
+          698,
+          699,
+          700,
+          701,
+          756,
+          757,
+          758
+        ],
+        "orient": "none",
+        "assembly": "fill",
+        "proven": true,
+        "illustrates": "plancher bois tan (hall/hémicycle/collège)"
       },
       "carpet_green": {
         "id": 922,
         "alt": 923,
         "assembly": "overlay inset on hall_wood",
         "illustrates": "Sample2 council carpet under table",
-        "forbidden_substitutes": [983, 982, 984]
+        "forbidden_substitutes": [
+          983,
+          982,
+          984
+        ]
+      },
+      "carpet_council": {
+        "fill": 980,
+        "borders": [
+          922,
+          923,
+          924,
+          1036,
+          1037,
+          1038
+        ],
+        "proven": true,
+        "illustrates": "tapis vert bordé du collège CE"
       }
     },
     "furniture": {
-      "chair": { "ids": [190, 191], "assembly": "overlay floor", "rule": "around tables, never on walls" },
-      "table": { "ids": [192, 193, 311], "assembly": "overlay floor" },
-      "desk": { "ids": [311], "assembly": "overlay floor", "use": "dept offices" },
-      "cabinet": { "ids": [196, 29], "assembly": "overlay floor against wall inside room" }
+      "chair": {
+        "ids": [
+          190,
+          191
+        ],
+        "assembly": "overlay floor",
+        "rule": "around tables, never on walls"
+      },
+      "table": {
+        "ids": [
+          192,
+          193,
+          311
+        ],
+        "assembly": "overlay floor"
+      },
+      "desk": {
+        "ids": [
+          311
+        ],
+        "assembly": "overlay floor",
+        "use": "dept offices"
+      },
+      "cabinet": {
+        "ids": [
+          196,
+          29
+        ],
+        "assembly": "overlay floor against wall inside room"
+      }
     },
     "roof": {
-      "kit": [[1217, 1222, 1218], [1274, 1279, 1275], [1331, 1276, 1332]],
+      "kit": [
+        [
+          1217,
+          1222,
+          1218
+        ],
+        [
+          1274,
+          1279,
+          1275
+        ],
+        [
+          1331,
+          1276,
+          1332
+        ]
+      ],
       "rule": "wall mass first; roof only non-entry façade band; multi-gable ~5-6; Sample1 isometric slopes"
     },
-    "tree": { "canopy": 586, "trunk": 643, "rule": "always pair canopy above trunk" }
+    "tree": {
+      "canopy": 586,
+      "trunk": 643,
+      "rule": "always pair canopy above trunk"
+    }
   },
   "room_programs": {
-    "hemicycle": { "floor": "hall_wood", "carpet": true, "furniture": "council_table" },
-    "college": { "floor": "hall_wood", "carpet": false, "furniture": "council_table" },
-    "meeting": { "floor": "hall_wood", "furniture": "table_chairs" },
-    "office": { "floor": "office", "furniture": "desk_chair_cabinet" },
-    "dept": { "floor": "office", "furniture": "desk_chair_cabinet" },
-    "corridor": { "floor": "office", "furniture": "none" }
+    "hemicycle": {
+      "floor": "hall_wood",
+      "carpet": true,
+      "furniture": "council_table"
+    },
+    "college": {
+      "floor": "hall_wood",
+      "carpet": false,
+      "furniture": "council_table"
+    },
+    "meeting": {
+      "floor": "hall_wood",
+      "furniture": "table_chairs"
+    },
+    "office": {
+      "floor": "office",
+      "furniture": "desk_chair_cabinet"
+    },
+    "dept": {
+      "floor": "office",
+      "furniture": "desk_chair_cabinet"
+    },
+    "corridor": {
+      "floor": "office",
+      "furniture": "none"
+    }
   },
   "spatial_rules": [
     "door_facade(): entry north of footprint → door on N wall (depts); south → S wall (GC/CE)",
@@ -110,20 +313,133 @@
     "room doors only on partitions between two floors"
   ],
   "roles": {
-    "grass": { "ids": [62] },
-    "water": { "ids": [60] },
-    "cobble": { "ids": [920] },
-    "tree_canopy": { "ids": [586] },
-    "tree_trunk": { "ids": [643] },
-    "wall_ext": { "ids": [873, 868, 872, 874] },
-    "door": { "ids": [331] },
-    "window": { "ids": [215, 158] },
-    "floor_wood": { "ids": [698, 756] },
-    "floor_stone": { "ids": [120, 119] },
-    "floor_beige": { "ids": [868] },
-    "carpet_green": { "ids": [922, 923] },
-    "chair": { "ids": [190, 191] },
-    "table": { "ids": [192, 193, 311] },
-    "cabinet": { "ids": [196, 29] }
+    "grass": {
+      "ids": [
+        62
+      ]
+    },
+    "water": {
+      "ids": [
+        60
+      ]
+    },
+    "cobble": {
+      "ids": [
+        920
+      ]
+    },
+    "tree_canopy": {
+      "ids": [
+        586
+      ]
+    },
+    "tree_trunk": {
+      "ids": [
+        643
+      ]
+    },
+    "wall_ext": {
+      "ids": [
+        873,
+        868,
+        872,
+        874
+      ]
+    },
+    "door": {
+      "ids": [
+        331
+      ]
+    },
+    "window": {
+      "ids": [
+        215,
+        158
+      ]
+    },
+    "floor_wood": {
+      "ids": [
+        698,
+        756
+      ]
+    },
+    "floor_stone": {
+      "ids": [
+        120,
+        119
+      ]
+    },
+    "floor_beige": {
+      "ids": [
+        868
+      ]
+    },
+    "carpet_green": {
+      "ids": [
+        922,
+        923
+      ]
+    },
+    "chair": {
+      "ids": [
+        190,
+        191
+      ]
+    },
+    "table": {
+      "ids": [
+        192,
+        193,
+        311
+      ]
+    },
+    "cabinet": {
+      "ids": [
+        196,
+        29
+      ]
+    }
+  },
+  "verification": {
+    "date": "2026-07-13",
+    "by": "claude",
+    "method": "Vérité terrain = decode TMX Map/sample_indoor.tmx (couches Floor/Carpet/Objects) + crops ×8 (atlas_catalog/verify_core.png, verify_gt.png)",
+    "proofs": [
+      "assets/kenney/refs/atlas_catalog/verify_core.png",
+      "assets/kenney/refs/atlas_catalog/verify_gt.png",
+      "assets/kenney/refs/atlas_catalog/assembly_1_bureau.png",
+      "assets/kenney/refs/atlas_catalog/assembly_2_deux_salles.png",
+      "assets/kenney/refs/atlas_catalog/assembly_3_college.png",
+      "assets/kenney/refs/atlas_catalog/verify_doors_outdoor.png"
+    ],
+    "resolved": {
+      "window": "2 tuiles EMPILÉES: coiffe arquée (158/159/160) + corps rectangulaire (215/216/218). PAS de fenêtre latérale E/W — 158 et 215 sont haut/bas d une MÊME fenêtre (confirmé TMX + assemblage).",
+      "hall_wood": "famille 697-701 + 756-758 (tan à refends) — 698 VALIDE (utilisé dans le TMX). Brun-brique alt = 119.",
+      "office_floor": "120 (pierre grise) confirmé ; 119 = brun-brique.",
+      "carpet_council": "fill 980 ; bords/coins 922/923/924/1036/1037/1038. 983/984 = tan (PAS vert).",
+      "door_room": "PAS de sprite dédié — c est une TROUÉE dans la cloison (168 non utilisé dans le TMX). L arche à tentures 168/282 est décorative.",
+      "door_building": "372/373 (double) + 90/33 (simples) — vérité terrain sample_map.tmx. 331 définitivement = FENÊTRE (à l étage).",
+      "dept_roof_north": "façade entrée N = 1 rangée mur seulement (anciennement 3/10 → demi-bâtiment nu) ; toit Sample1 sur le bulk"
+    },
+    "still_ambiguous": {}
+  },
+  "traps": {
+    "201": "MIROIR (meuble Objects) — jamais une porte",
+    "200": "miroir ovale — pas architecture",
+    "202": "objets ronds — pas architecture",
+    "214": "ROCHER — pas une fenêtre (voisin 215)",
+    "333": "CHAMPIGNON — pas une porte (voisin 331)",
+    "867": "tuile orange — pas un mur beige",
+    "983": "tan clair — PAS le tapis vert",
+    "331": "panneau vitré (French-door) — PAS la porte d entrée pleine",
+    "425": "poubelle/casier métal — pas une porte",
+    "67": "étal marché auvent rayé (haut) — pas architecture maison",
+    "296": "étal marché (bas)",
+    "10": "étal auvent variante",
+    "240": "étal variante",
+    "564": "pierre tombale — cimetière",
+    "566": "croix bois — cimetière",
+    "677": "tombeau — cimetière",
+    "540": "arbre mort — pas cheminée"
   }
 }

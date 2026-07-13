@@ -1,62 +1,76 @@
-# Dictionnaire sémantique v9 — plan d’architecte animé
+# SEMANTIC_TILES — catalogage PROUVÉ (Kenney Roguelike RPG Pack) · TASK-116
 
-> **But** : serious game 2D type plan d’architecte (Sample1 outdoor / Sample2 indoor).  
-> **SSOT** : `assets/kenney/roguelike_playbook.json`  
-> **Preuve visuelle** : `assets/kenney/refs/atlas_v9/`
+> Grille : spritesheet **968×526**, tuiles **16×16**, spacing **1 px**, **57 col × 31 row** = 1767 IDs.
+> `index = row*57 + col` · rect px `(col*17, row*17, 16, 16)`.
+> Preuve visuelle : `assets/kenney/refs/atlas_catalog/verify_core.png` (tuiles ×8 labellées).
+> ⚠ Les IDs de v9 étaient des **hypothèses**. Ici, seuls les IDs **prouvés à l'œil (crop)** sont retenus ; le reste est **ambigu** (à trancher, pas à forcer).
 
-## Critères de qualification (chaque sprite)
+## Grammaire observée (Sample1 extérieur · Sample2 intérieur)
 
-| Critère | Question |
-|---|---|
-| **role** | mur / sol / ouverture / meuble / terrain / toit ? |
-| **subtype** | office_floor, hall_wood, door_building, window_ew… |
-| **orientation** | N/S/E/W ou isotrope |
-| **layer** | ground · roofs · interiors |
-| **assembly** | fill · replace · overlay · ring |
-| **forbidden** | IDs ressemblants mais faux rôle |
+**Intérieur (Sample2 — LOD plan) :**
+1. Le bâtiment = **masse de mur beige** sur tout le footprint.
+2. Les **sols de salle** sont *découpés* dedans (rectangles inset) : pierre grise · bois brun · tapis vert.
+3. Les **cloisons** = bandes de mur beige ; **porte de salle** = trouée dans la cloison.
+4. Les **fenêtres** = panneaux à carreaux sombres posés **sur la coque** (replace d'une cellule mur), surtout sur les murs **horizontaux**.
+5. La **porte de bâtiment** = porte pleine **arquée** bois, centrée mur bas, avec **marches** devant.
+6. Les **meubles** = overlay **sur sol uniquement**.
 
-## Ouvertures (point faible corrigé)
+**Extérieur (Sample1 — LOD dézoom) :**
+- **Herbe** (62) / **eau** (60) en *fill* ; berge + nénuphars/rochers.
+- **Chemins** terre : **une seule largeur**, grain H/V (408/465) + **coins** (406/407/464/636) selon voisins.
+- **Maisons** = mur beige sous **toit brun pentu** (pignons) ; porte sombre, petites fenêtres.
 
-| Rôle | ID | Mur | Assemble |
-|---|---|---|---|
-| Porte bâtiment | **331** | façade d’entrée | **remplace** cellule mur |
-| Porte salle | **168** | cloison entre 2 sols | **remplace** milieu de cloison |
-| Fenêtre N/S | **215** | mur horizontal | **remplace** sur arête N/S |
-| Fenêtre E/W | **158** | mur vertical | **remplace** sur arête E/W (arche latérale) |
+## Table PROUVÉE (crop `verify_core.png`)
 
-**Interdits** : `201` comme porte · `215`/`272` sur murs E/W · flotter une ouverture hors mur.
+| Rôle | ID prouvé | subtype | orient. | preuve |
+|---|---|---|---|---|
+| terrain | **62** | grass | none | herbe fill ✓ |
+| terrain | **60** | water | none | eau fill ✓ |
+| path | **408 / 465** | path (grain V / H) | NS / EW | ✓ |
+| path coins | **406/407/464/636** | path_corner | ES/NE/SW/NW | ✓ (mapping fin par masque voisins à confirmer) |
+| wall | **873** | wall_solid | none | beige plein ✓ |
+| wall | **868/872/874** | wall_edge (bas/O/E) | none/W/E | bords beige ✓ |
+| floor | **120** | floor_office (pierre grise) | none | sol dépts/bureaux ✓ |
+| floor | **121** | floor_tiled (dalles) | none | alt ✓ |
+| carpet | **922** | carpet_council (vert bordé) | none | **tapis collège CE** ✓ (≠ 983) |
+| carpet | **923** | carpet_full | none | ✓ |
+| window | **215** | window_rect (4 carreaux) | mur horizontal | + allumées **216/217/218** ✓ |
+| window | **158 / 272** | window_arch | à préciser | + **159/160 / 273** ✓ |
+| window | **274** | window_small | — | petit modèle |
+| opening salle | **168** | door_room_arch (arche+tenture) | cloison | + **169/170** ; décoratif |
 
-## Sols
+## Pièges confirmés (⛔ forbidden)
 
-| Programme salle | ID | Illustre |
+| ID | RÉEL | Faux rôle v9 |
 |---|---|---|
-| `dept` / `office` / `corridor` | **120** (alt 119) | bureau pierre grise |
-| `hemicycle` / `college` / `meeting` | **698** (alt 756) | hall bois |
-| tapis conseil | **922** (alt 923) | carpet vert inset — **pas** 983 |
+| **201** | **miroir** arqué | ❌ « porte d'entrée » |
+| **200** | miroir ovale | ❌ architecture |
+| **202** | 2 objets ronds | ❌ architecture |
+| **214** | **rocher** | ❌ « fenêtre » (voisin 215) |
+| **333** | **champignon** | ❌ « porte » (voisin 331) |
+| **867** | tuile orange | ❌ mur beige |
 
-## Murs — grammaire d’assemblage
+## Ambigus — TOUS TRANCHÉS (v10.1, vérité terrain sample_map.tmx + sample_indoor.tmx)
 
-```
-1. paint WALL mass sur tout le footprint
-2. carve FLOOR dans chaque room rect (déjà inset)
-3. partitions = bande WALL entre rooms + DOOR_ROOM
-4. openings extérieures = REPLACE sur le shell (NS/EW)
-5. door_building en dernier (gagne sur fenêtre)
-6. furniture OVERLAY sols uniquement
-```
+1. **Porte de bâtiment ✅** : **372/373** (porte double bois, imposte+poignée — posée sur chemin dans le TMX) ; portes simples **90** (imposte grise) et **33** (arrondie) ; vantaux grange sombres **484/485**. ❌ 331 = FENÊTRE (le stack façade = fenêtre 331 à l'étage AU-DESSUS de la porte 90 au rez). Preuve : `verify_doors_outdoor.png`.
+2. **Hall bois ✅** : famille **697-701 / 756-758** (698 VALIDE, confirmé TMX indoor) ; brun-brique alt = 119.
+3. **Fenêtres N/S vs E/W ✅** : modèle réel = **empilement** coiffe arquée (158/159/160) + corps (215/216/218) — pas d'orientation latérale.
+4. **door_room ✅** : **trouée** dans la cloison (168 = arche à tentures décorative, non utilisée dans le TMX).
 
-## Façade / chemin
+Nouveaux pièges (extérieur) : 425=poubelle métal · 67/296/10/240=étal de marché · 564-566/620-621/677-680=cimetière · 540/597/654=arbres morts.
 
-- `door_facade()` : entrée world au **nord** du footprint → porte **N** (dépts) ; au sud → porte **S** (GC/CE)
-- Chemin mono-voie jusqu’à `outside_of_door()`
-- Toit Sample1 : bande façade d’entrée **sans** toit
-
-## Programmes de salles
+## Programmes de salles (structure conservée, sols à re-confirmer)
 
 | id | sol | mobilier |
 |---|---|---|
-| hemicycle | bois + carpet | table + chaises conseil |
-| college | bois | table + chaises |
-| meeting | bois | table + chaises |
-| dept / office | pierre grise | bureau + chaise + armoire |
-| corridor | pierre | — |
+| hemicycle | bois brun (⚠ ID à confirmer) + tapis | table + chaises conseil |
+| college / meeting | bois brun | table + chaises |
+| dept / office | pierre grise **120** ✓ | bureau + chaise + armoire |
+| corridor | pierre **120** | — |
+| conseil (tapis) | **922** ✓ | table à sept |
+
+## Prochaines étapes (finir la DoD 116)
+- Planches numérotées par famille (murs/sols/portes/fenêtres N-S/fenêtres E-W/chemins/toits/meubles).
+- Trancher les 4 ambigus (crops ciblés + comparaison Sample2).
+- ≥ 4 PNG d'assemblage (bureau dépt · 2 salles+cloison · hémicycle · collège CE).
+- Playbook **v10** + régénération `compose_roguelike_world.py` sans régression.

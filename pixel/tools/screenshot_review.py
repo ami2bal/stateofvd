@@ -55,8 +55,10 @@ def main():
                     page.wait_for_timeout(60)
                 page.wait_for_timeout(300)
                 page.screenshot(path=str(SHOTS / "04_zoom_out.png"))
-            # start a scenario
-            page.locator(".sc-card").first.click()
+            # open drawer + start a scenario
+            page.locator("#sp-drawer-btn").click()
+            page.wait_for_timeout(400)
+            page.locator(".sp-scen").first.click()
             page.wait_for_timeout(2000)
             page.screenshot(path=str(SHOTS / "05_scenario_running.png"))
             browser.close()

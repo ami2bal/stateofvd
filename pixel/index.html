@@ -5,8 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta http-equiv="Cache-Control" content="no-store, no-cache, must-revalidate, max-age=0" />
   <title>State of — Place du Château (pixel)</title>
-  <meta name="description" content="Simulation institutionnelle vaudoise — fork pixel art DA cible." />
-  <meta name="theme-color" content="#1a2438" />
+  <meta name="description" content="Simulation institutionnelle vaudoise — plan d’architecte pixel, UX Mode Parcours." />
+  <meta name="theme-color" content="#d6e6f2" />
   <link rel="icon" href="assets/blason-vaud.svg" type="image/svg+xml" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -19,14 +19,15 @@
       <div class="boot__inner">
         <img src="assets/blason-vaud.svg" width="44" height="52" alt="" />
         <p class="boot__title"><em>State of</em> <span>pixel</span></p>
-        <p class="boot__sub">Place du Château · direction artistique cible</p>
-        <div class="boot__bar"><i></i></div>
+        <p class="boot__sub" id="boot-sub">Place du Château · plan d’architecte animé</p>
+        <p class="boot__hint" id="boot-hint">Chargement des modules…</p>
+        <div class="boot__bar" id="boot-bar"><i></i></div>
       </div>
     </div>
 
     <div id="game-host" class="game-host" aria-label="Carte interactive"></div>
 
-    <!-- Chrome haut-droite -->
+    <!-- Chrome haut-droite (glass) -->
     <div id="sovd-chrome" class="chrome" role="group" aria-label="State of">
       <button type="button" id="sovd-fs" class="chrome-btn" title="Plein écran" aria-label="Plein écran" aria-pressed="false">
         <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path fill="currentColor" d="M7 14H5v5h5v-2H7v-3zm-2-4h2V7h3V5H5v5zm12 7h-3v2h5v-5h-2v3zM14 5v2h3v3h2V5h-5z"/></svg>
@@ -38,50 +39,106 @@
       </div>
     </div>
 
-    <!-- Panneau scénarios -->
-    <aside id="panel" class="panel" aria-label="Scénarios">
-      <header class="panel__head">
-        <h1>Parcours</h1>
-        <p class="panel__hint">Un dossier circule sur la place — lisez, pausez, explorez.</p>
-      </header>
-      <div id="scenario-list" class="scenario-list"></div>
-      <footer class="panel__foot">
-        <div id="transport" class="transport" hidden>
-          <button type="button" id="btn-play" class="t-btn t-btn--primary" title="Lecture">▶</button>
-          <button type="button" id="btn-pause" class="t-btn" title="Pause">❚❚</button>
-          <button type="button" id="btn-stop" class="t-btn" title="Stop">■</button>
-          <div class="transport__meta">
-            <span id="t-step" class="t-step">—</span>
-            <div class="t-rail"><i id="t-fill"></i></div>
-          </div>
-        </div>
-        <p class="panel__legend">N · Jura → S · Léman · zoom = intérieurs · assets Kenney CC0</p>
-      </footer>
-    </aside>
+    <!-- LOD chip -->
+    <div id="lod-chip" class="lod-chip" aria-live="polite" title="Niveau de détail selon le zoom">
+      <span class="lod-chip__dot" aria-hidden="true"></span>
+      <span id="lod-label">Toits</span>
+    </div>
 
-    <!-- Card étape (cinématique) -->
+    <!-- Fiche contextuelle (hover/clic) — glass -->
+    <div id="inspector" class="inspector" hidden>
+      <button type="button" class="inspector__close" id="inspector-close" aria-label="Fermer">×</button>
+      <div class="inspector__badge" id="inspector-badge"></div>
+      <h2 id="inspector-title" class="inspector__title"></h2>
+      <p id="inspector-sub" class="inspector__sub"></p>
+      <p id="inspector-body" class="inspector__body"></p>
+      <ul id="inspector-rooms" class="inspector__rooms" hidden></ul>
+    </div>
+
+    <!-- Card étape (près du bas, au-dessus de la barre) -->
     <div id="step-card" class="step-card" hidden>
       <div class="step-card__kicker" id="step-kicker">Étape</div>
       <h2 id="step-title" class="step-card__title">—</h2>
       <p id="step-body" class="step-card__body"></p>
-      <div class="step-card__timer" aria-hidden="true"><svg viewBox="0 0 36 36"><circle cx="18" cy="18" r="15" class="ring-bg"/><circle cx="18" cy="18" r="15" class="ring-fg" id="step-ring"/></svg></div>
+      <div class="step-card__timer" aria-hidden="true">
+        <svg viewBox="0 0 36 36"><circle cx="18" cy="18" r="15" class="ring-bg"/><circle cx="18" cy="18" r="15" class="ring-fg" id="step-ring"/></svg>
+      </div>
     </div>
 
-    <!-- Tooltip hover -->
-    <div id="tip" class="tip" hidden role="tooltip"></div>
-
-    <!-- Fiche pin -->
-    <div id="pin" class="pin" hidden>
-      <button type="button" class="pin__close" id="pin-close" aria-label="Fermer">×</button>
-      <div class="pin__badge" id="pin-badge"></div>
-      <h2 id="pin-title"></h2>
-      <p id="pin-sub"></p>
+    <!-- Mode Parcours — barre bas glass + drawer (aligné main) -->
+    <div id="flow-hud" class="flow-hud" role="region" aria-label="Mode Parcours">
+      <div class="sp-bar" role="toolbar" aria-label="Parcours">
+        <div class="sp-bar-left">
+          <span class="sp-scen-kicker">Parcours</span>
+          <button type="button" class="sp-drawer-btn" id="sp-drawer-btn" aria-expanded="false" aria-controls="sp-drawer" title="Choisir un scénario">
+            <span class="sp-drawer-ico" aria-hidden="true">☰</span>
+            <span class="sp-scen-label" id="sp-scen-label">Choisir un scénario</span>
+            <span class="sp-chev" aria-hidden="true">▴</span>
+          </button>
+          <span class="sp-step-count" id="sp-step-count" title="Étape courante">— / —</span>
+        </div>
+        <div class="sp-bar-right">
+          <div class="sp-transport" role="group" aria-label="Lecture">
+            <span class="sp-state-pill" id="sp-state-pill" aria-live="polite">Prêt</span>
+            <button type="button" id="sp-play" class="sp-btn primary" title="Lecture">▶</button>
+            <button type="button" id="sp-pause" class="sp-btn" title="Pause" disabled>❚❚</button>
+            <button type="button" id="sp-stop" class="sp-btn stop" title="Arrêter" disabled>■</button>
+            <button type="button" id="sp-speed" class="sp-speed-btn" title="Vitesse ×1" data-speed-i="1">
+              <span class="sp-speed-bars" aria-hidden="true"><i class="on"></i><i class="on"></i><i></i></span>
+              <span class="sp-speed-lab">×1</span>
+            </button>
+          </div>
+        </div>
+      </div>
+      <div class="sp-rail" aria-hidden="true"><i id="sp-fill"></i></div>
+      <div class="sp-drawer-stack" id="sp-drawer-stack" hidden>
+        <div class="sp-drawer" id="sp-drawer" role="dialog" aria-label="Scénarios" tabindex="-1">
+          <div class="sp-drawer-head">
+            <span>Scénarios · par entrée</span>
+            <button type="button" class="sp-drawer-close" id="sp-drawer-close" title="Fermer">✕</button>
+          </div>
+          <div class="sp-drawer-list" id="sp-picker"></div>
+          <p class="sp-drawer-hint">24 parcours (catalogue main) · molette = plans · clic = fiche RBAC</p>
+        </div>
+      </div>
     </div>
 
     <div id="toast" class="toast" hidden></div>
   </div>
 
   <script src="vendor/pixi.min.js"></script>
-  <script type="module" src="app.js"></script>
+  <script type="module">
+    // Import dynamique : toute erreur de graphe de modules s'affiche sur le boot
+    // (sinon écran figé « Place du Château… » sans message).
+    const sub = document.getElementById("boot-sub");
+    const hint = document.getElementById("boot-hint");
+    const bar = document.getElementById("boot-bar");
+    try {
+      await import("./app.js");
+    } catch (e) {
+      console.error("[pixel] load failed", e);
+      if (bar) bar.hidden = true;
+      if (sub) {
+        sub.textContent = "Erreur de chargement";
+        sub.classList.add("is-error");
+      }
+      if (hint) {
+        hint.classList.add("is-error");
+        const msg = (e && (e.message || String(e))) || "module inconnu";
+        const wrongServer =
+          /Failed to fetch|404|error loading dynamically imported module|NetworkError/i.test(
+            msg
+          );
+        hint.innerHTML = wrongServer
+          ? `<strong>Modules métier inaccessibles.</strong><br/>
+             Relancez depuis le dossier pixel&nbsp;:<br/>
+             <code>python serve.py 8771</code><br/>
+             puis ouvrez<br/>
+             <code>http://127.0.0.1:8771/pixel/</code><br/>
+             <span class="boot__detail">${msg}</span>`
+          : `<span class="boot__detail">${msg}</span><br/>Voir la console (F12).`;
+      }
+    }
+  </script>
 </body>
 </html>
