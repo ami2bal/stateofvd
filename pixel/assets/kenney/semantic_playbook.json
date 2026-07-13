@@ -1,0 +1,60 @@
+{
+  "version": 2,
+  "method": "visual_review_of_tile_strips",
+  "reviewed": [
+    "review_town_0_49.png",
+    "review_town_50_99.png",
+    "review_urban_0_49.png",
+    "review_dungeon_0_39.png"
+  ],
+  "note": "IDs only — never use character tiles. Buildings = modular multi-tile, not random flood fill.",
+  "town": {
+    "grass_fill": [0, 1, 2],
+    "tree": [4, 5, 6, 7, 8, 16, 17, 19, 30, 31, 32],
+    "path_fill": [12, 13, 14, 24, 36, 37, 38],
+    "path_edge": [33, 34, 35],
+    "water": [48, 49],
+    "mushroom_deco": [28],
+    "log_deco": [45, 46, 47],
+    "tree_BAN_trunks": [9, 10, 11, 18, 20, 21, 22, 23, 27, 29, 39, 40, 41],
+    "house_wall": [50, 51, 52, 53],
+    "house_door": [54, 55, 56, 57],
+    "house_roof": [58, 59, 60, 61, 62, 63, 64, 65],
+    "house_roof_edge": [66, 67, 68, 69, 70, 71],
+    "interior_furniture": [77, 78, 79, 80, 81, 82, 83, 84, 85, 86, 87, 88, 89],
+    "castle_bits": [90, 91, 92, 93, 94],
+    "BAN": [3, 15, 27, 29, 39, 40, 41, 66, 67, 68, 69, 70, 71, 72, 73, 74, 75, 76]
+  },
+  "urban": {
+    "grass_teal": [0, 1, 2, 3, 4, 5, 6, 7, 27, 28, 29, 30, 31, 32, 33, 34],
+    "sidewalk": [8, 9, 10, 11, 12, 13, 14, 15, 35, 36, 37, 38, 39, 40, 41, 42],
+    "brick_wall": [16, 17, 18, 19, 20, 21, 22],
+    "brick_roof": [43, 44, 45, 46, 47, 48, 49],
+    "BAN_character": [23, 24, 25, 26],
+    "note": "Only sidewalk + brick_wall + brick_roof for structure. Never 23-26."
+  },
+  "dungeon": {
+    "floor_dark": [0, 1, 2, 3, 16, 17, 18, 19, 20, 21, 22, 23],
+    "floor_brown": [16, 17, 18, 19],
+    "wall": [8, 9, 10, 11, 12, 13, 14, 15],
+    "furniture_ok": [4, 5, 6, 7, 28, 32, 33, 36, 37],
+    "BAN_busy": [24, 25, 26, 27, 29, 30, 31, 34, 35, 38, 39]
+  },
+  "compose_roles": {
+    "ground.grass": { "pack": "town", "keys": ["grass_fill"] },
+    "ground.tree": { "pack": "town", "keys": ["tree"] },
+    "ground.path": { "pack": "town", "keys": ["path_fill"] },
+    "ground.water": { "pack": "town", "keys": ["water"] },
+    "ground.road": { "pack": "urban", "keys": ["sidewalk"] },
+    "ground.crop": { "pack": "town", "keys": ["tree"], "note": "use sparse tree as crop stand-in if no crop row" },
+    "building.wall_gc": { "pack": "urban", "keys": ["brick_wall"], "tint": [62, 122, 82] },
+    "building.wall_ce": { "pack": "urban", "keys": ["brick_wall"], "tint": [201, 164, 92] },
+    "building.wall_dept": { "pack": "town", "keys": ["house_wall"] },
+    "building.roof_gc": { "pack": "town", "keys": ["house_roof"], "tint": [62, 130, 90] },
+    "building.roof_ce": { "pack": "town", "keys": ["house_roof"], "tint": [210, 170, 90] },
+    "building.roof_dept": { "pack": "town", "keys": ["house_roof"] },
+    "building.door": { "pack": "town", "keys": ["house_door"] },
+    "interior.floor": { "pack": "dungeon", "keys": ["floor_dark"] },
+    "interior.prop": { "pack": "dungeon", "keys": ["furniture_ok"] }
+  }
+}
