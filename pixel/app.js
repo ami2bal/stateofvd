@@ -149,11 +149,11 @@ function bindHotspots(markers, camera) {
     pinSub.textContent = hs.sub;
     pinBadge.textContent = hs.kind;
     pinBadge.style.background =
-      hs.kind === "parlement"
+      hs.kind === "parlement" || hs.siteKind === "parlement"
         ? "#3e7a52"
-        : hs.kind === "chateau"
+        : hs.kind === "chateau" || hs.siteKind === "chateau"
           ? "#a08040"
-          : hs.kind === "department"
+          : hs.kind === "department" || hs.siteKind === "department" || hs.kind === "room"
             ? "#5c6e8a"
             : hs.kind === "nature"
               ? "#4c83ab"

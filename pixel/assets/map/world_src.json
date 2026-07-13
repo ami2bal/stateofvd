@@ -1,0 +1,349 @@
+{
+  "grid": {
+    "h": 24,
+    "w": 38
+  },
+  "sites": [
+    {
+      "id": "parlement",
+      "kind": "parlement",
+      "displayName": "Parlement",
+      "gx": 3,
+      "gy": 2,
+      "fw": 14,
+      "fh": 9,
+      "entry": {
+        "gx": 10,
+        "gy": 11
+      },
+      "rooms": [
+        {
+          "id": "plenum-gc",
+          "label": "Hémicycle du Grand Conseil",
+          "role": "hemicycle"
+        },
+        {
+          "id": "bureau-gc",
+          "label": "Bureau du Grand Conseil",
+          "role": null
+        },
+        {
+          "id": "commission",
+          "label": "Commissions parlementaires",
+          "role": null
+        },
+        {
+          "id": "sgc",
+          "label": "Secrétariat général du Grand Conseil",
+          "role": "delays-board"
+        },
+        {
+          "id": "pas-perdus",
+          "label": "Salle des pas perdus",
+          "role": null
+        }
+      ]
+    },
+    {
+      "id": "chateau",
+      "kind": "chateau",
+      "displayName": "Château Saint-Maire",
+      "gx": 21,
+      "gy": 2,
+      "fw": 12,
+      "fh": 9,
+      "entry": {
+        "gx": 27,
+        "gy": 11
+      },
+      "rooms": [
+        {
+          "id": "college-ce",
+          "label": "Collège du Conseil d'État",
+          "role": "council-table"
+        },
+        {
+          "id": "csg",
+          "label": "Conférence des secrétaires généraux",
+          "role": "anteroom"
+        },
+        {
+          "id": "chancellerie",
+          "label": "Chancellerie d'État",
+          "role": "chancellerie"
+        }
+      ]
+    },
+    {
+      "id": "dep-dits",
+      "kind": "department",
+      "displayName": "DITS — Institutions, territoire et sport",
+      "gx": 2,
+      "gy": 16,
+      "fw": 3,
+      "fh": 5,
+      "entry": {
+        "gx": 3,
+        "gy": 15
+      },
+      "rooms": [
+        {
+          "id": "dep-dits-cabinet",
+          "label": "Cabinet du chef de département",
+          "role": "cabinet"
+        },
+        {
+          "id": "dep-dits-sg",
+          "label": "Secrétariat général",
+          "role": "secretariat"
+        },
+        {
+          "id": "dep-dits-projet",
+          "label": "Cellule EMPD",
+          "role": "projet"
+        }
+      ]
+    },
+    {
+      "id": "dep-deiep",
+      "kind": "department",
+      "displayName": "DEIEP — Économie, innovation, emploi et patrimoine",
+      "gx": 7,
+      "gy": 16,
+      "fw": 3,
+      "fh": 5,
+      "entry": {
+        "gx": 8,
+        "gy": 15
+      },
+      "rooms": [
+        {
+          "id": "dep-deiep-cabinet",
+          "label": "Cabinet du chef de département",
+          "role": "cabinet"
+        },
+        {
+          "id": "dep-deiep-sg",
+          "label": "Secrétariat général",
+          "role": "secretariat"
+        },
+        {
+          "id": "dep-deiep-projet",
+          "label": "Cellule EMPD",
+          "role": "projet"
+        }
+      ]
+    },
+    {
+      "id": "dep-def",
+      "kind": "department",
+      "displayName": "DEF — Enseignement et formation professionnelle",
+      "gx": 12,
+      "gy": 16,
+      "fw": 3,
+      "fh": 5,
+      "entry": {
+        "gx": 13,
+        "gy": 15
+      },
+      "rooms": [
+        {
+          "id": "dep-def-cabinet",
+          "label": "Cabinet du chef de département",
+          "role": "cabinet"
+        },
+        {
+          "id": "dep-def-sg",
+          "label": "Secrétariat général",
+          "role": "secretariat"
+        },
+        {
+          "id": "dep-def-projet",
+          "label": "Cellule EMPD",
+          "role": "projet"
+        }
+      ]
+    },
+    {
+      "id": "dep-dsas",
+      "kind": "department",
+      "displayName": "DSAS — Santé et action sociale",
+      "gx": 17,
+      "gy": 16,
+      "fw": 3,
+      "fh": 5,
+      "entry": {
+        "gx": 18,
+        "gy": 15
+      },
+      "rooms": [
+        {
+          "id": "dep-dsas-cabinet",
+          "label": "Cabinet du chef de département",
+          "role": "cabinet"
+        },
+        {
+          "id": "dep-dsas-sg",
+          "label": "Secrétariat général",
+          "role": "secretariat"
+        },
+        {
+          "id": "dep-dsas-projet",
+          "label": "Cellule EMPD",
+          "role": "projet"
+        }
+      ]
+    },
+    {
+      "id": "dep-dcirh",
+      "kind": "department",
+      "displayName": "DCIRH — Culture, infrastructures et ressources humaines",
+      "gx": 22,
+      "gy": 16,
+      "fw": 3,
+      "fh": 5,
+      "entry": {
+        "gx": 23,
+        "gy": 15
+      },
+      "rooms": [
+        {
+          "id": "dep-dcirh-cabinet",
+          "label": "Cabinet du chef de département",
+          "role": "cabinet"
+        },
+        {
+          "id": "dep-dcirh-sg",
+          "label": "Secrétariat général",
+          "role": "secretariat"
+        },
+        {
+          "id": "dep-dcirh-projet",
+          "label": "Cellule EMPD",
+          "role": "projet"
+        }
+      ]
+    },
+    {
+      "id": "dep-djes",
+      "kind": "department",
+      "displayName": "DJES — Jeunesse, environnement et sécurité",
+      "gx": 27,
+      "gy": 16,
+      "fw": 3,
+      "fh": 5,
+      "entry": {
+        "gx": 28,
+        "gy": 15
+      },
+      "rooms": [
+        {
+          "id": "dep-djes-cabinet",
+          "label": "Cabinet du chef de département",
+          "role": "cabinet"
+        },
+        {
+          "id": "dep-djes-sg",
+          "label": "Secrétariat général",
+          "role": "secretariat"
+        },
+        {
+          "id": "dep-djes-projet",
+          "label": "Cellule EMPD",
+          "role": "projet"
+        }
+      ]
+    },
+    {
+      "id": "dep-dfa",
+      "kind": "department",
+      "displayName": "DFA — Finances et agriculture",
+      "gx": 32,
+      "gy": 16,
+      "fw": 3,
+      "fh": 5,
+      "entry": {
+        "gx": 33,
+        "gy": 15
+      },
+      "rooms": [
+        {
+          "id": "dep-dfa-cabinet",
+          "label": "Cabinet du chef de département",
+          "role": "cabinet"
+        },
+        {
+          "id": "dep-dfa-sg",
+          "label": "Secrétariat général",
+          "role": "secretariat"
+        },
+        {
+          "id": "dep-dfa-projet",
+          "label": "Cellule EMPD",
+          "role": "projet"
+        }
+      ]
+    }
+  ],
+  "namedDepartments": [
+    {
+      "acronym": "DITS",
+      "deptTint": "#5C6E8A",
+      "id": "dep-dits",
+      "label": "Institutions, territoire et sport",
+      "v1playable": false
+    },
+    {
+      "acronym": "DEIEP",
+      "deptTint": "#8A6E5C",
+      "id": "dep-deiep",
+      "label": "Économie, innovation, emploi et patrimoine",
+      "v1playable": false
+    },
+    {
+      "acronym": "DEF",
+      "deptTint": "#6E8A6E",
+      "id": "dep-def",
+      "label": "Enseignement et formation professionnelle",
+      "v1playable": false
+    },
+    {
+      "acronym": "DSAS",
+      "deptTint": "#7A6A8C",
+      "id": "dep-dsas",
+      "label": "Santé et action sociale",
+      "v1playable": true
+    },
+    {
+      "acronym": "DCIRH",
+      "deptTint": "#5C7A8A",
+      "id": "dep-dcirh",
+      "label": "Culture, infrastructures et ressources humaines",
+      "v1playable": false
+    },
+    {
+      "acronym": "DJES",
+      "deptTint": "#8A5C6E",
+      "id": "dep-djes",
+      "label": "Jeunesse, environnement et sécurité",
+      "v1playable": false
+    },
+    {
+      "acronym": "DFA",
+      "deptTint": "#8A7A5C",
+      "id": "dep-dfa",
+      "label": "Finances et agriculture",
+      "v1playable": true
+    }
+  ],
+  "esplanade": {
+    "gx0": 17,
+    "gx1": 20,
+    "gy0": 2,
+    "gy1": 10
+  },
+  "zoneLabels": {
+    "lac": "Lac Léman",
+    "lavaux": "Terrasses de Lavaux"
+  }
+}

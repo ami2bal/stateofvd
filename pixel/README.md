@@ -1,13 +1,9 @@
 # State of — Pixel edition
 
-Pixel-art institutional simulation for Canton de Vaud (asset-driven tiles, dual LOD, cinematic tours).
+Structure aligned with the main State of VD world (Parlement, Château, 7 departments — **no Rumine**).
 
-**Play:** open `index.html` via any static server, or:
+**Play:** https://ami2bal.github.io/stateofvd/pixel/
 
-https://ami2bal.github.io/stateofvd/pixel/
+Zoom in to open roofs · scenarios use real room ids (`plenum-gc`, `college-ce`, …).
 
-```bash
-python serve.py 8771
-```
-
-Zoom in to open roofs · drag to pan · pick a scenario on the left.
+See `docs/QUALITY_ROADMAP.md` for how to reach concept-art quality.

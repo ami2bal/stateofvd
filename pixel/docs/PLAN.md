@@ -11,7 +11,7 @@
 | **M2** | Double LOD | Calques `roofs` / `interiors` selon zoom | ✅ done |
 | **M3** | Tokens parcours | Dossier spritesheet + trail + SFX WebAudio | ✅ done |
 | **M4** | Catalogue scénarios | 8 parcours, room-ids hotspots | ✅ done |
-| **M5** | Ship Pages | `/pixel/` sur stateofvd | 🔄 en cours |
+| **M5** | Ship Pages | `/pixel/` sur stateofvd | ✅ done — https://ami2bal.github.io/stateofvd/pixel/ |
 
 ## Stack
 
@@ -38,4 +38,4 @@ python serve.py 8771
 - [x] Dossier animé + trail
 - [x] ≥ 6 parcours
 - [x] validate_assets PASS
-- [ ] URL publique Pages live
+- [x] URL publique Pages live

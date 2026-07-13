@@ -237,10 +237,11 @@ export function installTour(opts) {
     if (transport.step)
       transport.step.textContent = "Parcours terminé — rejouer ▶";
     if (transport.fill) transport.fill.style.width = "100%";
+    // esplanade approx (world grid ~18,10 × 16px)
     camera.focusOn({
-      x: 240,
-      y: 190,
-      scale: Math.max(camera.minScale, 1.6),
+      x: 18 * 16,
+      y: 10 * 16,
+      scale: Math.max(camera.minScale, 1.5),
       ms: reduced ? 200 : 1000,
     });
   }

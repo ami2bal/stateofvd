@@ -3,9 +3,9 @@
  */
 /* global PIXI */
 
-/** Logical map size (crisp pixels). Displayed via camera scale. 30×23 tiles @ 16. */
-export let MAP_W = 480;
-export let MAP_H = 368;
+/** Logical map size — default 38×24 tiles @ 16 (state-of-vd grid). */
+export let MAP_W = 38 * 16;
+export let MAP_H = 24 * 16;
 
 /** @param {number} w @param {number} h */
 export function setMapSize(w, h) {
