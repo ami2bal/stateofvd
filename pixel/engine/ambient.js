@@ -94,7 +94,9 @@ export function installAmbient(layer) {
         spark.beginFill(0xffffff, 0.55);
         for (let i = 0; i < 12; i++) {
           const sx = Math.floor(rng() * MAP_W);
-          const sy = 332 + Math.floor(rng() * (MAP_H - 334));
+          // lake band ≈ bottom ~12% of map (works at any grid scale)
+          const lakeY0 = Math.floor(MAP_H * 0.88);
+          const sy = lakeY0 + Math.floor(rng() * Math.max(1, MAP_H - lakeY0));
           spark.drawRect(sx, sy, 1, 1);
         }
         spark.endFill();

@@ -1,4 +1,3 @@
-Roguelike RPG Pack by Kenney (www.kenney.nl)
-License: CC0 1.0 Universal
+Roguelike RPG Pack by Kenney (www.kenney.nl) — CC0 1.0
 https://kenney.nl/assets/roguelike-rpg-pack
-Playbook v4 — Sample1 texture discipline.
+Sample1 exterior + Sample2 interior dual LOD (playbook v5).

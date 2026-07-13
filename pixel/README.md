@@ -1,29 +1,33 @@
 # State of VD — Pixel (Roguelike RPG)
 
-Simulation institutionnelle vaudoise en **pixel art**.  
-**Source art unique** : [Kenney Roguelike RPG Pack](https://kenney.nl/assets/roguelike-rpg-pack) (CC0).
+Fork **conceptuel** du simulateur `state-of-vd` : **mêmes** parcours, menus, zoom LOD, hotspots, tour dossier.  
+Seul le **décor** change — [Kenney Roguelike RPG Pack](https://kenney.nl/assets/roguelike-rpg-pack) (CC0).
 
 ## Live
 
 https://ami2bal.github.io/stateofvd/pixel/
 
-## Direction artistique
+## Dual LOD (in/out superposés)
 
-Langage visuel calqué sur les samples Kenney du pack :
-
-| Couche | Référence | Tiles (playbook v3) |
+| Zoom | Couche | Référence Kenney |
 |---|---|---|
-| Terrain | `Sample1` / `sample_map.tmx` | herbe `62`, chemins `408/465`, eau `60`, arbres `586/643`, pavés `920` |
-| Bâtiments | maisons Sample1 | murs beige `872/873`, toits bruns modulaires `1217–1346`, portes `201`, fenêtres `215–218` |
-| Intérieurs | `Sample2` / `sample_indoor.tmx` | sols pierre/bois, tapis vert hémicycle, **meubles en props sparses** |
+| Éloigné | `ground` + `roofs` | [Sample1](https://kenney.nl/media/pages/assets/roguelike-rpg-pack/6b88b8d663-1677697411/sample1.png) extérieur |
+| Proche | `ground` + `interiors` | [Sample2](https://kenney.nl/media/pages/assets/roguelike-rpg-pack/5f73473862-1677697413/sample2.png) plan intérieur |
 
-**Invariants**
+Crossfade inchangé (`engine/tiled.js` → `applyLod`).
 
-- Un seul pack — pas de mix Urban/Tiny Town/Dungeon.
-- Les meubles ne sont **jamais** utilisés en mur / toit / sol.
-- Layout = `../state-of-vd/data/world.json` (Parlement · Château · 7 dépts).
+## Grille
 
-Crédit : *Assets by [Kenney](https://www.kenney.nl) (CC0) — Roguelike RPG Pack*.
+- SSOT structure : `../state-of-vd/data/world.json`
+- **Scale ×2** → grille pixel **76×48** (1216×768 px @ 16) pour des salles Sample2 spacieuses
+- Hotspots régénérés par le compose
+
+## Texture discipline (playbook v5)
+
+- **Arbres** : paires cime+tronc
+- **Chemins** : mono-tuile dirt, couloirs orthogonaux
+- **Extérieur** : toits multi-pignons + façade courte (murs/porte/fenêtres)
+- **Intérieur** : coque murs beige + sols par pièce + meubles ; fenêtres **dans** les murs
 
 ## Lancer
 
@@ -31,27 +35,11 @@ Crédit : *Assets by [Kenney](https://www.kenney.nl) (CC0) — Roguelike RPG Pac
 python serve.py 8771
 ```
 
-- Molette **zoom** → ouvre les toits (intérieurs)
-- Glisser = pan · scénarios à gauche
-
 ## Rebuild
 
 ```bash
-python tools/build_from_world.py         # hotspots + grille
-python tools/compose_roguelike_world.py  # ground/roofs/interiors (playbook v3)
-python tools/screenshot_review.py        # shots Playwright
-node tools/validate_assets.mjs
+python tools/compose_roguelike_world.py
+python tools/screenshot_review.py
 ```
 
-Playbook machine-readable : `assets/kenney/roguelike_playbook.json`.
-
-## Structure
-
-```
-assets/kenney/roguelike-rpg-pack/   pack CC0 brut
-assets/kenney/roguelike_playbook.json
-assets/composed/                    carte assemblée (runtime)
-assets/hotspots.json
-engine/tiled.js                     charge composed en priorité
-tools/compose_roguelike_world.py
-```
+Crédit : *Assets by [Kenney](https://www.kenney.nl) (CC0)*.

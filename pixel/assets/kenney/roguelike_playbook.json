@@ -1,70 +1,41 @@
 {
-  "version": 4,
+  "version": 5,
   "pack": "roguelike-rpg-pack",
   "source": "Kenney Roguelike RPG Pack (CC0)",
-  "sheet": "Spritesheet/roguelikeSheet_transparent.png",
-  "tile": 16,
-  "spacing": 1,
-  "columns": 57,
-  "method": "Sample1 language strict: tree pairs, facade walls, mono-path tunnels, indoor floors only",
-  "rules": [
-    "TREE: always 2-high pair canopy+trunk (586 over 643). Never place either alone.",
-    "PATH: single body tile 408 only, orthogonal corridors end-to-end. No random mix.",
-    "BUILDING exterior: roof dominates; only bottom 2 rows are wall facade (Sample1).",
-    "WINDOW: only on south facade wall row, never inside footprint / never on interiors layer.",
-    "INTERIOR floor: wood/beige only for rooms. Never cobble 920, never path 408, never outdoor stone as dept floor.",
-    "FURNITURE: props sparse on interiors only."
-  ],
-  "roles": {
-    "grass": { "ids": [62], "note": "solid grass" },
-    "path_body": { "ids": [408], "note": "ONLY path fill — mono tile tunnels" },
-    "path_corner": { "ids": [404, 405], "note": "optional corners; prefer mono 408 for clarity" },
-    "cobble": { "ids": [920], "note": "esplanade outdoor only — never indoor" },
-    "water_fill": { "ids": [60], "note": "lake" },
-    "shore": { "ids": [408], "note": "dirt shore band" },
-    "tree_canopy": { "ids": [586], "note": "pine top — must sit above trunk" },
-    "tree_trunk": { "ids": [643], "note": "pine base — must sit below canopy" },
-    "tree_canopy_alt": { "ids": [587], "note": "autumn canopy optional" },
-    "tree_trunk_alt": { "ids": [644], "note": "autumn trunk optional" },
-    "roof_peak_l": { "ids": [1217] },
-    "roof_peak_r": { "ids": [1218] },
-    "roof_ridge": { "ids": [1231, 1232] },
-    "roof_fill": { "ids": [1275, 1288, 1274] },
-    "roof_eave_l": { "ids": [1331, 1345] },
-    "roof_eave_r": { "ids": [1332, 1346] },
-    "wall_fill": { "ids": [873, 872], "note": "beige wall body — facade only" },
-    "wall_top": { "ids": [871, 869], "note": "wall row under roof" },
-    "door": { "ids": [201], "note": "arched door on south facade" },
-    "window": { "ids": [215, 216], "note": "framed window — south facade only" },
-    "floor_wood": { "ids": [698, 756], "note": "indoor wood — departments + offices" },
-    "floor_beige": { "ids": [868, 873], "note": "indoor beige — château" },
-    "floor_stone_indoor": { "ids": [119, 120], "note": "indoor stone — GC secondary rooms only, not depts" },
-    "carpet_green": { "ids": [983, 982], "note": "plenum carpet" },
-    "chair": { "ids": [190, 191], "note": "wooden chairs ONLY (visual props_check) — 160/161 are doors/windows FORBIDDEN as props" },
-    "table": { "ids": [192, 193, 311], "note": "wood tables/desks — never 160-162 (door/window/mushroom)" },
-    "cabinet": { "ids": [196, 197, 29], "note": "cabinets / nightstand" }
+  "refs": {
+    "exterior": "https://kenney.nl/media/pages/assets/roguelike-rpg-pack/6b88b8d663-1677697411/sample1.png",
+    "interior": "https://kenney.nl/media/pages/assets/roguelike-rpg-pack/5f73473862-1677697413/sample2.png"
   },
-  "building_recipes": {
-    "parlement": {
-      "wall_rows": 2,
-      "tint_wall": [70, 130, 95],
-      "tint_roof": [50, 110, 80],
-      "tint_strength": 0.2,
-      "window_every": 3
-    },
-    "chateau": {
-      "wall_rows": 2,
-      "tint_wall": [210, 175, 100],
-      "tint_roof": [180, 100, 70],
-      "tint_strength": 0.25,
-      "window_every": 3
-    },
-    "department": {
-      "wall_rows": 2,
-      "tint_wall": null,
-      "tint_roof": null,
-      "tint_strength": 0.3,
-      "window_every": 2
-    }
+  "scale": 2,
+  "base_grid": { "w": 38, "h": 24 },
+  "method": "Sample1 roofs layer + Sample2 interiors layer; dual LOD crossfade; grid×2 for room space",
+  "dual_lod": {
+    "zoomed_out": "ground (Sample1 outdoor) + roofs (Sample1 houses)",
+    "zoomed_in": "ground + interiors (Sample2 floor plans with wall borders)"
+  },
+  "roles": {
+    "grass": { "ids": [62], "layer": "ground" },
+    "path": { "ids": [408], "layer": "ground", "note": "mono dirt road Sample1" },
+    "cobble": { "ids": [920], "layer": "ground", "note": "plaza outdoor only" },
+    "water": { "ids": [60], "layer": "ground" },
+    "tree_canopy": { "ids": [586], "layer": "ground" },
+    "tree_trunk": { "ids": [643], "layer": "ground" },
+    "roof_peak_l": { "ids": [1217], "layer": "roofs" },
+    "roof_peak_r": { "ids": [1218], "layer": "roofs" },
+    "roof_ridge": { "ids": [1231, 1232], "layer": "roofs" },
+    "roof_fill": { "ids": [1275, 1288, 1274], "layer": "roofs" },
+    "roof_eave_l": { "ids": [1331, 1345], "layer": "roofs" },
+    "roof_eave_r": { "ids": [1332, 1346], "layer": "roofs" },
+    "wall_ext": { "ids": [873, 872], "layer": "both", "note": "beige wall — Sample1 facade + Sample2 perimeter" },
+    "wall_top": { "ids": [871, 869], "layer": "roofs" },
+    "door": { "ids": [201], "layer": "both" },
+    "window": { "ids": [215, 216], "layer": "both", "note": "in WALL cells only (Sample2)" },
+    "floor_stone": { "ids": [119, 120], "layer": "interiors", "note": "Sample2 grey rooms" },
+    "floor_wood": { "ids": [698, 756], "layer": "interiors", "note": "Sample2 brown hall" },
+    "floor_beige": { "ids": [868], "layer": "interiors" },
+    "carpet_green": { "ids": [983, 982, 984], "layer": "interiors", "note": "Sample2 center carpet" },
+    "chair": { "ids": [190, 191], "layer": "interiors" },
+    "table": { "ids": [192, 193, 311], "layer": "interiors" },
+    "cabinet": { "ids": [196, 197, 29], "layer": "interiors" }
   }
 }
