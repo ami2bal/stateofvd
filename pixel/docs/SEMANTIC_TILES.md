@@ -1,27 +1,62 @@
-# Dual LOD — Sample1 extérieur / Sample2 intérieur (v5)
+# Orientation spatiale des textures (playbook v6)
 
-## Modèle
+## Grille de lecture
 
-Le fork conserve la **dynamique** du jeu principal (parcours, menus, zoom, tour).  
-Seules les textures changent, avec **deux langages Kenney superposés** :
+Chaque tuile structurelle a une **orientation** (2 ou 4 directions).  
+On ne place **jamais** une tuile « au hasard » : le choix dépend du **rôle spatial** (bord, coin, axe).
 
-| LOD | Calque | Réf. officielle | Contenu |
-|---|---|---|---|
-| Zoom out | `ground` + `roofs` | [Sample1](https://kenney.nl/media/pages/assets/roguelike-rpg-pack/6b88b8d663-1677697411/sample1.png) | Herbe, chemins dirt, arbres complets, maisons toit+façade |
-| Zoom in | `ground` + `interiors` | [Sample2](https://kenney.nl/media/pages/assets/roguelike-rpg-pack/5f73473862-1677697413/sample2.png) | Coque murs beige, sols par pièce, fenêtres **dans** les murs, meubles |
+```
+        N (1)
+         │
+  W (8) ─┼─ E (2)
+         │
+        S (4)
+```
 
-Preuve côte-à-côte : `assets/composed/preview_dual_lod.png`.
+## Chemins (4-way)
 
-## Grille ×2
+| Masque voisins path | Tuile | Sens |
+|---|---|---|
+| N, S, N+S | `408` | grain **vertical** |
+| E, W, E+W | `465` | grain **horizontal** |
+| N+E | `407` | coin NE |
+| E+S | `406` | coin ES |
+| S+W | `464` | coin SW |
+| N+W | `636` | coin NW |
+| T NSW / ESW | `405` / `404` | jonctions (sample_map) |
 
-`world.json` 38×24 → pixel **76×48** (scale=2) pour que le kit Sample2 (murs 1 tuile + meubles + tapis) tienne dans les salles.
+Source : fréquences `sample_map.tmx` Objects + validation visuelle.
 
-## Règles dures
+## Toits (kit gable 2-way L/R × 3 rangs)
 
-1. Arbres = paire cime `586` + tronc `643`
-2. Chemins = mono `408`, tunnels orthogonaux (avenue + embranchements)
-3. Extérieur = multi-pignons + façade 2–3 rangs (jamais un pavé beige plein)
-4. Intérieur = shell mur + floors + props ; fenêtres uniquement sur coque mur
-5. Pas de pavé outdoor en sol de département
+| Rôle | ID | Face |
+|---|---|---|
+| TL / TR | 1217 / 1218 | pignon haut gauche / droite |
+| ML / MR | 1331 / 1332 | rive gauche / droite |
+| BL / BR | 1345 / 1346 | égout gauche / droite |
+| TOP / FILL | 1288 / 1275 | faîtage / corps |
 
-Playbook : `assets/kenney/roguelike_playbook.json` v5.
+Multi-pignons = **répéter** le kit par segment (pas un fill aléatoire).
+
+## Arbres (2-way vertical)
+
+| Rôle | ID |
+|---|---|
+| Cime (au-dessus) | 586 |
+| Tronc (en dessous) | 643 |
+
+## Façade / intérieurs
+
+- Porte **face sud** (entrée)
+- Fenêtres extérieures sur rang mur sous égout (face sud)
+- Fenêtres intérieures **uniquement** sur coque mur N/W/E (Sample2)
+- `wall_top` (871) = arase sous toit · `wall` (873) = corps
+
+## Dual LOD
+
+| Zoom | Calque | Réf. |
+|---|---|---|
+| out | ground + roofs | Sample1 orienté |
+| in | ground + interiors | Sample2 plans |
+
+Preuves : `preview_roofs.png`, `preview_dual_lod.png`, `role_usage_sheet.png`.

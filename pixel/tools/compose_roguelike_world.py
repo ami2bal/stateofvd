@@ -1,12 +1,18 @@
 #!/usr/bin/env python3
-"""Compose dual-LOD world from Kenney Roguelike RPG Pack (playbook v5).
+"""Compose dual-LOD world from Kenney Roguelike RPG Pack (playbook v6).
 
-Conceptual model (fork of state-of-vd dynamics, textures only change):
-  • Zoomed-out  → Sample1 outdoor language (ground + house roofs/facades)
-  • Zoomed-in   → Sample2 indoor language (floor plans with wall borders)
+Orientation-first DA:
+  Every structural tile has a spatial facing (2-way or 4-way).
+  Placement uses neighbor masks / edge roles — never random orientation.
 
-Grid is scaled ×2 from world.json so Sample2 rooms have real space
-(walls 1 tile thick + furniture + carpet insets).
+  • Paths: V=408 H=465 + oriented corners (406/407/636/464…)
+  • Roofs: TL/TR/ML/MR/BL/BR/fill gable kit (Sample1)
+  • Walls: facade top vs body; windows only on outward faces
+  • Trees: canopy above trunk (vertical pair)
+
+Dual LOD unchanged:
+  Zoomed-out → Sample1 outdoor · Zoomed-in → Sample2 floor plans
+  Grid ×2 from world.json for room space.
 """
 from __future__ import annotations
 
@@ -31,6 +37,42 @@ OUT = ROOT / "assets" / "composed"
 HOTSPOTS = ROOT / "assets" / "hotspots.json"
 TW, SP, COLS = 16, 1, 57
 SCALE = 2  # world.json → pixel grid multiplier
+
+# ── Orientation kits (visual + sample_map.tmx) ──────────────────────────────
+# Cardinal bits (do NOT use S — that name is the scale helper)
+CN, CE, CS, CW = 1, 2, 4, 8  # North East South West
+
+# Paths: grain follows direction; corners face the open grass
+PATH_V = 408  # vertical grain (N–S)
+PATH_H = 465  # horizontal grain (E–W)
+PATH_BY_MASK = {
+    0: PATH_V,
+    CN: PATH_V,
+    CS: PATH_V,
+    CN | CS: PATH_V,
+    CE: PATH_H,
+    CW: PATH_H,
+    CE | CW: PATH_H,
+    # corners (concave toward grass)
+    CN | CE: 407,
+    CE | CS: 406,
+    CS | CW: 464,
+    CN | CW: 636,
+    # T-junctions (sample_map)
+    CN | CE | CS: PATH_V,
+    CN | CE | CW: PATH_H,
+    CN | CS | CW: 405,
+    CE | CS | CW: 404,
+    # cross
+    CN | CE | CS | CW: PATH_V,
+}
+
+# Roof gable kit — each piece faces a role on the gable silhouette
+ROOF_TL, ROOF_TR = 1217, 1218  # top-left / top-right peaks
+ROOF_ML, ROOF_MR = 1331, 1332  # mid left / right edges
+ROOF_BL, ROOF_BR = 1345, 1346  # bottom-left / bottom-right eaves
+ROOF_TOP = 1288  # top-center ridge fill (not a side triangle)
+ROOF_FILL = 1275  # body fill
 
 
 # ── sheet helpers ───────────────────────────────────────────────────────────
@@ -232,6 +274,54 @@ def build_path_set(sites, esplanade, W, H, occupied):
     return path
 
 
+def path_neighbor_mask(x, y, path_cells):
+    """CN=1 CE=2 CS=4 CW=8 — which cardinal neighbors are also path."""
+    m = 0
+    if (x, y - 1) in path_cells:
+        m |= CN
+    if (x + 1, y) in path_cells:
+        m |= CE
+    if (x, y + 1) in path_cells:
+        m |= CS
+    if (x - 1, y) in path_cells:
+        m |= CW
+    return m
+
+
+def path_tile_for(x, y, path_cells):
+    """Orientation-aware path tile from neighbor mask."""
+    return PATH_BY_MASK.get(path_neighbor_mask(x, y, path_cells), PATH_V)
+
+
+def paint_oriented_paths(ground, sheet, path_cells, W, H):
+    for tx, ty in path_cells:
+        if 0 <= tx < W and 0 <= ty < H:
+            paste(ground, sheet, path_tile_for(tx, ty, path_cells), tx, ty)
+
+
+def roof_tile_for(lx, ly, gw, roof_rows):
+    """Gable-local orientation: which edge of this gable segment."""
+    is_l, is_r = lx == 0, lx == gw - 1
+    if ly == 0:
+        if is_l:
+            return ROOF_TL
+        if is_r:
+            return ROOF_TR
+        return ROOF_TOP
+    if ly == roof_rows - 1:
+        if is_l:
+            return ROOF_BL
+        if is_r:
+            return ROOF_BR
+        return ROOF_FILL
+    # mid rows
+    if is_l:
+        return ROOF_ML
+    if is_r:
+        return ROOF_MR
+    return ROOF_FILL
+
+
 # ── trees ───────────────────────────────────────────────────────────────────
 
 
@@ -270,19 +360,14 @@ def place_trees(ground, sheet, roles, free, W, H, rng):
 
 
 def stamp_exterior(roofs, sheet, s, roles, rng, dept_tint=None):
-    """Sample1 house: roof-dominant + short beige facade with door/windows."""
+    """Sample1 house with oriented gable roof kit + south facade."""
     gx, gy, fw, fh = s["gx"], s["gy"], s["fw"], s["fh"]
-    # facade height grows slightly with building size but stays short
-    wall_rows = 2 if fh <= 10 else 3
-    wall_rows = min(wall_rows, fh - 2)
-    roof_rows = fh - wall_rows
+    # Keep roof dominant; short facade (Sample1 proportions)
+    wall_rows = 2 if fh <= 12 else 3
+    wall_rows = min(wall_rows, max(2, fh // 3))
+    wall_rows = min(wall_rows, fh - 3)
+    roof_rows = max(3, fh - wall_rows)
 
-    peak_l = first(roles, "roof_peak_l")
-    peak_r = first(roles, "roof_peak_r")
-    ridge = roles["roof_ridge"]["ids"]
-    rfill = roles["roof_fill"]["ids"]
-    eave_l = roles["roof_eave_l"]["ids"]
-    eave_r = roles["roof_eave_r"]["ids"]
     wall = roles["wall_ext"]["ids"]
     wall_top = roles["wall_top"]["ids"]
     door = first(roles, "door")
@@ -290,16 +375,16 @@ def stamp_exterior(roofs, sheet, s, roles, rng, dept_tint=None):
 
     kind = s.get("kind")
     if kind == "parlement":
-        tw, tr, st = (70, 130, 95), (50, 110, 80), 0.2
+        tw, tr, st = (70, 130, 95), (50, 110, 80), 0.18
     elif kind == "chateau":
-        tw, tr, st = (210, 175, 100), (180, 100, 70), 0.24
+        tw, tr, st = (210, 175, 100), (180, 100, 70), 0.22
     else:
-        tw, tr, st = as_rgb(dept_tint), as_rgb(dept_tint), 0.28 if dept_tint else 0.0
+        tw, tr, st = as_rgb(dept_tint), as_rgb(dept_tint), 0.26 if dept_tint else 0.0
 
-    ex, ey = s["entry"]["gx"], s["entry"]["gy"]
+    ex = s["entry"]["gx"]
 
-    # Multi-gable roof (Sample1 long manors = repeated house peaks every gable_w)
-    gable_w = 6 if fw >= 12 else (4 if fw >= 8 else fw)
+    # Multi-gable: each segment is a full oriented house roof (Sample1 island)
+    gable_w = 6 if fw >= 12 else (5 if fw >= 8 else max(4, fw))
 
     for ty in range(gy, gy + fh):
         for tx in range(gx, gx + fw):
@@ -308,41 +393,30 @@ def stamp_exterior(roofs, sheet, s, roles, rng, dept_tint=None):
             is_bot = ly == fh - 1
 
             if ly < roof_rows:
-                # position inside current gable segment
-                seg = lx % gable_w
-                seg_last = min(gable_w - 1, fw - 1 - (lx - seg))
-                # clamp last segment width
-                remaining = fw - (lx - seg)
-                local_last = min(gable_w, remaining) - 1
-                if ly == 0:
-                    if seg == 0:
-                        idx = peak_l
-                    elif seg == local_last:
-                        idx = peak_r
-                    else:
-                        idx = pick(rng, ridge)
-                elif ly == roof_rows - 1:
-                    if seg == 0:
-                        idx = pick(rng, eave_l)
-                    elif seg == local_last:
-                        idx = pick(rng, eave_r)
-                    else:
-                        idx = pick(rng, rfill)
-                else:
-                    idx = pick(rng, rfill)
+                # local coords inside current gable
+                seg_x0 = (lx // gable_w) * gable_w
+                local_w = min(gable_w, fw - seg_x0)
+                local_x = lx - seg_x0
+                idx = roof_tile_for(local_x, ly, local_w, roof_rows)
                 paste(roofs, sheet, idx, tx, ty, tr, st)
                 continue
 
-            # facade
+            # ── facade (south-facing elevation) ──
+            # Door faces south on bottom row
             if is_bot and tx == ex:
                 paste(roofs, sheet, door, tx, ty)
                 continue
-            # windows on upper facade row, spaced (Sample1 house windows)
+            # Windows face south on the wall-top row under eaves (not on L/R corners)
             if ly == roof_rows and not is_l and not is_r and (lx % 3) == 1:
-                paste(roofs, sheet, pick(rng, windows), tx, ty, tw, st * 0.4)
+                paste(roofs, sheet, pick(rng, windows), tx, ty, tw, st * 0.35)
                 continue
-            idx = pick(rng, wall_top) if ly == roof_rows else pick(rng, wall)
-            paste(roofs, sheet, idx, tx, ty, tw if ly == roof_rows else None, st if ly == roof_rows else 0)
+            # wall_top on the row under roof (horizontal top edge of facade)
+            # wall_fill on lower facade body
+            if ly == roof_rows:
+                idx = pick(rng, wall_top)
+                paste(roofs, sheet, idx, tx, ty, tw, st)
+            else:
+                paste(roofs, sheet, pick(rng, wall), tx, ty)
 
 
 # ── Sample2 interior floor plan ─────────────────────────────────────────────
@@ -551,7 +625,7 @@ def build():
     rng = random.Random(13)
     sheet = load_sheet()
 
-    print(f"Roguelike v5 — Sample1/2 dual LOD · grid {W}×{H} (scale×{SCALE})")
+    print(f"Roguelike v6 — orientation-aware · grid {W}×{H} (scale×{SCALE})")
 
     occupied = set()
     for s in sites:
@@ -566,7 +640,6 @@ def build():
     interiors = Image.new("RGBA", (W * TW, H * TW), (0, 0, 0, 0))
 
     grass = first(roles, "grass")
-    path = first(roles, "path")
     water = first(roles, "water")
     cobble = first(roles, "cobble")
 
@@ -576,7 +649,8 @@ def build():
             if ty >= H - S(2):
                 paste(ground, sheet, water, tx, ty)
             elif ty == H - S(2) - 1:
-                paste(ground, sheet, path, tx, ty)
+                # shore: horizontal dirt band (E–W grain)
+                paste(ground, sheet, PATH_H, tx, ty)
             else:
                 paste(ground, sheet, grass, tx, ty)
 
@@ -586,10 +660,12 @@ def build():
             if (tx, ty) not in occupied:
                 paste(ground, sheet, cobble, tx, ty)
 
-    # mono path tunnels
-    for tx, ty in path_cells:
-        if 0 <= tx < W and 0 <= ty < H - S(2):
-            paste(ground, sheet, path, tx, ty)
+    # shore cells join path set so corners orient at junctions
+    for tx in range(W):
+        path_cells.add((tx, H - S(2) - 1))
+
+    # orientation-aware path tunnels (H/V grain + corners)
+    paint_oriented_paths(ground, sheet, path_cells, W, H - S(2))
 
     # free for trees
     free = set()
@@ -646,22 +722,29 @@ def build():
     proof.paste(b, (a.width + 8, 0))
     proof.save(OUT / "preview_dual_lod.png")
 
-    # role sheet
+    # role + orientation proof sheet
     pairs = [
         ("grass", [grass]),
-        ("path", [path]),
+        ("pathV", [PATH_V]),
+        ("pathH", [PATH_H]),
+        ("pNE", [407]),
+        ("pES", [406]),
+        ("pSW", [464]),
+        ("pNW", [636]),
         ("water", [water]),
         ("treeC", [first(roles, "tree_canopy")]),
         ("treeT", [first(roles, "tree_trunk")]),
+        ("rTL", [ROOF_TL]),
+        ("rTR", [ROOF_TR]),
+        ("rML", [ROOF_ML]),
+        ("rMR", [ROOF_MR]),
+        ("rBL", [ROOF_BL]),
+        ("rBR", [ROOF_BR]),
         ("wall", roles["wall_ext"]["ids"]),
-        ("roof", roles["roof_fill"]["ids"][:2]),
         ("door", [first(roles, "door")]),
         ("win", roles["window"]["ids"]),
-        ("stone", roles["floor_stone"]["ids"]),
         ("wood", roles["floor_wood"]["ids"]),
-        ("carpet", roles["carpet_green"]["ids"][:2]),
         ("chair", roles["chair"]["ids"]),
-        ("table", roles["table"]["ids"]),
     ]
     img = Image.new("RGBA", (260, len(pairs) * 22), (18, 20, 26, 255))
     dr = ImageDraw.Draw(img)
@@ -679,14 +762,15 @@ def build():
         "grid": {"w": W, "h": H},
         "scale": SCALE,
         "source": "roguelike-rpg-pack",
-        "playbook": "roguelike_playbook.json v5",
+        "playbook": "roguelike_playbook.json v6",
         "packs": ["Roguelike RPG Pack — Kenney CC0 (sole art source)"],
         "credit": "Assets by Kenney (www.kenney.nl) CC0 — Roguelike RPG Pack.",
         "da": {
-            "exterior": "Sample1 — outdoor ground + roof-dominant houses",
-            "interior": "Sample2 — wall shell + floors + furniture floor plans",
-            "lod": "crossfade roofs↔interiors on zoom (fork dynamics preserved)",
-            "scale": f"×{SCALE} from world.json for Sample2 room space",
+            "orientation": "paths H/V/corners; roofs TL/TR/ML/MR/BL/BR; trees canopy>trunk",
+            "exterior": "Sample1 — oriented gables + facade",
+            "interior": "Sample2 — wall shell + floors + furniture",
+            "lod": "crossfade roofs↔interiors on zoom",
+            "scale": f"×{SCALE} from world.json",
         },
         "layers": {
             "ground": "ground.png",
@@ -702,7 +786,7 @@ def build():
         "Sample1 exterior + Sample2 interior dual LOD (playbook v5).\n",
         encoding="utf-8",
     )
-    print(f"OK v5 {W}×{H}px={W*TW}×{H*TW} hotspots={n_hs} paths={len(path_cells)}")
+    print(f"OK v6 {W}×{H}px={W*TW}×{H*TW} hotspots={n_hs} paths={len(path_cells)}")
 
 
 if __name__ == "__main__":

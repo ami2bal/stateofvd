@@ -8,16 +8,17 @@
   },
   "scale": 2,
   "source": "roguelike-rpg-pack",
-  "playbook": "roguelike_playbook.json v5",
+  "playbook": "roguelike_playbook.json v6",
   "packs": [
     "Roguelike RPG Pack \u2014 Kenney CC0 (sole art source)"
   ],
   "credit": "Assets by Kenney (www.kenney.nl) CC0 \u2014 Roguelike RPG Pack.",
   "da": {
-    "exterior": "Sample1 \u2014 outdoor ground + roof-dominant houses",
-    "interior": "Sample2 \u2014 wall shell + floors + furniture floor plans",
-    "lod": "crossfade roofs\u2194interiors on zoom (fork dynamics preserved)",
-    "scale": "\u00d72 from world.json for Sample2 room space"
+    "orientation": "paths H/V/corners; roofs TL/TR/ML/MR/BL/BR; trees canopy>trunk",
+    "exterior": "Sample1 \u2014 oriented gables + facade",
+    "interior": "Sample2 \u2014 wall shell + floors + furniture",
+    "lod": "crossfade roofs\u2194interiors on zoom",
+    "scale": "\u00d72 from world.json"
   },
   "layers": {
     "ground": "ground.png",
